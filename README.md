@@ -12,29 +12,81 @@ This repository provides source code and Docker instructions for running MERIT l
 
 ## Quick Start: Run With Docker
 
-Install Docker, then run:
+Install Docker, then pull the MERIT image:
 
 ```bash
 docker pull ghcr.io/biosystemengineeringlab-iitb/merit-ml:v7
-docker run --rm -p 8773:8773 ghcr.io/biosystemengineeringlab-iitb/merit-ml:v7
+```
+
+Run the local web app:
+
+```bash
+docker run -d --name merit-ml -p 8780:8773 ghcr.io/biosystemengineeringlab-iitb/merit-ml:v7
 ```
 
 Open:
 
 ```text
-http://localhost:8773
+http://localhost:8780
 ```
 
-If port `8773` is already in use:
+Port mapping format is `HOST_PORT:CONTAINER_PORT`. MERIT listens on port `8773` inside the container, so you can change only the host-side port if needed:
 
 ```bash
-docker run --rm -p 8780:8773 ghcr.io/biosystemengineeringlab-iitb/merit-ml:v7
+docker run -d --name merit-ml -p 8773:8773 ghcr.io/biosystemengineeringlab-iitb/merit-ml:v7
 ```
 
-Then open:
+On Linux, prefix Docker commands with `sudo` if your user is not in the Docker group.
+
+## Stop Or Restart MERIT
+
+Stop the running container:
+
+```bash
+docker stop merit-ml
+```
+
+Remove the stopped container before starting a new one with the same name:
+
+```bash
+docker rm merit-ml
+```
+
+If Docker reports that the name is already in use, run:
+
+```bash
+docker ps -a | grep merit-ml
+docker stop merit-ml
+docker rm merit-ml
+```
+
+Then start it again with the `docker run` command above.
+
+## Access From Another Computer On The Same Network
+
+If MERIT is running on one computer and you want to open it from another computer on the same network, use the host computer's IP address:
 
 ```text
-http://localhost:8780
+http://<HOST-IP>:8780
+```
+
+For example, if the host IP is `192.168.1.25`, open:
+
+```text
+http://192.168.1.25:8780
+```
+
+Your firewall must allow inbound traffic on the selected host port.
+
+## If `docker pull` Says `denied`
+
+A `denied` error usually means the GitHub Container Registry package is private or your GitHub account does not have package access. Anonymous pulls require the package visibility to be set to **Public** in GitHub Packages.
+
+If the package is private, log in first with a GitHub account that has package access:
+
+```bash
+docker login ghcr.io
+docker pull ghcr.io/biosystemengineeringlab-iitb/merit-ml:v7
 ```
 
 ## What The Docker Image Contains
@@ -55,7 +107,7 @@ Some chart assets may also load from public JavaScript CDNs depending on browser
 
 ## Build From Source
 
-Most users should use the prebuilt image above. Building the image from source requires the MERIT v7 cache directory to be present at repository root as:
+Most users should use the prebuilt image above. Building the image from source is intended for maintainers and requires the MERIT v7 cache directory to be present at repository root as:
 
 ```text
 merit-cache-workbench-full-v7/
@@ -65,7 +117,7 @@ Then run:
 
 ```bash
 docker build -f docker/merit-ui-v2.Dockerfile -t merit-ml:v7-local .
-docker run --rm -p 8773:8773 merit-ml:v7-local
+docker run --rm -p 8780:8773 merit-ml:v7-local
 ```
 
 ## Repository Contents
