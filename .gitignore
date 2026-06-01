@@ -1,0 +1,13 @@
+.vercel
+.env*.local
+
+# Local data/cache artifacts should not be committed to the source repository.
+# The Docker image can still bundle the current cache from the local build
+# context; publish that image through GHCR or a GitHub Release artifact instead.
+merit-cache-workbench-full-v*/
+mw-dump-latest-confirmation*/
+metabolights_data/
+outputs/
+*.tar
+*.tar.gz
+*.zip

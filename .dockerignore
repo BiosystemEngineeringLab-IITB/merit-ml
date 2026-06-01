@@ -1,0 +1,30 @@
+# MERIT Docker build context
+#
+# The repository working tree contains multiple historical caches, manuscript
+# artifacts, screenshots, and release folders. Docker should package only the
+# current UI runtime plus the current v7 precomputed cache needed for local use.
+
+*
+
+!merit-ui-v2/
+!merit-ui-v2/api/
+!merit-ui-v2/api/**
+!merit-ui-v2/merit/
+!merit-ui-v2/merit/**
+!merit-ui-v2/static/
+!merit-ui-v2/static/**
+!merit-ui-v2/Logo.png
+!merit-ui-v2/README.md
+!merit-ui-v2/pyproject.toml
+!merit-ui-v2/requirements.txt
+
+!merit-cache-workbench-full-v7/
+!merit-cache-workbench-full-v7/json/
+!merit-cache-workbench-full-v7/json/**
+!merit-cache-workbench-full-v7/index.json
+!merit-cache-workbench-full-v7/study_metadata_index.json
+!merit-cache-workbench-full-v7/citation_index.json
+
+!docker/
+!docker/**
+!docker-compose.merit.yml

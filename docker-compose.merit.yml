@@ -1,0 +1,12 @@
+services:
+  merit-ui:
+    build:
+      context: .
+      dockerfile: docker/merit-ui-v2.Dockerfile
+    image: merit-ml:v7-local
+    ports:
+      - "8773:8773"
+    environment:
+      MERIT_CACHE_ONLY: "1"
+      MERIT_UI_PRECOMPUTED_ROOT: /opt/merit/merit-cache-workbench-full-v7
+      PORT: "8773"

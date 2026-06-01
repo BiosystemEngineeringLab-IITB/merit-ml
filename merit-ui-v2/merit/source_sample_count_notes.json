@@ -1,0 +1,2036 @@
+{
+  "ST000005": {
+    "counts": "datatable=116; mwtab=87",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000010": {
+    "counts": "datatable=39; mwtab=39; untarg_data=37",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000014": {
+    "counts": "datatable=72; mwtab=67",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000041": {
+    "counts": "datatable=35; mwtab=34",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000042": {
+    "counts": "datatable=23; mwtab=21",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000061": {
+    "counts": "datatable=118; mwtab=106",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000063": {
+    "counts": "datatable=97; mwtab=94",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000087": {
+    "counts": "datatable=79; mwtab=93",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000090": {
+    "counts": "datatable=70; mwtab=70; untarg_data=71",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000095": {
+    "counts": "datatable=15; mwtab=7",
+    "possible_reason": "mwTab appears to contain repeated sample headers or header-format irregularities; compare source tabs before reuse.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000105": {
+    "counts": "datatable=112; mwtab=111",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000120": {
+    "counts": "datatable=270; mwtab=240",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000121": {
+    "counts": "datatable=245; mwtab=242",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000138": {
+    "counts": "datatable=370; mwtab=367",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000153": {
+    "counts": "datatable=16; mwtab=8",
+    "possible_reason": "mwTab appears to contain repeated sample headers or header-format irregularities; compare source tabs before reuse.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000171": {
+    "counts": "datatable=11; mwtab=8",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000172": {
+    "counts": "datatable=59; mwtab=24",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000198": {
+    "counts": "datatable=40; mwtab=20",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000202": {
+    "counts": "datatable=59; mwtab=17",
+    "possible_reason": "mwTab appears to contain repeated sample headers or header-format irregularities; compare source tabs before reuse.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000203": {
+    "counts": "datatable=66; mwtab=33",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000213": {
+    "counts": "datatable=66; mwtab=33",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000239": {
+    "counts": "datatable=20; mwtab=19; untarg_data=19",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000245": {
+    "counts": "datatable=19; mwtab=17",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000253": {
+    "counts": "datatable=32; mwtab=28",
+    "possible_reason": "mwTab appears to contain repeated sample headers or header-format irregularities; compare source tabs before reuse.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000255": {
+    "counts": "datatable=42; mwtab=21",
+    "possible_reason": "mwTab appears to contain repeated sample headers or header-format irregularities; compare source tabs before reuse.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000269": {
+    "counts": "datatable=29; mwtab=28",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000293": {
+    "counts": "datatable=72; mwtab=56",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000297": {
+    "counts": "datatable=34; mwtab=33",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000299": {
+    "counts": "datatable=80; mwtab=20",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000302": {
+    "counts": "datatable=54; mwtab=53",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000310": {
+    "counts": "datatable=17; mwtab=16; untarg_data=16",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000311": {
+    "counts": "datatable=17; mwtab=17; untarg_data=9",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000325": {
+    "counts": "datatable=54; mwtab=53",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000368": {
+    "counts": "datatable=192; mwtab=191",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000374": {
+    "counts": "datatable=16; mwtab=8",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000375": {
+    "counts": "datatable=16; mwtab=8",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000376": {
+    "counts": "datatable=25; mwtab=24",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000378": {
+    "counts": "datatable=18; mwtab=12",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000388": {
+    "counts": "datatable=95; mwtab=94",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000389": {
+    "counts": "datatable=95; mwtab=94",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000421": {
+    "counts": "datatable=222; mwtab=111; untarg_data=112",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000422": {
+    "counts": "datatable=180; mwtab=120; untarg_data=120",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000424": {
+    "counts": "datatable=25; mwtab=24; untarg_data=24",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000428": {
+    "counts": "datatable=20; mwtab=19",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000432": {
+    "counts": "datatable=54; mwtab=52",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000441": {
+    "counts": "datatable=189; mwtab=190",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000449": {
+    "counts": "datatable=2; mwtab=0",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000458": {
+    "counts": "datatable=21; mwtab=20",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000468": {
+    "counts": "datatable=9; mwtab=8",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000475": {
+    "counts": "datatable=10; mwtab=10; untarg_data=20",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000485": {
+    "counts": "datatable=560; mwtab=556",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000502": {
+    "counts": "datatable=193; mwtab=192",
+    "possible_reason": "mwTab contains repeated sample headers and the deposited sources still expose different usable sample subsets.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000523": {
+    "counts": "datatable=169; mwtab=168; untarg_data=207",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000551": {
+    "counts": "datatable=148; mwtab=148; untarg_data=74",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000566": {
+    "counts": "datatable=288; mwtab=288; untarg_data=144",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000567": {
+    "counts": "datatable=288; mwtab=144; untarg_data=144",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000606": {
+    "counts": "datatable=63; mwtab=63; untarg_data=15",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000614": {
+    "counts": "datatable=143; mwtab=119",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000623": {
+    "counts": "datatable=20; mwtab=19",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000659": {
+    "counts": "datatable=158; mwtab=138",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000664": {
+    "counts": "datatable=165; mwtab=17",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000668": {
+    "counts": "datatable=44; mwtab=42",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000676": {
+    "counts": "datatable=236; mwtab=235",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000689": {
+    "counts": "datatable=7; mwtab=6; untarg_data=6",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000690": {
+    "counts": "datatable=13; mwtab=12",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000692": {
+    "counts": "datatable=41; mwtab=39",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000693": {
+    "counts": "datatable=21; mwtab=19; untarg_data=19",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000694": {
+    "counts": "datatable=52; mwtab=51; untarg_data=51",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000701": {
+    "counts": "datatable=11; mwtab=3",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000702": {
+    "counts": "datatable=13; mwtab=12; untarg_data=12",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000703": {
+    "counts": "datatable=213; mwtab=212",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000706": {
+    "counts": "datatable=15; mwtab=14",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000722": {
+    "counts": "datatable=16; mwtab=16; untarg_data=8",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000742": {
+    "counts": "datatable=40; mwtab=38; untarg_data=38",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000745": {
+    "counts": "datatable=46; mwtab=38; untarg_data=38",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000746": {
+    "counts": "datatable=64; mwtab=45; untarg_data=45",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000747": {
+    "counts": "datatable=43; mwtab=42",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000758": {
+    "counts": "datatable=46; mwtab=46; untarg_data=43",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000774": {
+    "counts": "datatable=36; mwtab=9",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000785": {
+    "counts": "datatable=83; mwtab=81",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000814": {
+    "counts": "datatable=28; mwtab=27; untarg_data=29",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000818": {
+    "counts": "datatable=450; mwtab=450; untarg_data=452",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000824": {
+    "counts": "datatable=24; mwtab=23",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000838": {
+    "counts": "datatable=12; mwtab=6",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000842": {
+    "counts": "datatable=60; mwtab=60; untarg_data=62",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000852": {
+    "counts": "datatable=30; mwtab=29",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000855": {
+    "counts": "datatable=390; mwtab=390; untarg_data=392",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000863": {
+    "counts": "datatable=30; mwtab=25",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000864": {
+    "counts": "datatable=30; mwtab=27",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000865": {
+    "counts": "datatable=90; mwtab=84",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000867": {
+    "counts": "datatable=196; mwtab=359",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000890": {
+    "counts": "datatable=129; mwtab=68",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000892": {
+    "counts": "datatable=21; mwtab=20",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000917": {
+    "counts": "datatable=88; mwtab=86",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000919": {
+    "counts": "datatable=140; mwtab=139; untarg_data=139",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000922": {
+    "counts": "datatable=8; mwtab=8; untarg_data=6",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000962": {
+    "counts": "datatable=87; mwtab=86",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST000978": {
+    "counts": "datatable=450; mwtab=441",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001035": {
+    "counts": "datatable=108; mwtab=98",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001036": {
+    "counts": "datatable=51; mwtab=49",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001046": {
+    "counts": "datatable=8; mwtab=7",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001052": {
+    "counts": "datatable=53; mwtab=51",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001053": {
+    "counts": "datatable=24; mwtab=22",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001056": {
+    "counts": "datatable=56; mwtab=29",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001063": {
+    "counts": "datatable=40; mwtab=10",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001065": {
+    "counts": "datatable=40; mwtab=10",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001066": {
+    "counts": "datatable=40; mwtab=10",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001067": {
+    "counts": "datatable=40; mwtab=10",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001088": {
+    "counts": "datatable=60; mwtab=57",
+    "possible_reason": "mwTab contains repeated sample headers and the deposited sources still expose different usable sample subsets.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001104": {
+    "counts": "datatable=9; mwtab=4",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001108": {
+    "counts": "datatable=178; mwtab=87",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001109": {
+    "counts": "datatable=178; mwtab=91",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001124": {
+    "counts": "datatable=80; mwtab=79",
+    "possible_reason": "mwTab contains repeated sample headers and the deposited sources still expose different usable sample subsets.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001166": {
+    "counts": "datatable=60; mwtab=58",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001170": {
+    "counts": "datatable=90; mwtab=80",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001175": {
+    "counts": "datatable=42; mwtab=41",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001185": {
+    "counts": "datatable=13; mwtab=12; untarg_data=13",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001190": {
+    "counts": "datatable=110; mwtab=108",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001201": {
+    "counts": "datatable=192; mwtab=175",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001202": {
+    "counts": "datatable=135; mwtab=84",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001218": {
+    "counts": "datatable=32; mwtab=16",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001219": {
+    "counts": "datatable=63; mwtab=62",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001229": {
+    "counts": "datatable=108; mwtab=36",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001240": {
+    "counts": "datatable=194; mwtab=192",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001334": {
+    "counts": "datatable=80; mwtab=79",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001335": {
+    "counts": "datatable=527; mwtab=527; untarg_data=1056",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001361": {
+    "counts": "datatable=23; mwtab=16",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001375": {
+    "counts": "datatable=20; mwtab=19",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001376": {
+    "counts": "datatable=160; mwtab=79",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001378": {
+    "counts": "datatable=168; mwtab=108",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001381": {
+    "counts": "datatable=49; mwtab=24",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001402": {
+    "counts": "datatable=48; mwtab=47",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001403": {
+    "counts": "datatable=48; mwtab=47",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001404": {
+    "counts": "datatable=50; mwtab=49",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001422": {
+    "counts": "datatable=690; mwtab=690; untarg_data=1348",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001435": {
+    "counts": "datatable=106; mwtab=102",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001441": {
+    "counts": "datatable=56; mwtab=28",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001442": {
+    "counts": "datatable=23; mwtab=11",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001451": {
+    "counts": "datatable=47; mwtab=24",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001467": {
+    "counts": "datatable=150; mwtab=120",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001518": {
+    "counts": "datatable=14; mwtab=2; untarg_data=12",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001523": {
+    "counts": "datatable=75; mwtab=74",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001527": {
+    "counts": "datatable=72; mwtab=71",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001548": {
+    "counts": "datatable=8; mwtab=7",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001632": {
+    "counts": "datatable=108; mwtab=72",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001639": {
+    "counts": "datatable=649; mwtab=648",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001676": {
+    "counts": "datatable=46; mwtab=44; untarg_data=44",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001690": {
+    "counts": "datatable=10; mwtab=9",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001706": {
+    "counts": "datatable=258; mwtab=256",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001748": {
+    "counts": "datatable=287; mwtab=235",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001773": {
+    "counts": "datatable=12; mwtab=11",
+    "possible_reason": "mwTab contains repeated sample headers and the deposited sources still expose different usable sample subsets.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001779": {
+    "counts": "datatable=36; mwtab=16",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001811": {
+    "counts": "datatable=60; mwtab=48",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001814": {
+    "counts": "datatable=78; mwtab=75; untarg_data=78",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001851": {
+    "counts": "datatable=387; mwtab=327",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001852": {
+    "counts": "datatable=1044; mwtab=958",
+    "possible_reason": "mwTab appears to contain repeated sample headers or header-format irregularities; compare source tabs before reuse.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001908": {
+    "counts": "datatable=100; mwtab=99",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001924": {
+    "counts": "datatable=84; mwtab=82",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001926": {
+    "counts": "datatable=261; mwtab=93; untarg_data=168",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001932": {
+    "counts": "datatable=2062; mwtab=2062; untarg_data=2063",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001942": {
+    "counts": "datatable=150; mwtab=90; untarg_data=60",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001955": {
+    "counts": "datatable=12; mwtab=6",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001961": {
+    "counts": "datatable=11; mwtab=10",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001975": {
+    "counts": "datatable=31; mwtab=26",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001979": {
+    "counts": "datatable=33; mwtab=63",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST001990": {
+    "counts": "datatable=35; mwtab=33; untarg_data=29",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002008": {
+    "counts": "datatable=342; mwtab=275; untarg_data=209",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002057": {
+    "counts": "datatable=103; mwtab=101",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002091": {
+    "counts": "datatable=200; mwtab=199",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002110": {
+    "counts": "datatable=40; mwtab=41",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002132": {
+    "counts": "datatable=92; mwtab=0",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002134": {
+    "counts": "datatable=169; mwtab=168; untarg_data=168",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002135": {
+    "counts": "datatable=151; mwtab=150; untarg_data=139",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002140": {
+    "counts": "datatable=29; mwtab=28",
+    "possible_reason": "mwTab contains repeated sample headers and the deposited sources still expose different usable sample subsets.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002157": {
+    "counts": "datatable=71; mwtab=40",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002159": {
+    "counts": "datatable=157; mwtab=137",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002161": {
+    "counts": "datatable=305; mwtab=304",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002213": {
+    "counts": "datatable=36; mwtab=18",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002228": {
+    "counts": "datatable=75; mwtab=73",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002254": {
+    "counts": "datatable=96; mwtab=32",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002270": {
+    "counts": "datatable=20; mwtab=19",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002285": {
+    "counts": "datatable=247; mwtab=61; untarg_data=186",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002314": {
+    "counts": "datatable=18; mwtab=9",
+    "possible_reason": "mwTab contains repeated sample headers and the deposited sources still expose different usable sample subsets.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002327": {
+    "counts": "datatable=38; mwtab=35",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002330": {
+    "counts": "datatable=144; mwtab=108",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002340": {
+    "counts": "datatable=32; mwtab=16",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002345": {
+    "counts": "datatable=33; mwtab=23",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002367": {
+    "counts": "datatable=87; mwtab=86",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002377": {
+    "counts": "datatable=12; mwtab=10",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002382": {
+    "counts": "datatable=40; mwtab=36",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002414": {
+    "counts": "datatable=85; mwtab=84",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002415": {
+    "counts": "datatable=14; mwtab=13",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002433": {
+    "counts": "datatable=20; mwtab=6",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002462": {
+    "counts": "datatable=50; mwtab=40",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002463": {
+    "counts": "datatable=60; mwtab=30",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002466": {
+    "counts": "datatable=231; mwtab=228",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002491": {
+    "counts": "datatable=56; mwtab=36",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002503": {
+    "counts": "datatable=48; mwtab=40",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002509": {
+    "counts": "datatable=285; mwtab=249",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002510": {
+    "counts": "datatable=138; mwtab=96",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002512": {
+    "counts": "datatable=95; mwtab=72",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002513": {
+    "counts": "datatable=21; mwtab=20",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002515": {
+    "counts": "datatable=94; mwtab=82",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002516": {
+    "counts": "datatable=564; mwtab=539",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002517": {
+    "counts": "datatable=119; mwtab=118",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002539": {
+    "counts": "datatable=71; mwtab=31",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002585": {
+    "counts": "datatable=20; mwtab=15",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002621": {
+    "counts": "datatable=26; mwtab=25",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002701": {
+    "counts": "datatable=24; mwtab=22",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002707": {
+    "counts": "datatable=78; mwtab=49",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002714": {
+    "counts": "datatable=20; mwtab=19",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002756": {
+    "counts": "datatable=30; mwtab=29",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002763": {
+    "counts": "datatable=100; mwtab=25; untarg_data=75",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002786": {
+    "counts": "datatable=48; mwtab=47",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002794": {
+    "counts": "datatable=535; mwtab=457",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002818": {
+    "counts": "datatable=321; mwtab=289",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002830": {
+    "counts": "datatable=9; mwtab=6",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002862": {
+    "counts": "datatable=230; mwtab=228",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002866": {
+    "counts": "datatable=2938; mwtab=2938; untarg_data=2939",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002923": {
+    "counts": "datatable=159; mwtab=147",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002924": {
+    "counts": "datatable=318; mwtab=159",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002937": {
+    "counts": "datatable=962; mwtab=942; untarg_data=962",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002949": {
+    "counts": "datatable=268; mwtab=240",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002958": {
+    "counts": "datatable=256; mwtab=223",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002978": {
+    "counts": "datatable=18; mwtab=30",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002987": {
+    "counts": "datatable=242; mwtab=241",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST002993": {
+    "counts": "datatable=110; mwtab=109; untarg_data=110",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003022": {
+    "counts": "datatable=16; mwtab=15",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003024": {
+    "counts": "datatable=110; mwtab=108",
+    "possible_reason": "mwTab contains repeated sample headers and the deposited sources still expose different usable sample subsets.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003050": {
+    "counts": "datatable=120; mwtab=96",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003076": {
+    "counts": "datatable=63; mwtab=9",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003077": {
+    "counts": "datatable=60; mwtab=8",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003113": {
+    "counts": "datatable=46; mwtab=36",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003127": {
+    "counts": "datatable=40; mwtab=32",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003147": {
+    "counts": "datatable=9; mwtab=8",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003150": {
+    "counts": "datatable=36; mwtab=30",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003167": {
+    "counts": "datatable=6; mwtab=7",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003177": {
+    "counts": "datatable=2190; mwtab=2189",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003206": {
+    "counts": "datatable=828; mwtab=818",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003207": {
+    "counts": "datatable=828; mwtab=821",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003208": {
+    "counts": "datatable=828; mwtab=818",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003220": {
+    "counts": "datatable=45; mwtab=40",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003226": {
+    "counts": "datatable=14; mwtab=13",
+    "possible_reason": "mwTab contains repeated sample headers and the deposited sources still expose different usable sample subsets.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003250": {
+    "counts": "datatable=13; mwtab=12",
+    "possible_reason": "mwTab contains repeated sample headers and the deposited sources still expose different usable sample subsets.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003256": {
+    "counts": "datatable=69; mwtab=67",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003268": {
+    "counts": "datatable=21; mwtab=20",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003277": {
+    "counts": "datatable=84; mwtab=71",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003306": {
+    "counts": "datatable=21; mwtab=9",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003318": {
+    "counts": "datatable=684; mwtab=639",
+    "possible_reason": "mwTab contains repeated sample headers and the deposited sources still expose different usable sample subsets.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003320": {
+    "counts": "datatable=61; mwtab=59",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003345": {
+    "counts": "datatable=34; mwtab=31",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003362": {
+    "counts": "datatable=28; mwtab=24",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003363": {
+    "counts": "datatable=63; mwtab=60",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003364": {
+    "counts": "datatable=311; mwtab=227",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003398": {
+    "counts": "datatable=19; mwtab=18",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003444": {
+    "counts": "datatable=1082; mwtab=1079",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003452": {
+    "counts": "datatable=18; mwtab=9",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003453": {
+    "counts": "datatable=480; mwtab=72",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003472": {
+    "counts": "datatable=143; mwtab=142",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003477": {
+    "counts": "datatable=9; mwtab=0",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003512": {
+    "counts": "datatable=9; mwtab=6",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003516": {
+    "counts": "datatable=53; mwtab=35",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003533": {
+    "counts": "datatable=9; mwtab=6",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003566": {
+    "counts": "datatable=62; mwtab=47",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003596": {
+    "counts": "datatable=442; mwtab=438",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003622": {
+    "counts": "datatable=23; mwtab=19",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003624": {
+    "counts": "datatable=16; mwtab=10",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003653": {
+    "counts": "datatable=81; mwtab=80",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003657": {
+    "counts": "datatable=109; mwtab=108",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003658": {
+    "counts": "datatable=16; mwtab=8",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003661": {
+    "counts": "datatable=63; mwtab=51",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003662": {
+    "counts": "datatable=321; mwtab=242",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003663": {
+    "counts": "datatable=206; mwtab=205",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003664": {
+    "counts": "datatable=100; mwtab=50",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003675": {
+    "counts": "datatable=398; mwtab=388",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003703": {
+    "counts": "datatable=40; mwtab=34",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003704": {
+    "counts": "datatable=49; mwtab=47",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003705": {
+    "counts": "datatable=333; mwtab=332",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003735": {
+    "counts": "datatable=192; mwtab=96",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003741": {
+    "counts": "datatable=1; mwtab=0",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003761": {
+    "counts": "datatable=14; mwtab=12",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003762": {
+    "counts": "datatable=51; mwtab=48",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003763": {
+    "counts": "datatable=41; mwtab=39",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003783": {
+    "counts": "datatable=234; mwtab=229; untarg_data=229",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003784": {
+    "counts": "datatable=101; mwtab=20",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003791": {
+    "counts": "datatable=474; mwtab=112",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003801": {
+    "counts": "datatable=84; mwtab=32",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003847": {
+    "counts": "datatable=33; mwtab=26",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003924": {
+    "counts": "datatable=65; mwtab=64",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003932": {
+    "counts": "datatable=80; mwtab=79",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003936": {
+    "counts": "datatable=72; mwtab=71; untarg_data=71",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003969": {
+    "counts": "datatable=90; mwtab=75",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST003999": {
+    "counts": "datatable=44; mwtab=43",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004012": {
+    "counts": "datatable=66; mwtab=65",
+    "possible_reason": "mwTab contains repeated sample headers and the deposited sources still expose different usable sample subsets.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004013": {
+    "counts": "datatable=113; mwtab=101",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004028": {
+    "counts": "datatable=69; mwtab=42",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004030": {
+    "counts": "datatable=27; mwtab=24",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004032": {
+    "counts": "datatable=24; mwtab=12",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004033": {
+    "counts": "datatable=279; mwtab=270; untarg_data=270",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004049": {
+    "counts": "datatable=18; mwtab=16",
+    "possible_reason": "mwTab contains repeated sample headers and the deposited sources still expose different usable sample subsets.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004058": {
+    "counts": "datatable=97; mwtab=93",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004060": {
+    "counts": "datatable=55; mwtab=54",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004107": {
+    "counts": "datatable=15; mwtab=10",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004119": {
+    "counts": "datatable=30; mwtab=24",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004120": {
+    "counts": "datatable=11; mwtab=10",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004121": {
+    "counts": "datatable=11; mwtab=10",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004124": {
+    "counts": "datatable=88; mwtab=28",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004145": {
+    "counts": "datatable=313; mwtab=232",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004167": {
+    "counts": "datatable=10; mwtab=5",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004190": {
+    "counts": "datatable=28; mwtab=27",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004202": {
+    "counts": "datatable=18; mwtab=17",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004206": {
+    "counts": "datatable=138; mwtab=95",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004207": {
+    "counts": "datatable=111; mwtab=43",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004217": {
+    "counts": "datatable=54; mwtab=18",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004230": {
+    "counts": "datatable=40; mwtab=39",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004236": {
+    "counts": "datatable=54; mwtab=48",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004237": {
+    "counts": "datatable=48; mwtab=47",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004251": {
+    "counts": "datatable=18; mwtab=17",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004267": {
+    "counts": "datatable=26; mwtab=24",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004268": {
+    "counts": "datatable=28; mwtab=24",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004296": {
+    "counts": "datatable=15; mwtab=14",
+    "possible_reason": "mwTab contains repeated sample headers and the deposited sources still expose different usable sample subsets.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004337": {
+    "counts": "datatable=13; mwtab=9",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004347": {
+    "counts": "datatable=124; mwtab=116",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004352": {
+    "counts": "datatable=54; mwtab=42",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004353": {
+    "counts": "datatable=54; mwtab=42",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004354": {
+    "counts": "datatable=50; mwtab=42",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004357": {
+    "counts": "datatable=84; mwtab=70",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004383": {
+    "counts": "datatable=177; mwtab=176",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004422": {
+    "counts": "datatable=17; mwtab=16",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004448": {
+    "counts": "datatable=12; mwtab=6",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004457": {
+    "counts": "datatable=48; mwtab=24",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004458": {
+    "counts": "datatable=12; mwtab=6",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004470": {
+    "counts": "datatable=101; mwtab=71; untarg_data=29",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004471": {
+    "counts": "datatable=101; mwtab=71; untarg_data=29",
+    "possible_reason": "Untarg data and Tier-1 sources may represent different peak tables, analysis coverage, or usable sample subsets.",
+    "sources": "datatable;mwtab;untarg_data",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004491": {
+    "counts": "datatable=16; mwtab=14",
+    "possible_reason": "mwTab contains repeated sample headers and the deposited sources still expose different usable sample subsets.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004535": {
+    "counts": "datatable=56; mwtab=41",
+    "possible_reason": "One source appears to name samples that are not all available as usable numeric matrix entries, or the source uses a different matrix layout.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004537": {
+    "counts": "datatable=22; mwtab=14",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004582": {
+    "counts": "datatable=24; mwtab=23",
+    "possible_reason": "mwTab contains repeated sample headers and the deposited sources still expose different usable sample subsets.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  },
+  "ST004607": {
+    "counts": "datatable=172; mwtab=164",
+    "possible_reason": "Deposited sources expose different usable sample subsets for this study.",
+    "sources": "datatable;mwtab",
+    "user_note": "Review the source tabs and choose the matrix whose sample coverage and labels match your reuse objective. MERIT scores each source independently and does not merge sources silently."
+  }
+}
