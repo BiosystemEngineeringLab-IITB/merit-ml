@@ -12,16 +12,16 @@ This repository provides source code and Docker instructions for running MERIT l
 
 ## Quick Start: Run With Docker
 
-Install Docker, then pull the MERIT image:
+Install Docker, then pull the MERIT image from Docker Hub:
 
 ```bash
-docker pull ghcr.io/biosystemengineeringlab-iitb/merit-ml:v7
+docker pull banerjee28/merit-ml:v7
 ```
 
 Run the local web app:
 
 ```bash
-docker run -d --name merit-ml -p 8780:8773 ghcr.io/biosystemengineeringlab-iitb/merit-ml:v7
+docker run -d --name merit-ml -p 8780:8773 banerjee28/merit-ml:v7
 ```
 
 Open:
@@ -33,7 +33,7 @@ http://localhost:8780
 Port mapping format is `HOST_PORT:CONTAINER_PORT`. MERIT listens on port `8773` inside the container, so you can change only the host-side port if needed:
 
 ```bash
-docker run -d --name merit-ml -p 8773:8773 ghcr.io/biosystemengineeringlab-iitb/merit-ml:v7
+docker run -d --name merit-ml -p 8773:8773 banerjee28/merit-ml:v7
 ```
 
 On Linux, prefix Docker commands with `sudo` if your user is not in the Docker group.
@@ -78,11 +78,15 @@ http://192.168.1.25:8780
 
 Your firewall must allow inbound traffic on the selected host port.
 
-## If `docker pull` Says `denied`
+## GitHub Container Registry Mirror
 
-A `denied` error usually means the GitHub Container Registry package is private or your GitHub account does not have package access. Anonymous pulls require the package visibility to be set to **Public** in GitHub Packages.
+A GitHub Container Registry image may also be available:
 
-If the package is private, log in first with a GitHub account that has package access:
+```bash
+docker pull ghcr.io/biosystemengineeringlab-iitb/merit-ml:v7
+```
+
+If this returns `denied`, use the Docker Hub image above or log in with a GitHub account that has package access:
 
 ```bash
 docker login ghcr.io
