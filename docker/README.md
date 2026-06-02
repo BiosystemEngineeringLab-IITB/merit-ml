@@ -1,6 +1,6 @@
-# MERIT Local Docker Package
+# MERIT-ML Local Docker Package
 
-This package builds a local MERIT web UI image that includes the current precomputed Workbench assessment cache. Users can run the UI in their own browser without depending on the hosted MERIT site.
+This package builds a local MERIT-ML web UI image that includes the current precomputed Workbench assessment cache. Users can run the UI in their own browser without depending on the hosted MERIT-ML site.
 
 The readiness reports are served from the bundled cache. The **Download Tabular Data** feature still fetches tabular matrices live from Metabolomics Workbench REST endpoints, so that feature requires an internet connection.
 
@@ -19,7 +19,7 @@ Then open:
 http://localhost:8780
 ```
 
-MERIT listens on `8773` inside the container. The host-side port can be changed, for example `-p 8773:8773` or `-p 8780:8773`.
+MERIT-ML listens on `8773` inside the container. The host-side port can be changed, for example `-p 8773:8773` or `-p 8780:8773`.
 
 Stop and remove the container with:
 
@@ -32,7 +32,7 @@ On Linux, prefix Docker commands with `sudo` if your user is not in the Docker g
 
 ## Build Locally
 
-Run from the repository root with the MERIT cache directory present:
+Run from the repository root with the MERIT-ML cache directory present:
 
 ```bash
 docker compose -f docker-compose.merit.yml build
@@ -126,8 +126,8 @@ docker run --rm -p 8780:8773 banerjee28/merit-ml:v7
 
 ## Notes For Users
 
-- The container serves cached MERIT readiness reports locally.
+- The container serves cached MERIT-ML readiness reports locally.
 - The browser opens on the user's own system at `http://localhost:8780` when using the recommended run command.
-- To access MERIT from another computer on the same network, open `http://<HOST-IP>:8780` and ensure the host firewall allows the selected port.
+- To access MERIT-ML from another computer on the same network, open `http://<HOST-IP>:8780` and ensure the host firewall allows the selected port.
 - The **Download Tabular Data** tab performs live Workbench REST API calls and needs internet access.
-- MERIT does not write new cache files inside the container during normal UI use.
+- MERIT-ML does not write new cache files inside the container during normal UI use.
