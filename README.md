@@ -1,4 +1,4 @@
-# MERIT
+# MERIT-ML
 
 MERIT-ML (Metabolomics Evaluation of Readiness and Interoperability of Tabular Data for Machine Learning) provides a web interface for assessing machine-learning readiness of tabular metabolomics datasets from Metabolomics Workbench.
 
