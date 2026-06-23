@@ -10,6 +10,7 @@ from merit.ui import (
     _bulk_clean_session,
     _bulk_ml_ready_data_zip_payload,
     _bulk_runner_page,
+    _embargoed_study_message,
     _load_cached_workflow_state,
     _load_precomputed_state,
     _ml_ready_data_zip_payload,
@@ -66,6 +67,9 @@ def home() -> Response:
             )
             if cached_state is not None:
                 return Response(_page(state=cached_state, defaults=defaults), mimetype="text/html")
+            embargo_message = _embargoed_study_message(study_id)
+            if embargo_message:
+                return Response(_page(error=embargo_message, defaults=defaults), status=403, mimetype="text/html")
             return Response(
                 _page(error=f"The study {study_id} is not available in the current version of MERIT.", defaults=defaults),
                 status=404,
@@ -107,6 +111,9 @@ def load_state() -> Response:
         return Response(_page(error="State JSON path is required.", defaults=defaults), status=400, mimetype="text/html")
     try:
         state = _load_cached_workflow_state(state_path)
+        embargo_message = _embargoed_study_message(state.get("study_id") if isinstance(state, dict) else "")
+        if embargo_message:
+            return Response(_page(error=embargo_message, defaults=defaults), status=403, mimetype="text/html")
     except Exception as exc:
         return Response(_page(error=str(exc), defaults=defaults), status=400, mimetype="text/html")
     return Response(_page(state=state, defaults=defaults), mimetype="text/html")
@@ -129,6 +136,9 @@ def workflow_run() -> Response:
         or _default_precomputed_root()
     )
     try:
+        embargo_message = _embargoed_study_message(study_id)
+        if embargo_message:
+            return Response(_page(error=embargo_message, defaults=defaults), status=403, mimetype="text/html")
         cached_state = _load_precomputed_state(
             study_id=study_id,
             precomputed_root=precomputed_root,

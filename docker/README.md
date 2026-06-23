@@ -13,6 +13,9 @@ docker pull banerjee28/merit-ml:v7
 docker run -d --name merit-ml -p 8780:8773 banerjee28/merit-ml:v7
 ```
 
+
+The current published `v7` and `latest` images resolve to digest `sha256:81be0074e11b1d18d8e2bee2c49c800b766f8d5c4c14e721779163a46ddfcbec`. This build blocks Workbench studies that are currently under embargo from direct lookup, search, bulk analysis, and ML-ready data export.
+
 Then open:
 
 ```text

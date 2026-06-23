@@ -136,6 +136,32 @@ _V2_HIDDEN_LEGACY_METRICS = {
 
 _V2_DEFAULT_MW_DUMP_ROOT = "/home/shayantan/metabolomics/ML-ready/mw-dump-latest-confirmation-latest-version"
 
+_EMBARGOED_STUDIES: dict[str, str] = {
+    "ST002866": "2026-08-29",
+    "ST003408": "2027-03-31",
+    "ST003494": "2026-09-30",
+    "ST003594": "2026-12-31",
+}
+
+
+def _study_id_key(study_id: Any) -> str:
+    return str(study_id or "").strip().upper()
+
+
+def _embargoed_study_message(study_id: Any) -> str:
+    sid = _study_id_key(study_id)
+    release_date = _EMBARGOED_STUDIES.get(sid)
+    if not release_date:
+        return ""
+    return (
+        f"{sid} is currently under embargo in Metabolomics Workbench and is not available through MERIT-ML "
+        f"until {release_date}. MERIT-ML does not display, export, or include embargoed studies."
+    )
+
+
+def _is_embargoed_study(study_id: Any) -> bool:
+    return bool(_embargoed_study_message(study_id))
+
 
 def _v2_band_label(band: Any) -> str:
     raw = str(band or "").strip()
@@ -503,6 +529,8 @@ def _load_study_browser_data(precomputed_root: str | Path) -> list[dict[str, Any
         sid = str(row.get("study_id", "")).strip().upper()
         if not (sid.startswith("ST") and len(sid) == 8 and sid[2:].isdigit()):
             continue
+        if _is_embargoed_study(sid):
+            continue
         score_raw = row.get("score")
         score = float(score_raw) if isinstance(score_raw, (int, float)) else None
         platform_raw = str(row.get("platform", "")).strip()
@@ -864,7 +892,10 @@ def _study_browser_compact_row(row: dict[str, Any]) -> dict[str, Any]:
 
 def _study_browser_data_payload(precomputed_root: str | Path, query: dict[str, str] | None = None) -> dict[str, Any]:
     query = query or {}
-    rows = _study_browser_sorted_rows(_load_study_browser_data(precomputed_root))
+    rows = [
+        row for row in _study_browser_sorted_rows(_load_study_browser_data(precomputed_root))
+        if not _is_embargoed_study(row.get("study_id"))
+    ]
     include_facets = str(query.get("facets", "1") or "1").strip().lower() not in {"0", "false", "no"}
     facets = _study_browser_facets(rows) if include_facets else {}
     search = str(query.get("q") or query.get("search") or "").strip()
@@ -1075,12 +1106,6 @@ def _bulk_workspace_html(precomputed_root: str | Path) -> str:
         "background:#0d6e6e;color:white;padding:10px 12px;font:inherit;font-size:.82rem;"
         "font-weight:900;cursor:pointer;box-shadow:0 10px 20px rgba(13,110,110,.18)'>"
         "Run Bulk MERIT</button>"
-        "</form>"
-        "<form id='bulk-data-download-form' method='post' action='/bulk/download-data' style='margin:8px 0 0'>"
-        "<input type='hidden' id='bulk-data-session-field' name='bulk_session' value=''>"
-        "<button id='bulk-data-download-button' type='submit' style='width:100%;border:1px solid rgba(13,110,110,.28);"
-        "border-radius:12px;background:rgba(13,110,110,.08);color:#0d6e6e;padding:8px 9px;"
-        "font:inherit;font-size:.75rem;font-weight:900;cursor:pointer'>Download data ZIP</button>"
         "</form>"
         "<button id='bulk-download-session' type='button' style='width:100%;margin-top:8px;border:1px solid rgba(19,35,39,.14);"
         "border-radius:12px;background:rgba(255,255,255,.82);color:#51656a;padding:8px 9px;"
@@ -6968,9 +6993,6 @@ def _result_panel(
         f"padding:9px 14px;background:rgba(13,110,110,.08);color:#0d6e6e;font:inherit;font-size:.82rem;"
         f"font-weight:700;cursor:pointer;white-space:nowrap' title='Download the exact JSON payload used to render this UI'>"
         f"Download Result JSON</button>"
-        f"<button onclick='printReport()' style='border:1px solid rgba(13,110,110,.4);border-radius:12px;"
-        f"padding:9px 18px;background:rgba(13,110,110,.06);color:#0d6e6e;font:inherit;font-size:.85rem;"
-        f"font-weight:700;cursor:pointer;white-space:nowrap' id='pdf-btn-inline'>&#x2913; Save as PDF</button>"
         f"</div>"
         f"</div>"
     )
@@ -7088,6 +7110,29 @@ def _bulk_clean_session(raw: str) -> dict[str, Any]:
         "n_submitted": len(studies),
         "n_used": min(len(studies), 500),
     }
+
+
+def _bulk_session_embargoed_ids(raw: str | dict[str, Any]) -> list[str]:
+    try:
+        if isinstance(raw, dict):
+            session = raw
+        else:
+            session = _bulk_clean_session(raw)
+    except Exception:
+        return []
+    ids: list[str] = []
+    for item in session.get("studies", []) if isinstance(session, dict) else []:
+        sid = _study_id_key(item.get("study_id") if isinstance(item, dict) else item)
+        if sid and _is_embargoed_study(sid) and sid not in ids:
+            ids.append(sid)
+    return ids
+
+
+def _raise_if_embargoed_bulk_session(raw: str | dict[str, Any]) -> None:
+    ids = _bulk_session_embargoed_ids(raw)
+    if ids:
+        messages = [_embargoed_study_message(sid) for sid in ids]
+        raise ValueError(" ".join(messages))
 
 
 _WB_REST_BASE = "https://www.metabolomicsworkbench.org/rest"
@@ -7738,6 +7783,9 @@ def _ml_ready_data_zip_payload(
     sid = str(study_id or "").strip().upper()
     if not (sid.startswith("ST") and len(sid) == 8 and sid[2:].isdigit()):
         raise ValueError("A valid Workbench study ID is required for tabular data export.")
+    embargo_message = _embargoed_study_message(sid)
+    if embargo_message:
+        raise ValueError(embargo_message)
     overrides = _bulk_clean_matrix_overrides(matrix_overrides or {})
     return _ml_export_build_zip(
         [{"study_id": sid, "matrix_overrides": overrides, "analysis_ids": _ml_export_clean_analysis_ids(analysis_ids)}],
@@ -7747,6 +7795,7 @@ def _ml_ready_data_zip_payload(
 
 def _bulk_ml_ready_data_zip_payload(raw_session: str) -> tuple[bytes, str]:
     session = _bulk_clean_session(raw_session)
+    _raise_if_embargoed_bulk_session(session)
     return _ml_export_build_zip(session.get("studies", []), bulk=True)
 
 
@@ -8122,6 +8171,7 @@ def _bulk_run_from_session(session: dict[str, Any], precomputed_root: str | Path
 
 def _bulk_chunk_payload(raw_session: str, precomputed_root: str | Path) -> dict[str, Any]:
     session = _bulk_clean_session(raw_session)
+    _raise_if_embargoed_bulk_session(session)
     summary_rows, metric_rows, errors = _bulk_run_from_session(session, precomputed_root)
     return {
         "ok": True,
@@ -8139,6 +8189,7 @@ def _bulk_runner_page(session: dict[str, Any], precomputed_root: str | Path) -> 
     limit. The runner keeps each request bounded while preserving a 500-study
     per-run user workflow.
     """
+    _raise_if_embargoed_bulk_session(session)
     header_help = {
         "priority": "Action order: failed gates first, then warnings, then lower readiness scores.",
         "study": "Metabolomics Workbench study accession.",
@@ -9007,6 +9058,16 @@ label{{display:block;font-size:.78rem;font-weight:700;letter-spacing:.04em;text-
 input,select{{width:100%;padding:10px 13px;border-radius:12px;border:1px solid rgba(19,35,39,.12);
   background:rgba(255,255,255,.94);font:inherit;color:inherit}}
 input:focus,select:focus{{outline:2px solid rgba(13,110,110,.2);border-color:rgba(13,110,110,.4)}}
+.example-studies{{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin-top:9px;color:#51656a;
+  font-size:.78rem;line-height:1.35}}
+.example-studies-label{{font-weight:800;letter-spacing:.02em;color:#40565b;margin-right:2px}}
+.example-study-chip{{display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(13,110,110,.22);
+  border-radius:999px;background:rgba(13,110,110,.07);color:#0d6e6e;padding:5px 9px;font:inherit;
+  font-size:.76rem;font-weight:800;line-height:1;cursor:pointer;transition:transform .14s ease,background .14s ease,
+  box-shadow .14s ease,border-color .14s ease}}
+.example-study-chip small{{font-size:.66rem;font-weight:700;color:#607379;letter-spacing:0}}
+.example-study-chip:hover,.example-study-chip:focus{{background:rgba(13,110,110,.13);border-color:rgba(13,110,110,.36);
+  box-shadow:0 5px 14px rgba(13,110,110,.13);outline:none;transform:translateY(-1px)}}
 .form-grid{{display:grid;grid-template-columns:1fr 1fr;gap:16px}}
 .form-grid .full{{grid-column:1/-1}}
 .card{{padding:16px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.72)}}
@@ -9068,11 +9129,6 @@ input:focus,select:focus{{outline:2px solid rgba(13,110,110,.2);border-color:rgb
 .tab-btn:hover{{background:rgba(13,110,110,.08);color:var(--accent)}}
 .tab-btn.active{{background:var(--accent);color:white;border-color:var(--accent)}}
 footer{{margin-top:18px;color:var(--muted);font-size:.82rem}}
-#pdf-btn{{position:fixed;bottom:28px;right:28px;z-index:9999;border:0;border-radius:50px;
-  padding:12px 22px;font:inherit;font-size:.88rem;font-weight:700;color:white;cursor:pointer;
-  background:linear-gradient(135deg,#113e52,#0d6e6e);box-shadow:0 8px 28px rgba(17,62,82,.35);
-  display:none;align-items:center;gap:8px;transition:opacity .2s}}
-#pdf-btn:hover{{opacity:.88}}
 @media(max-width:1600px){{
   .wrap{{grid-template-columns:minmax(300px,340px) minmax(0,1fr);grid-template-areas:"left content" "right content";gap:16px}}
   .sidebar .panel{{position:static;min-height:0}}
@@ -9081,7 +9137,7 @@ footer{{margin-top:18px;color:var(--muted);font-size:.82rem}}
 @media(max-width:1100px){{.wrap{{grid-template-columns:1fr;grid-template-areas:"content" "left" "right"}}.sidebar .panel{{position:static}}}}
 @media(max-width:760px){{.form-grid,.ig{{grid-template-columns:1fr}}.actions{{flex-direction:column}}}}
 @media print{{
-  #pdf-btn,#pdf-btn-inline,.sidebar,form,.actions,.caption,footer,#tab-bar,.btn{{display:none!important}}
+  .sidebar,form,.actions,.caption,footer,#tab-bar,.btn{{display:none!important}}
   body{{background:white!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
   .wrap{{display:block!important;width:100%!important;margin:0!important;padding:0!important}}
   .content{{width:100%!important}}
@@ -9181,7 +9237,6 @@ body.report-tools-expanded.report-analytical-active .tool-rail-toggle{{bottom:38
 </style>
 </head>
 <body class='{body_class}'>
-<button id='pdf-btn' onclick='printReport()'>&#x2913; Download PDF</button>
 {tool_toggle_html}
 <main class='wrap'>
   <aside class='sidebar sidebar-left'>
@@ -9209,6 +9264,13 @@ body.report-tools-expanded.report-analytical-active .tool-rail-toggle{{bottom:38
           <label style='margin-top:10px'>Accession ID</label>
           <input id='study-id-input' name='study_id' value='{_e(defaults.get("study_id",""))}' placeholder='e.g. ST000356' list='study-id-suggestions' autocomplete='off' required>
           <datalist id='study-id-suggestions'></datalist>
+          <div class='example-studies' aria-label='Representative study examples'>
+            <span class='example-studies-label'>Try examples:</span>
+            <button type='button' class='example-study-chip' data-study-id='ST000043' title='Small ML-ready demo study'>ST000043 <small>ML-ready</small></button>
+            <button type='button' class='example-study-chip' data-study-id='ST000496' title='Study with rich annotation summary'>ST000496 <small>annotation</small></button>
+            <button type='button' class='example-study-chip' data-study-id='ST001518' title='Small labelled study example'>ST001518 <small>small n</small></button>
+            <button type='button' class='example-study-chip' data-study-id='ST003741' title='Limited-readiness example with source differences'>ST003741 <small>limited</small></button>
+          </div>
         </section>
         <div class='actions'>
           <p class='caption'>MERIT pipeline: <strong>acquire → normalize → assess → Readiness Score</strong>. Results are written to the run output directory and shown below.</p>
@@ -9237,14 +9299,6 @@ body.report-tools-expanded.report-analytical-active .tool-rail-toggle{{bottom:38
   </div>
 </footer>
 <script>
-// PDF / Print support
-(function() {{
-  // Show the print button only when a report is present
-  var hasTabs = document.getElementById('tab-overview');
-  var btn = document.getElementById('pdf-btn');
-  if (hasTabs && btn) btn.style.display = 'inline-flex';
-}})();
-
 function printReport() {{
   function doPrint() {{
     // Ensure Plotly charts are rendered before printing when Plotly is available.
@@ -9286,6 +9340,23 @@ window.addEventListener('afterprint', function() {{
   var activeBtn = document.querySelector('.tab-btn.active');
   if (activeBtn) {{ var tid = activeBtn.getAttribute('data-tab'); if (tid) switchTab(tid); }}
 }});
+
+// Landing-page examples: fill the accession box without auto-submitting.
+(function() {{
+  document.querySelectorAll('.example-study-chip').forEach(function(btn) {{
+    btn.addEventListener('click', function(ev) {{
+      ev.preventDefault();
+      var input = document.getElementById('study-id-input');
+      if (!input) return;
+      input.value = btn.getAttribute('data-study-id') || '';
+      input.focus();
+      try {{
+        input.dispatchEvent(new Event('input', {{bubbles:true}}));
+        input.dispatchEvent(new Event('change', {{bubbles:true}}));
+      }} catch(e) {{}}
+    }});
+  }});
+}})();
 
 // Report focus mode: hide utility rails while reading metric tabs.
 (function() {{
@@ -10706,18 +10777,6 @@ window.addEventListener('afterprint', function() {{
 	    if (field) field.value = JSON.stringify(session);
 	    status('Opening Bulk MERIT runner. Keep the next page open until it finishes.', '#0d6e6e');
 	  }});
-	  var dataForm = document.getElementById('bulk-data-download-form');
-	  if (dataForm) dataForm.addEventListener('submit', function(ev) {{
-	    var session = readSession();
-	    if (!Object.keys(session.studies || {{}}).length) {{
-	      ev.preventDefault();
-	      status('Add at least one study before downloading data.', '#8f2d2d');
-	      return;
-	    }}
-	    var dataField = document.getElementById('bulk-data-session-field');
-	    if (dataField) dataField.value = JSON.stringify(session);
-	    status('Preparing data ZIP from Workbench REST endpoints. Keep this tab open until the download starts.', '#0d6e6e');
-	  }});
 	  var dl = document.getElementById('bulk-download-session');
 	  if (dl) dl.addEventListener('click', function(ev) {{
 	    ev.preventDefault();
@@ -10812,6 +10871,10 @@ class MetaboUIHandler(BaseHTTPRequestHandler):
             "profile": requested_profile,
         }
         if study_id:
+            embargo_message = _embargoed_study_message(study_id)
+            if embargo_message:
+                self._send_html(_page(error=embargo_message, defaults=defaults), HTTPStatus.FORBIDDEN)
+                return
             cached_state = _load_precomputed_state(
                 study_id=study_id,
                 precomputed_root=_default_precomputed_root(),
@@ -10874,6 +10937,7 @@ class MetaboUIHandler(BaseHTTPRequestHandler):
                     or _default_precomputed_root()
                 )
                 session = _bulk_clean_session(form.get("bulk_session", ""))
+                _raise_if_embargoed_bulk_session(session)
                 self._send_html(_bulk_runner_page(session, precomputed_root))
                 return
 
@@ -10882,12 +10946,21 @@ class MetaboUIHandler(BaseHTTPRequestHandler):
                 if not state_path:
                     raise ValueError("State JSON path is required.")
                 state = _load_cached_workflow_state(state_path)
+                state_study_id = _v2_state_study_id(state)
+                embargo_message = _embargoed_study_message(state_study_id)
+                if embargo_message:
+                    self._send_html(_page(error=embargo_message, defaults=defaults), HTTPStatus.FORBIDDEN)
+                    return
                 self._send_html(_page(state=state, defaults=defaults))
                 return
 
             source = "workbench"
             fetch_mode = _requested_fetch_mode(source, allow_remote_fallback=False)
             study_id = form.get("study_id", "").strip()
+            embargo_message = _embargoed_study_message(study_id)
+            if embargo_message:
+                self._send_html(_page(error=embargo_message, defaults=defaults), HTTPStatus.FORBIDDEN)
+                return
             requested_profile = form.get("profile", "full")
             precomputed_root = (
                 form.get("precomputed_root")
@@ -10978,6 +11051,8 @@ def _load_precomputed_state(
     requested_profile: str | None = None,
 ) -> dict[str, Any] | None:
     """Resolve a cached workflow state by study id from index.json/direct JSON path."""
+    if _is_embargoed_study(study_id):
+        return None
     root_raw = str(precomputed_root).strip() if precomputed_root else _default_precomputed_root()
     remote_root = _is_http_location(root_raw)
     index_loc = (

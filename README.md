@@ -10,9 +10,11 @@ https://merit-ml.in
 
 This repository provides source code and Docker instructions for running MERIT-ML locally.
 
+This release excludes Workbench records that are currently under embargo from the public MERIT-ML interface. Embargoed studies are not shown in search results, direct accession lookup, bulk analysis, or ML-ready data export until they are publicly available from Metabolomics Workbench.
+
 ## Quick Start: Run With Docker
 
-Install Docker, then pull the MERIT-ML image from Docker Hub:
+Install Docker, then pull the MERIT-ML image from Docker Hub. The current `v7` and `latest` tags resolve to digest `sha256:81be0074e11b1d18d8e2bee2c49c800b766f8d5c4c14e721779163a46ddfcbec`:
 
 ```bash
 docker pull banerjee28/merit-ml:v7
