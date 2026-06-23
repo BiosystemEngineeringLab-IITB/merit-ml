@@ -138,6 +138,5 @@ The large precomputed cache is intentionally not committed to Git history. It is
 
 ## Citation
 
-If you use MERIT-ML, please cite the associated manuscript and Metabolomics Workbench data source as described in the MERIT-ML interface. Also cite the preprint associated with this study:  
-Shayantan Banerjee, Pramod P. Wangikar. MERIT-ML: A Machine-Learning-Readiness Framework for Tabular Public Metabolomics Data. ChemRxiv. 10 June 2026.
+If you use MERIT-ML, please cite the associated manuscript and Metabolomics Workbench data source as described in the MERIT-ML interface. Also cite the preprint associated with this study: Shayantan Banerjee, Pramod P. Wangikar. MERIT-ML: A Machine-Learning-Readiness Framework for Tabular Public Metabolomics Data. ChemRxiv. 10 June 2026.
 DOI: https://doi.org/10.26434/chemrxiv.15004429/v2
