@@ -1,14 +1,14 @@
 FROM python:3.12-slim
 
 LABEL org.opencontainers.image.title="MERIT ML Readiness UI" \
-      org.opencontainers.image.description="Local MERIT web UI with bundled precomputed Workbench assessment cache" \
-      org.opencontainers.image.source="https://github.com/<OWNER>/<REPO>" \
+      org.opencontainers.image.description="Thin local MERIT web UI; assessment artifacts are fetched from the hosted MERIT endpoint/R2 at runtime" \
+      org.opencontainers.image.source="https://github.com/BiosystemEngineeringLab-IITB/merit-ml" \
       org.opencontainers.image.licenses="MIT"
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     MERIT_CACHE_ONLY=1 \
-    MERIT_UI_PRECOMPUTED_ROOT=/opt/merit/merit-cache-workbench-full-v7 \
+    MERIT_UI_PRECOMPUTED_ROOT=https://pub-acf151eb41e04ee795a86a8049d54039.r2.dev/merit-cache/releases/v7.2026-04-30-190939.metabatch-annotation-compatibility/ \
     PORT=8773
 
 WORKDIR /opt/merit/app
@@ -25,8 +25,6 @@ COPY merit-ui-v2/Logo.png ./Logo.png
 
 RUN python -m pip install --no-cache-dir --upgrade pip \
     && python -m pip install --no-cache-dir . gunicorn
-
-COPY merit-cache-workbench-full-v7 /opt/merit/merit-cache-workbench-full-v7
 
 EXPOSE 8773
 
