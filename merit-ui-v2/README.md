@@ -28,13 +28,13 @@ Terminology: v2 displays `ML-eligible sample count` for QC/blank-filtered sample
 
 ## Local Docker package
 
-The repository root includes a Docker packaging recipe that runs this UI with the bundled v7 precomputed cache:
+The repository root includes a Docker packaging recipe that runs this UI as a thin local container. The public Docker image does not bundle the v7 cache or local Metabolomics Workbench dumps; it reads hosted MERIT assessment artifacts at runtime.
 
 ```bash
 docker compose -f docker-compose.merit.yml build
 docker compose -f docker-compose.merit.yml up
 ```
 
-Open `http://localhost:8773` after the container starts. Cached readiness reports are served locally; the "Download Tabular Data" feature still fetches matrices live from Metabolomics Workbench REST endpoints and therefore requires internet access.
+Open `http://localhost:8773` after the container starts. The app requires internet access for normal study lookup and for MERIT-derived tabular exports, which fetch source-specific matrices live from Metabolomics Workbench REST endpoints.
 
 See `docker/README.md` for GitHub Container Registry and GitHub Release distribution options.
