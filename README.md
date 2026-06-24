@@ -10,11 +10,13 @@ https://merit-ml.in
 
 This repository provides source code and Docker instructions for running MERIT-ML locally.
 
+The public Docker distribution is a thin local UI container. It does **not** bundle the MERIT v7 cache, raw Metabolomics Workbench source records, or generated tabular exports. Study reports are loaded from hosted MERIT-derived assessment artifacts at runtime, and source-specific tabular exports are generated on demand from Metabolomics Workbench REST.
+
 This release excludes Workbench records that are currently under embargo from the public MERIT-ML interface. Embargoed studies are not shown in search results, direct accession lookup, bulk analysis, or ML-ready data export until they are publicly available from Metabolomics Workbench.
 
 ## Quick Start: Run With Docker
 
-Install Docker, then pull the MERIT-ML image from Docker Hub. The current `v7` and `latest` tags resolve to digest `sha256:81be0074e11b1d18d8e2bee2c49c800b766f8d5c4c14e721779163a46ddfcbec`:
+Install Docker, then pull the MERIT-ML image from Docker Hub. The current thin-image `v7` and `latest` tags resolve to index digest `sha256:6e1f637846e3eb87760222f24700e0bd46afe2340877148794862d79c41bb5fc`:
 
 ```bash
 docker pull banerjee28/merit-ml:v7
@@ -100,24 +102,21 @@ docker pull ghcr.io/biosystemengineeringlab-iitb/merit-ml:v7
 The Docker image includes:
 
 - the MERIT-ML UI runtime;
-- the precomputed MERIT v7 assessment cache for Metabolomics Workbench studies;
-- study browser, per-study readiness reports, source-level readiness bands, scoring-parameter controls, bulk MERIT analysis, and ML-ready data export controls.
+- static assets needed to render the browser interface;
+- a default pointer to the hosted MERIT assessment artifact root;
+- study browser, per-study readiness reports, source-level readiness bands, scoring-parameter controls, bulk MERIT analysis, and MERIT-derived export controls.
 
-Readiness reports are served locally from the bundled cache.
+The Docker image does **not** include `merit-cache-workbench-full-v7/` or any local Metabolomics Workbench source-data dump.
 
 ## Internet Requirement
 
-The main readiness UI can run from the bundled cache. The **Download Tabular Data** feature fetches matrices live from official Metabolomics Workbench REST endpoints and therefore requires internet access.
+MERIT-ML Docker requires internet access for normal study lookup because reports are loaded from hosted MERIT assessment artifacts rather than a bundled cache. The **Generate MERIT Export ZIP** feature also fetches matrices live from official Metabolomics Workbench REST endpoints.
 
 Some chart assets may also load from public JavaScript CDNs depending on browser cache state.
 
 ## Build From Source
 
-Most users should use the prebuilt image above. Building the image from source is intended for maintainers and requires the MERIT v7 cache directory to be present at repository root as:
-
-```text
-merit-cache-workbench-full-v7/
-```
+Most users should use the prebuilt image above. Building the image from source does not require the MERIT v7 cache directory.
 
 Then run:
 
@@ -134,7 +133,7 @@ docker/                   Dockerfile and Docker distribution notes
 docker-compose.merit.yml  Local compose launcher
 ```
 
-The large precomputed cache is intentionally not committed to Git history. It is distributed through the Docker image.
+The large precomputed cache is intentionally not committed to Git history and is not distributed through the Docker image. The public image reads hosted MERIT assessment artifacts at runtime.
 
 ## Citation
 
