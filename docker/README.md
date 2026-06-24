@@ -1,136 +1,154 @@
 # MERIT-ML Local Docker Package
 
-This package builds a local MERIT-ML web UI image that includes the current precomputed Workbench assessment cache. Users can run the UI in their own browser without depending on the hosted MERIT-ML site.
+This Docker package runs the MERIT-ML browser interface locally without bundling the Metabolomics Workbench v7 cache inside the image.
 
-The readiness reports are served from the bundled cache. The **Download Tabular Data** feature still fetches tabular matrices live from Metabolomics Workbench REST endpoints, so that feature requires an internet connection.
+The public Docker image is intentionally thin:
 
-## Recommended: Use The Published Docker Hub Image
+- It contains the MERIT-ML UI/runtime only.
+- It does **not** contain `merit-cache-workbench-full-v7/` or any local Metabolomics Workbench dump.
+- It reads hosted MERIT-derived assessment artifacts from the configured MERIT/R2 artifact root at runtime.
+- Source-specific tabular exports are generated on demand from Metabolomics Workbench REST, not from a bundled mirror.
 
-Most users should pull and run the published Docker Hub image:
+Because the image is thin, users need an internet connection for normal study lookup and for MERIT-derived tabular export generation.
+
+## Run The Published Image
 
 ```bash
 docker pull banerjee28/merit-ml:v7
 docker run -d --name merit-ml -p 8780:8773 banerjee28/merit-ml:v7
 ```
 
-
-The current published `v7` and `latest` images resolve to digest `sha256:81be0074e11b1d18d8e2bee2c49c800b766f8d5c4c14e721779163a46ddfcbec`. This build blocks Workbench studies that are currently under embargo from direct lookup, search, bulk analysis, and ML-ready data export.
-
-Then open:
+Open:
 
 ```text
 http://localhost:8780
 ```
 
-MERIT-ML listens on `8773` inside the container. The host-side port can be changed, for example `-p 8773:8773` or `-p 8780:8773`.
+Port mapping format is `HOST_PORT:CONTAINER_PORT`. MERIT-ML listens on port `8773` inside the container, so the host-side port can be changed if needed:
 
-Stop and remove the container with:
+```bash
+docker run -d --name merit-ml -p 8773:8773 banerjee28/merit-ml:v7
+```
+
+On Linux, prefix Docker commands with `sudo` if your user is not in the Docker group.
+
+## Stop Or Restart
 
 ```bash
 docker stop merit-ml
 docker rm merit-ml
 ```
 
-On Linux, prefix Docker commands with `sudo` if your user is not in the Docker group.
+If the name is already in use:
+
+```bash
+docker ps -a | grep merit-ml
+docker rm -f merit-ml
+```
+
+Then start it again with the `docker run` command above.
+
+## What The Image Contains
+
+The image includes:
+
+- the Flask/Gunicorn MERIT-ML UI runtime;
+- static UI assets needed to render the local browser app;
+- the configured default pointer to the hosted MERIT assessment artifact root.
+
+The image excludes:
+
+- `merit-cache-workbench-full-v7/`;
+- Metabolomics Workbench raw/source dump folders;
+- local manuscript outputs, figures, scratch folders, and private deployment credentials;
+- generated MERIT-derived export ZIPs.
+
+## Runtime Data Access
+
+Study reports are loaded from hosted MERIT-derived assessment artifacts using:
+
+```text
+MERIT_UI_PRECOMPUTED_ROOT=https://pub-acf151eb41e04ee795a86a8049d54039.r2.dev/merit-cache/releases/v7.2026-04-30-190939.metabatch-annotation-compatibility/
+```
+
+You can override this at runtime if you maintain your own compatible assessment-artifact endpoint:
+
+```bash
+docker run -d --name merit-ml -p 8780:8773 \
+  -e MERIT_UI_PRECOMPUTED_ROOT=https://example.org/path/to/merit-artifacts/ \
+  banerjee28/merit-ml:v7
+```
+
+The **Generate MERIT Export ZIP** workflow fetches source-specific tables live from Metabolomics Workbench REST at download time, aligns labels/settings inside the browser session, and writes a MERIT-derived assessment export. MERIT does not modify Metabolomics Workbench records and does not maintain a persistent server-side mirror of generated exports.
 
 ## Build Locally
 
-Run from the repository root with the MERIT-ML cache directory present:
+Run from the `ML-ready` repository root:
+
+```bash
+docker build -f docker/merit-ui-v2.Dockerfile -t merit-ml:v7-local .
+```
+
+Or with compose:
 
 ```bash
 docker compose -f docker-compose.merit.yml build
 ```
 
-This creates:
-
-```text
-merit-ml:v7-local
-```
-
-The Docker build context is intentionally restricted by `.dockerignore` to:
-
-- `merit-ui-v2/`
-- `merit-cache-workbench-full-v7/json/`
-- `merit-cache-workbench-full-v7/index.json`
-- `merit-cache-workbench-full-v7/study_metadata_index.json`
-- `merit-cache-workbench-full-v7/citation_index.json`
-
-Older caches, manuscript files, figures, scratch files, and local dumps are excluded.
-
-## Run A Local Build
-
-```bash
-docker compose -f docker-compose.merit.yml up
-```
-
-Then open:
-
-```text
-http://localhost:8773
-```
-
-To run without compose:
+Run the local build:
 
 ```bash
 docker run --rm -p 8780:8773 merit-ml:v7-local
 ```
 
-Then open:
+## Publish To DockerHub
 
-```text
-http://localhost:8780
+Log in with a DockerHub access token, not a password written into a file:
+
+```bash
+docker login -u <dockerhub-username>
 ```
 
-## Publish Through Docker Hub
-
-Do not commit the multi-GB cache as normal Git files. Publish the built image through Docker Hub instead.
-
-Build once, then publish the image:
+Build, tag, and push:
 
 ```bash
 docker build -f docker/merit-ui-v2.Dockerfile -t banerjee28/merit-ml:v7 .
 docker tag banerjee28/merit-ml:v7 banerjee28/merit-ml:latest
+
 docker push banerjee28/merit-ml:v7
 docker push banerjee28/merit-ml:latest
 ```
 
-Users can then run:
+## Publish To GitHub Container Registry
+
+If the GHCR package is enabled for the repository:
 
 ```bash
-docker pull banerjee28/merit-ml:v7
-docker run -d --name merit-ml -p 8780:8773 banerjee28/merit-ml:v7
-```
+echo "$GITHUB_PAT" | docker login ghcr.io -u <github-username> --password-stdin
 
-## Optional: GitHub Container Registry Mirror
-
-If desired, publish a GitHub Container Registry mirror:
-
-```bash
 docker tag banerjee28/merit-ml:v7 ghcr.io/biosystemengineeringlab-iitb/merit-ml:v7
+docker tag banerjee28/merit-ml:v7 ghcr.io/biosystemengineeringlab-iitb/merit-ml:latest
+
 docker push ghcr.io/biosystemengineeringlab-iitb/merit-ml:v7
+docker push ghcr.io/biosystemengineeringlab-iitb/merit-ml:latest
 ```
 
-If `docker pull` from GHCR returns `denied`, the package is private or the user does not have GitHub Package access. Anonymous GHCR pulls require the package visibility to be **Public**.
+## Verification Checklist
 
-## Alternative: GitHub Release Asset
-
-Export the image as a compressed artifact:
+After building the image, confirm that no cache is present:
 
 ```bash
-docker save banerjee28/merit-ml:v7 | gzip > merit-ml-v7-docker-image.tar.gz
+docker run --rm banerjee28/merit-ml:v7 sh -lc \
+  'find /opt/merit -maxdepth 4 -iname "*merit-cache*" -o -iname "*mw-dump*"'
 ```
 
-Attach the `.tar.gz` file to a GitHub Release. Users can load it with:
+The command should not print a bundled Workbench cache directory.
+
+Then smoke-test the UI:
 
 ```bash
-docker load < merit-ml-v7-docker-image.tar.gz
-docker run --rm -p 8780:8773 banerjee28/merit-ml:v7
+docker rm -f merit-ml-test 2>/dev/null || true
+docker run -d --name merit-ml-test -p 8782:8773 banerjee28/merit-ml:v7
+curl -fsSL http://127.0.0.1:8782/healthz
+docker rm -f merit-ml-test
 ```
-
-## Notes For Users
-
-- The container serves cached MERIT-ML readiness reports locally.
-- The browser opens on the user's own system at `http://localhost:8780` when using the recommended run command.
-- To access MERIT-ML from another computer on the same network, open `http://<HOST-IP>:8780` and ensure the host firewall allows the selected port.
-- The **Download Tabular Data** tab performs live Workbench REST API calls and needs internet access.
-- MERIT-ML does not write new cache files inside the container during normal UI use.
