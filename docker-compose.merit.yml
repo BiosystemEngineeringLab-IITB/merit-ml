@@ -8,5 +8,5 @@ services:
       - "8773:8773"
     environment:
       MERIT_CACHE_ONLY: "1"
-      MERIT_UI_PRECOMPUTED_ROOT: /opt/merit/merit-cache-workbench-full-v7
+      MERIT_UI_PRECOMPUTED_ROOT: https://pub-acf151eb41e04ee795a86a8049d54039.r2.dev/merit-cache/releases/v7.2026-04-30-190939.metabatch-annotation-compatibility/
       PORT: "8773"
