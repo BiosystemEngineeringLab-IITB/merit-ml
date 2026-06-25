@@ -1,141 +1,128 @@
-# MERIT-ML
+# MERIT
 
-MERIT-ML (Metabolomics Evaluation of Readiness and Interoperability of Tabular Data for Machine Learning) provides a web interface for assessing machine-learning readiness of tabular metabolomics datasets from Metabolomics Workbench.
+MERIT (MachinE learning ReadIness for Tabular metabolomics data) is a publication-first framework inspired by AIDRIN, specialized for public metabolomics repositories. It provides:
 
-Hosted version:
+- repository-aware ingestion for MetaboLights and Metabolomics Workbench
+- canonical normalization into a common study schema
+- domain-specific readiness scoring across fixed score families
+- auditable remediations with before/after deltas
+- baseline benchmark execution for ML suitability checks
+- machine-readable reports and Markdown/HTML summaries
 
-```text
-https://merit-ml.in
-```
+## Public Docker Distribution
 
-This repository provides source code and Docker instructions for running MERIT-ML locally.
-
-The public Docker distribution is a thin local UI container. It does **not** bundle the MERIT v7 cache, raw Metabolomics Workbench source records, or generated tabular exports. Study reports are loaded from hosted MERIT-derived assessment artifacts at runtime, and source-specific tabular exports are generated on demand from Metabolomics Workbench REST.
-
-This release excludes Workbench records that are currently under embargo from the public MERIT-ML interface. Embargoed studies are not shown in search results, direct accession lookup, bulk analysis, or ML-ready data export until they are publicly available from Metabolomics Workbench.
-
-## Quick Start: Run With Docker
-
-Install Docker, then pull the MERIT-ML image from Docker Hub. The current thin-image `v7` and `latest` tags resolve to index digest `sha256:935bd325d5ff2cda44dcb6170dd1a6faad8ff17980176c34251e152aeb60d716`:
+The public MERIT-ML Docker image is a thin local UI container. It does not
+bundle the Workbench v7 cache, raw Metabolomics Workbench source dumps, or
+generated export files. At runtime, the container reads hosted MERIT-derived
+assessment artifacts from the configured MERIT/R2 artifact endpoint and fetches
+source-specific tabular details only on demand from Metabolomics Workbench REST
+for MERIT-derived export generation.
 
 ```bash
 docker pull banerjee28/merit-ml:v7
-```
-
-Run the local web app:
-
-```bash
 docker run -d --name merit-ml -p 8780:8773 banerjee28/merit-ml:v7
 ```
 
-Open:
+Then open `http://localhost:8780`. See `docker/README.md` for the full Docker
+run, build, verification, and publication workflow.
 
-```text
-http://localhost:8780
-```
+This repository ships a working v0 foundation designed around the local source data already present in this workspace:
 
-Port mapping format is `HOST_PORT:CONTAINER_PORT`. MERIT-ML listens on port `8773` inside the container, so you can change only the host-side port if needed:
+- `metabolights_data/mtbls_metadata/MTBLS2262`
+- `mw-dump-latest/ST001814/AN002942/tabular/AN002942_datatable.tsv`
+- `mw-dump/json/ST000356.json`
+- `mw-dump/datatable/ST000356/*.datatable.tsv.gz`
 
-```bash
-docker run -d --name merit-ml -p 8773:8773 banerjee28/merit-ml:v7
-```
+For Metabolomics Workbench, ingestion now defaults to local archives and prefers `mw-dump-latest/` when present, then `mw_dump/`, then `mw-dump/`. The connector supports:
 
-On Linux, prefix Docker commands with `sudo` if your user is not in the Docker group.
+1. Latest nested dump layout: `STUDY/ANALYSIS/json` + `STUDY/ANALYSIS/tabular` with a study `manifest.json`
+2. Managed archive layout (`catalog.sqlite` + `studies/<ST>/manifest.json`)
+3. Legacy dump layout (`json/` + `datatable/`)
 
-## Stop Or Restart MERIT-ML
+Tabular selection priority remains:
 
-Stop the running container:
+1. `*_Results.txt`
+2. `*_datatable.tsv` / `*.datatable.tsv.gz`
+3. `*.mwtab` / `*.mwtab.txt`
 
-```bash
-docker stop merit-ml
-```
+For local-first operation during MW downtime, use `--fetch-mode local` and point `--root` at your dump. `merit mw rebuild-index` now merges managed manifests and legacy `json/datatable` entries so one catalog can cover all locally available studies.
 
-Remove the stopped container before starting a new one with the same name:
+The preferred long-term MW storage model is now a managed archive:
 
-```bash
-docker rm merit-ml
-```
+- `catalog.sqlite` for lightweight study and asset indexing
+- `studies/<STUDY_ID>/manifest.json` for per-study current state
+- `objects/json/<sha-prefix>/<sha>.json.gz` for compressed JSON payloads
+- `objects/tabular/<sha-prefix>/<sha>...` for compressed tabular assets
 
-If Docker reports that the name is already in use, run:
+This keeps the Python package small while preserving the full JSON and raw tabular payloads outside the git-tracked source tree.
 
-```bash
-docker ps -a | grep merit-ml
-docker stop merit-ml
-docker rm merit-ml
-```
+## Readiness Scoring Overview
 
-Then start it again with the `docker run` command above.
+MERIT reports two top-level scores:
 
-## Access From Another Computer On The Same Network
+- **Core ML readiness score**: unweighted mean of Structural, Analytical QC, Annotation, Cohort/Bias, and ML Readiness section scores.
+- **Reusability score**: Metadata / FAIR section score (reported separately from core ML readiness).
 
-If MERIT-ML is running on one computer and you want to open it from another computer on the same network, use the host computer's IP address:
+Annotation is intentionally part of the core score: in metabolomics, weak annotation does not always prevent model training, but it directly limits interpretability and biological usability of model outputs.
 
-```text
-http://<HOST-IP>:8780
-```
+MERIT also applies feasibility gates (tabular data availability, biological sample count, group count, minimum per-group support, and non-catastrophic missingness). Gates do not change the numeric score; they can cap the final readiness band.
 
-For example, if the host IP is `192.168.1.25`, open:
-
-```text
-http://192.168.1.25:8780
-```
-
-Your firewall must allow inbound traffic on the selected host port.
-
-## GitHub Container Registry Mirror
-
-A GitHub Container Registry image may also be available:
+## Install
 
 ```bash
-docker pull ghcr.io/biosystemengineeringlab-iitb/merit-ml:v7
+python3 -m pip install -e .
 ```
 
-If this returns `denied`, use the Docker Hub image above or log in with a GitHub account that has package access:
+## Quick Start
 
 ```bash
-docker login ghcr.io
-docker pull ghcr.io/biosystemengineeringlab-iitb/merit-ml:v7
+merit ingest --source metabolights --study-id MTBLS2262 --fetch-mode auto --output outputs/mtbls2262_bundle.json
+merit assess --bundle outputs/mtbls2262_bundle.json --profile full --output outputs/mtbls2262_assessment.json
+merit ingest --source workbench --study-id ST000356 --fetch-mode auto --output outputs/st000356_bundle.json
+merit assess --bundle outputs/st000356_bundle.json --profile full --output outputs/st000356_assessment.json
+merit report --assessment outputs/st000356_assessment.json --format md --output outputs/st000356_report.md
+merit mw sync --root ~/.cache/merit/mw --limit 10
+merit mw pull ST004241 --root ~/.cache/merit/mw
+merit mw rebuild-index --root ~/.cache/merit/mw
+merit mw snapshot-create --root ~/.cache/merit/mw --output outputs/mw_snapshot.tar.gz
+merit mw snapshot-install --root ~/.cache/merit/mw --snapshot outputs/mw_snapshot.tar.gz
+merit mw full-run --dump-root /path/to/mw-dump-latest --output-root /path/to/merit-full-run-mw --profile full
+merit ui --port 8765
 ```
 
-## What The Docker Image Contains
+## CLI Commands
 
-The Docker image includes:
+- `merit ingest`
+- `merit normalize`
+- `merit assess`
+- `merit remediate`
+- `merit benchmark`
+- `merit report`
+- `merit ui`
+- `merit mw sync`
+- `merit mw pull`
+- `merit mw rebuild-index`
+- `merit mw snapshot-create`
+- `merit mw snapshot-install`
+- `merit mw full-run`
 
-- the MERIT-ML UI runtime;
-- static assets needed to render the browser interface;
-- a default pointer to the hosted MERIT assessment artifact root;
-- study browser, per-study readiness reports, source-level readiness bands, scoring-parameter controls, bulk MERIT analysis, and MERIT-derived export controls.
+`merit mw full-run` creates a centralized JSON cache (`<output-root>/json/*_workflow_state.json`) plus logs (`<output-root>/logs/`) so the UI can replay reports from cached JSON without touching raw dump files.
 
-The Docker image does **not** include `merit-cache-workbench-full-v7/` or any local Metabolomics Workbench source-data dump.
+## Scope of This Version
 
-## Internet Requirement
+This implementation delivers the initial end-to-end scientific core:
 
-MERIT-ML Docker requires internet access for normal study lookup because reports are loaded from hosted MERIT assessment artifacts rather than a bundled cache. The **Generate MERIT Export ZIP** feature also fetches matrices live from official Metabolomics Workbench REST endpoints.
+- canonical data model
+- dual-source local connectors
+- metrics across all planned score families
+- JSON assessment reports with reproducible content hashes
+- safe remediations (label normalization, duplicate feature collapse, missingness filtering)
+- baseline within-study and leave-one-study-out benchmarking
+- tests for parsers, metrics, and benchmark orchestration
+- remote accession fetchers with local cache materialization
+- JSON-first incremental Metabolomics Workbench archive sync
+- `catalog.sqlite` index plus content-addressed compressed object storage for MW
+- portable MW snapshot create/install commands for lightweight distribution
+- local testing UI with a directed workflow and experimental MetaboScore panel
 
-Some chart assets may also load from public JavaScript CDNs depending on browser cache state.
-
-## Build From Source
-
-Most users should use the prebuilt image above. Building the image from source does not require the MERIT v7 cache directory.
-
-Then run:
-
-```bash
-docker build -f docker/merit-ui-v2.Dockerfile -t merit-ml:v7-local .
-docker run --rm -p 8780:8773 merit-ml:v7-local
-```
-
-## Repository Contents
-
-```text
-merit-ui-v2/              MERIT-ML UI and Python runtime
-docker/                   Dockerfile and Docker distribution notes
-docker-compose.merit.yml  Local compose launcher
-```
-
-The large precomputed cache is intentionally not committed to Git history and is not distributed through the Docker image. The public image reads hosted MERIT assessment artifacts at runtime.
-
-## Citation
-
-If you use MERIT-ML, please cite the associated manuscript and Metabolomics Workbench data source as described in the MERIT-ML interface. Also cite the preprint associated with this study: Shayantan Banerjee, Pramod P. Wangikar. MERIT-ML: A Machine-Learning-Readiness Framework for Tabular Public Metabolomics Data. ChemRxiv. 10 June 2026.
-DOI: https://doi.org/10.26434/chemrxiv.15004429/v2
+It does not yet ship a production web application.

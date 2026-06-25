@@ -1,0 +1,9 @@
+credentials.env
+config.env
+cloudfare
+cloudflare
+*.token
+*secret*
+*credential*
+*.log
+tmp/

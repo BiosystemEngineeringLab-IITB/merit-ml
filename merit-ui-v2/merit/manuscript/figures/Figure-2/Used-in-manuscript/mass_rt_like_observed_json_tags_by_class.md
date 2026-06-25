@@ -1,0 +1,398 @@
+# Observed mass/RT-like field tags in mwTab JSON
+
+Source: direct scan of populated field names in `mw-dump-latest-confirmation-latest-version/ST*/AN*/json/*_mwtab.json` metabolite blocks.
+
+## mz-like (152)
+
+- `[M-H]- resp [M+H]+ acc mass m/z`
+- `acc mass [M+H]+ resp. [M-H]- m/z`
+- `Ave m/z`
+- `average m/z`
+- `Average m/z`
+- `Average Mz`
+- `Average Mz (LCMS); Quant Mz (GCMS)`
+- `Average.Mz`
+- `Batch m/z`
+- `CalcMz`
+- `Calculated m/z`
+- `CalMz`
+- `Characteristic Fragment Ions`
+- `characteristic_m/z`
+- `Characteristic_m/z`
+- `corrected_mz`
+- `daughter m/z`
+- `Expected m/z`
+- `Expected Mass m/z`
+- `Experimental m/z`
+- `feature (m/z@RT)`
+- `feature mz`
+- `Fragment Ion`
+- `Fragmentation ion (m/z)`
+- `ion Mz`
+- `Lib_mz`
+- `m-z_time`
+- `M.z`
+- `m.z`
+- `m.z.`
+- `m/z`
+- `M/Z`
+- `M/z`
+- `m/z (MS2, Da)`
+- `M/z (unique)`
+- `m/z [M+H]+`
+- `m/z [M-H]-`
+- `M/z Accuracy (%)`
+- `m/z at analysis`
+- `M/z Correlation (%)`
+- `m/z for M+H`
+- `m/z fragement`
+- `m/z matched`
+- `m/z meas.`
+- `m/z med`
+- `m/z Precursor Ion`
+- `m/z Product ion`
+- `m/z Product Ion`
+- `m/z ratio`
+- `m/z rounded`
+- `m/z value`
+- `m/z values`
+- `m/z window`
+- `m/z_tolerance_ppm`
+- `Mass (m/z)`
+- `Mass Info (precursor ion, product ion)`
+- `Mass to Charge`
+- `Mass to Charge (m/z)`
+- `measured m/z`
+- `med Mz`
+- `Median m/z`
+- `median Mz`
+- `medMz`
+- `Moverz Quant`
+- `moverz_quant`
+- `MRM`
+- `MRM (precursor ion/fragment ion)`
+- `ms1 m/z`
+- `MS1_mz`
+- `MS1_obs_mz`
+- `ms2 m/z`
+- `MS2_mz`
+- `mz`
+- `mZ`
+- `MZ`
+- `Mz`
+- `mz delta`
+- `mz_rt`
+- `neg m/z`
+- `observed m/z`
+- `ObsMZ`
+- `Parent ion`
+- `parent m/z`
+- `parent(m/z)`
+- `pos m/z`
+- `precursor (m/z)`
+- `Precursor Ion`
+- `precursor ion`
+- `Precursor ion (m/z)`
+- `Precursor Ion m/z`
+- `Precursor ion m/z`
+- `Precursor ions (Q1)`
+- `Precursor m/z`
+- `Precursor Mz`
+- `Precursor.m.z`
+- `Precursor.M.Z`
+- `PrecursorMz`
+- `precursorMz`
+- `product (m/z)`
+- `Product Ion`
+- `Product ion`
+- `product ion`
+- `Product ion (m/z)`
+- `Product ion m/z`
+- `Product Ion m/z`
+- `Product Ions`
+- `Product ions (Q3)`
+- `Product m/z`
+- `product m/z`
+- `Product Mz`
+- `ProductMz`
+- `productMz`
+- `Q1 (m/z)`
+- `Q1 m/z`
+- `Q3 (m/z)`
+- `Q3 m/z`
+- `Q4(m/z)`
+- `qualified m/z`
+- `quanitated m/z`
+- `quanitfied m/z`
+- `Quanitied m/z`
+- `Quant m/z`
+- `quant mz`
+- `quant_mz`
+- `quantified m/z`
+- `Quantified m/z`
+- `quantified m/z (Da)`
+- `Quantified M/z (MS1)`
+- `Quantified M/z (MS2)`
+- `quantified m/z (Q1)`
+- `quantified m/z (Q3)`
+- `quantified m/z `
+- `Quantified MS2 m/z`
+- `quantified mz`
+- `Quantified mz`
+- `quantified_m/z`
+- `quantitated m/z`
+- `Quantitated m/z`
+- `quantitated m/z [M+H]+`
+- `quantitated m/z [M-H]-`
+- `quantitated m/z avg`
+- `quantitated m/z measured`
+- `quantitated m/z value`
+- `quantitated mz`
+- `Reference m/z`
+- `Reference(m/z)`
+- `retention time_m/z`
+- `row m/z`
+- `stan_mz`
+- `theoretical m_z`
+- `theoretical.m_z`
+- `Δm/z [ppm]`
+
+## mass-like (85)
+
+- `[M-H]- resp [M+H]+ acc mass`
+- `[M] neutral acc mass`
+- `acc.mass (neutral)`
+- `Analyte Mass Ranges (Da)`
+- `Average Mass`
+- `Calc Mass`
+- `Calc MW`
+- `Calc. Molecular weight`
+- `Calc. MW`
+- `Calc..MW`
+- `Calculated mass`
+- `Compound Mass`
+- `Delta Mass`
+- `Derived Molecular Mass`
+- `Exact mass`
+- `exact mass`
+- `Exact Mass`
+- `Exact Mass (optional)`
+- `Exact mass molecule`
+- `Exact.mass`
+- `Exact_mass`
+- `ExactMass`
+- `exactmass`
+- `M meas.`
+- `Mass`
+- `mass`
+- `MASS`
+- `Mass (actual)`
+- `Mass (avg)`
+- `Mass (g/mol)`
+- `Mass (measured)`
+- `Mass accuracy (ppm, average across LC-MS runs)`
+- `Mass accuracy (ppm, mean of reversed-phase experiment set 1)`
+- `Mass Accuracy Score`
+- `Mass error`
+- `Mass error (ppm)`
+- `Mass Error (ppm)`
+- `mass error(ppm)`
+- `Mass error_ppm`
+- `Mass found`
+- `mass number`
+- `mass over z of significant ions (relative abundance)`
+- `Mass range 1`
+- `Mass range 2`
+- `mass spec`
+- `mass spectrum`
+- `Mass Transition`
+- `mass_spectrum`
+- `Mass_Transition`
+- `Measured mass`
+- `Measured mass (mean of reversed-phase experiment set 1)`
+- `Mol. Mass`
+- `Molecular Weight`
+- `Molecular weight`
+- `molecular weight`
+- `Molecular Weight (Da)`
+- `Molecular weight (Da)`
+- `MolecularWeight`
+- `Monoisotopic mass`
+- `Monoisotopic Mass`
+- `Monoisotopic_Mass`
+- `Monoisotopic_mass`
+- `MonoisotopicMass`
+- `MW`
+- `MW (detected)`
+- `MW (theoretical)`
+- `MW structure`
+- `mw_regno`
+- `Neutal Mass`
+- `Neutral Mass`
+- `neutral mass`
+- `Neutral mass`
+- `neutral_mass`
+- `Neutral_masses`
+- `NIST Observed Mol. Mass`
+- `NIST Theo. Mol. Mass`
+- `Q1 Mass`
+- `Q1 Mass (Da)`
+- `Q3 Mass`
+- `Q3 Mass (Da)`
+- `Quant mass`
+- `RSD (Mass, ppm)`
+- `Target Mass`
+- `Theoretical Mass (Neg)`
+- `Theoretical Mass (Pos)`
+
+## rt-like (134)
+
+- `alkane-based retention index`
+- `Analyte Expected RT (min)`
+- `average retention time minutes`
+- `Average Retention times(min)`
+- `Average RI`
+- `Average Rt (min) (LCMS); Retention Index (GCMS)`
+- `Average Rt(min)`
+- `Base RT (min)`
+- `BaseRt`
+- `BaseRT`
+- `Batch RT`
+- `Delta Ret Time (min)`
+- `Delta RT`
+- `expected retention time`
+- `Expected RT`
+- `Feature@RT`
+- `GC-MS RT %Error`
+- `Library RT`
+- `Measured RT (min)`
+- `med RT`
+- `med Rt`
+- `median Rt`
+- `Median RT (Min)`
+- `Median RT(min)`
+- `medRt`
+- `Molecular feature (M@RT)`
+- `Molecular feature (transition(s)@RT)`
+- `MS1_RT_std`
+- `MT/RT`
+- `r.t.`
+- `r.t. (min)`
+- `Reference RI`
+- `Reference RT`
+- `Reference RT (min)`
+- `ret index`
+- `ret time`
+- `Ret Time (min)`
+- `Ret. Index`
+- `ret.index`
+- `Ret.Time`
+- `retention index`
+- `Retention Index`
+- `Retention index`
+- `retention index (min)`
+- `retention index (minutes)`
+- `retention index `
+- `retention time`
+- `Retention Time`
+- `Retention time`
+- `RETENTION TIME`
+- `Retention time (average across LC-MS runs)`
+- `Retention time (mean of reversed-phase experiment set 1)`
+- `Retention time (median)`
+- `Retention time (medium)`
+- `Retention time (min)`
+- `retention time (min)`
+- `Retention Time (min)`
+- `Retention time (min) Experiment 1`
+- `Retention time (min) Experiment 2`
+- `Retention Time (mins)`
+- `Retention time [min]`
+- `retention time [min]`
+- `retention time C18 [min] Altis`
+- `retention time C30 [min] Exploris`
+- `Retention time in min`
+- `retention time index`
+- `retention time measured`
+- `Retention Time(min)`
+- `retention time(min) avg`
+- `retention time, min`
+- `Retention time, min`
+- `Retention time[min]`
+- `retention times`
+- `Retention times`
+- `Retention Times`
+- `Retention Times (min)`
+- `retention times (min)`
+- `Retention times (sec)`
+- `Retention times [min]`
+- `Retention times(min)`
+- `Retention times(min) avg`
+- `Retention times(min)avg`
+- `Retention.time`
+- `Retention.time..min.`
+- `retention_index`
+- `Retention_Index`
+- `Retention_time`
+- `retention_time`
+- `Retention_Time (min)`
+- `retention_time [mins]`
+- `retention_time(min)`
+- `retention_times`
+- `RetentionTime`
+- `Retentiontime`
+- `ri`
+- `RI`
+- `RI (resolved)`
+- `RI similarity`
+- `rindex`
+- `row retention time`
+- `RT`
+- `rt`
+- `Rt`
+- `RT (min)`
+- `rt (min)`
+- `RT (minutes)`
+- `RT (sec)`
+- `RT [min]`
+- `RT found`
+- `RT Match`
+- `RT matched`
+- `RT min.`
+- `RT rounded`
+- `RT similarity`
+- `RT(min)`
+- `Rt(min)`
+- `RT(minutes)`
+- `RT, min`
+- `RT-(min)`
+- `RT..seC-`
+- `RT.[min]`
+- `RT_mean_Analyte`
+- `RT_min`
+- `RT_minute`
+- `RT_range`
+- `RT_sec`
+- `RT_tolerance_min`
+- `rtimes`
+- `stan_rt_expected`
+- `Tgt RT`
+- `Tgt_RT_min`
+- `ΔRT`
+- `ΔRT error`
+- `ΔRT error (%)`
+
+## ambiguous (11)
+
+- `Compound`
+- `compound`
+- `Compound #`
+- `Identifier`
+- `identifier`
+- `parent`
+- `Precursor`
+- `Q1`
+- `Q3`
+- `Transition`
+- `transition`
+

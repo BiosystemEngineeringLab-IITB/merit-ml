@@ -37,6 +37,14 @@ def _e(text: str) -> str:
     return html.escape(str(text))
 
 
+def _repository_display_label(source: Any) -> str:
+    normalized = normalize_label(str(source or "")).lower()
+    if normalized in {"workbench", "metabolomics workbench", "metabolomics_workbench"}:
+        return "Metabolomics Workbench"
+    text = str(source or "").strip()
+    return text
+
+
 _V2_BAND_LABELS: dict[str, str] = {
     "Ready": "ML-ready",
     "Conditional": "ML-ready with caveats",
@@ -54,7 +62,7 @@ _V2_BAND_ORDER: dict[str, int] = {
 }
 
 _SCOPE_NOTE_TEXT = (
-    "MERIT is an independent, source-aware ML-readiness assessment of public metabolomics "
+    "MERIT-ML is an independent, source-aware ML-readiness assessment of public metabolomics "
     "tabular data. This report is derived from publicly available Metabolomics Workbench "
     "records and does not evaluate the scientific validity, analytical quality, or "
     "biological importance of the original study. Users should verify the current source "
@@ -63,8 +71,8 @@ _SCOPE_NOTE_TEXT = (
 )
 
 _INDEPENDENCE_NOTE_TEXT = (
-    "MERIT is an independent research tool developed for source-aware assessment of "
-    "supervised ML-readiness in public metabolomics tabular data. MERIT is not affiliated "
+    "MERIT-ML is an independent research tool developed for source-aware assessment of "
+    "supervised ML-readiness in public metabolomics tabular data. MERIT-ML is not affiliated "
     "with, endorsed by, or maintained by Metabolomics Workbench, NMDR, NIH, or the original "
     "data submitters. Original data and metadata remain attributable to their source "
     "repositories and study authors. We gratefully acknowledge the "
@@ -73,6 +81,85 @@ _INDEPENDENCE_NOTE_TEXT = (
 )
 
 _MERIT_PARSING_ISSUE_FORM_URL = "https://forms.gle/devGeKVKQTxJRceH7"
+
+_UMAMI_WEBSITE_ID = "e9fa298c-3199-4358-a0ec-8fa401f3eb10"
+_ANALYTICS_CONSENT_STORAGE_KEY = "merit-ml-umami-consent"
+
+
+def _merit_analytics_head_script() -> str:
+    return f"""<script>
+(function(){{
+  var KEY = "{_ANALYTICS_CONSENT_STORAGE_KEY}";
+  var WEBSITE_ID = "{_UMAMI_WEBSITE_ID}";
+  function loadUmami() {{
+    if (document.querySelector('script[data-website-id="' + WEBSITE_ID + '"]')) return;
+    var s = document.createElement("script");
+    s.defer = true;
+    s.src = "https://cloud.umami.is/script.js";
+    s.setAttribute("data-website-id", WEBSITE_ID);
+    document.head.appendChild(s);
+  }}
+  window.__meritAnalytics = {{
+    accept: function() {{
+      try {{ localStorage.setItem(KEY, "accepted"); }} catch (e) {{}}
+      loadUmami();
+      var banner = document.getElementById("merit-analytics-consent");
+      if (banner) banner.style.display = "none";
+      document.body.classList.remove("merit-analytics-banner-visible");
+    }},
+    decline: function() {{
+      try {{ localStorage.setItem(KEY, "declined"); }} catch (e) {{}}
+      var banner = document.getElementById("merit-analytics-consent");
+      if (banner) banner.style.display = "none";
+      document.body.classList.remove("merit-analytics-banner-visible");
+    }},
+    getConsent: function() {{
+      try {{ return localStorage.getItem(KEY); }} catch (e) {{ return null; }}
+    }}
+  }};
+  if (window.__meritAnalytics.getConsent() === "accepted") loadUmami();
+}})();
+</script>"""
+
+
+def _merit_analytics_consent_css() -> str:
+    return """
+#merit-analytics-consent{display:none;position:fixed;top:0;left:0;right:0;z-index:100000;
+  background:#4a90c4;color:#fff;font-size:.92rem;line-height:1.45;
+  box-shadow:0 2px 12px rgba(19,35,39,.18)}
+body.merit-analytics-banner-visible #merit-analytics-consent{display:block}
+body.merit-analytics-banner-visible{padding-top:92px}
+#merit-analytics-consent .merit-analytics-inner{max-width:min(1800px,calc(100vw - 28px));margin:0 auto;
+  padding:14px 18px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+#merit-analytics-consent .merit-analytics-text{flex:1 1 320px;margin:0}
+#merit-analytics-consent .merit-analytics-actions{display:flex;gap:10px;flex:0 0 auto}
+#merit-analytics-consent .merit-analytics-actions button{border:0;border-radius:4px;padding:10px 22px;
+  font:inherit;font-size:.82rem;font-weight:800;letter-spacing:.04em;color:#fff;cursor:pointer}
+#merit-analytics-consent .merit-analytics-accept{background:#3d9e52}
+#merit-analytics-consent .merit-analytics-accept:hover{background:#349447}
+#merit-analytics-consent .merit-analytics-decline{background:#d94b4b}
+#merit-analytics-consent .merit-analytics-decline:hover{background:#c43f3f}
+@media(max-width:700px){#merit-analytics-consent .merit-analytics-actions{width:100%;justify-content:flex-end}}
+"""
+
+
+def _merit_analytics_consent_banner() -> str:
+    return """<div id="merit-analytics-consent" role="dialog" aria-label="Analytics consent">
+  <div class="merit-analytics-inner">
+    <p class="merit-analytics-text">This website uses Umami Analytics to collect anonymous usage statistics. The data is processed via Umami Cloud and is not shared with any third parties or external services beyond what is required to operate the analytics service. These statistics are invaluable to us, as they enable us to focus future developments on the features of <strong>MERIT-ML</strong> that are most used, or on the contrary, to pinpoint the features that are of least interest to users.</p>
+    <div class="merit-analytics-actions">
+      <button type="button" class="merit-analytics-accept" onclick="window.__meritAnalytics.accept()">ACCEPT</button>
+      <button type="button" class="merit-analytics-decline" onclick="window.__meritAnalytics.decline()">DECLINE</button>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var consent = window.__meritAnalytics && window.__meritAnalytics.getConsent();
+  if (!consent) document.body.classList.add("merit-analytics-banner-visible");
+})();
+</script>"""
+
 
 _V2_DEFAULT_PARAMS: dict[str, float] = {
     # Band cutoffs
@@ -270,7 +357,7 @@ def _overview_verify_chip(study_id: Any, field_key: str) -> str:
         label="Verify from source",
         endpoint_label=endpoint_label,
         compact=True,
-        title=f"{note}. MERIT parsed or derived this displayed field from public Metabolomics Workbench source metadata. Endpoint: {endpoint_label}",
+        title=f"{note}. MERIT-ML parsed or derived this displayed field from public Metabolomics Workbench source metadata. Endpoint: {endpoint_label}",
     )
 
 
@@ -313,7 +400,7 @@ def _report_merit_parsing_issue_card(summary: dict[str, Any]) -> str:
             "style='display:inline-flex;align-items:center;justify-content:center;border-radius:12px;"
             "border:1px solid rgba(13,110,110,.32);background:#0d6e6e;color:white;"
             "padding:8px 12px;font-weight:800;text-decoration:none;font-size:.8rem'>"
-            "Report a MERIT parsing issue</a>"
+            "Report a MERIT-ML parsing issue</a>"
         )
     else:
         action_html = (
@@ -321,7 +408,7 @@ def _report_merit_parsing_issue_card(summary: dict[str, Any]) -> str:
             "style='display:inline-flex;align-items:center;justify-content:center;border-radius:12px;"
             "border:1px solid rgba(13,110,110,.22);background:rgba(13,110,110,.08);"
             "color:#0d6e6e;padding:8px 12px;font-weight:800;font-size:.8rem'>"
-            "Report a MERIT parsing issue</span>"
+            "Report a MERIT-ML parsing issue</span>"
         )
     chips = []
     if study_id:
@@ -346,12 +433,12 @@ def _report_merit_parsing_issue_card(summary: dict[str, Any]) -> str:
         "display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:flex-start;"
         "box-shadow:0 10px 26px rgba(19,35,39,.05)'>"
         "<div style='min-width:0;color:#2e474d;font-size:.86rem;line-height:1.5'>"
-        "<strong style='display:block;color:#132327;margin-bottom:3px'>Report a MERIT parsing issue</strong>"
-        "If you believe MERIT has mis-parsed a Metabolomics Workbench record, please report the issue "
-        "with the Study ID, source matrix, and expected correction. MERIT does not modify "
+        "<strong style='display:block;color:#132327;margin-bottom:3px'>Report a MERIT-ML parsing issue</strong>"
+        "If you believe MERIT-ML has mis-parsed a Metabolomics Workbench record, please report the issue "
+        "with the Study ID, source matrix, and expected correction. MERIT-ML does not modify "
         "original Metabolomics Workbench records."
         "<div style='margin-top:5px;color:#51656a;font-size:.8rem'>"
-        "Reports help distinguish MERIT parsing errors, missing or ambiguous source metadata, "
+        "Reports help distinguish MERIT-ML parsing errors, missing or ambiguous source metadata, "
         "and possible repository/API inconsistencies.</div>"
         f"{chip_html}"
         "</div>"
@@ -528,7 +615,7 @@ def _logo_asset_url() -> str:
 
 
 def _json_safe_state_payload(state: dict[str, Any] | None) -> dict[str, Any] | None:
-    """Build a derived-only public MERIT assessment JSON payload."""
+    """Build a derived-only public MERIT-ML assessment JSON payload."""
     if not state:
         return None
 
@@ -644,7 +731,7 @@ def _json_safe_state_payload(state: dict[str, Any] | None) -> dict[str, Any] | N
                 if not isinstance(metric_dict, dict):
                     continue
                 # Informational analytical-QC entries may encode source-deposited metadata
-                # such as platform/instrument descriptors. Public JSON keeps scored MERIT
+                # such as platform/instrument descriptors. Public JSON keeps scored MERIT-ML
                 # outputs only.
                 if bool(metric_dict.get("informational", False)):
                     continue
@@ -713,7 +800,7 @@ def _json_safe_state_payload(state: dict[str, Any] | None) -> dict[str, Any] | N
             "matrix_properties_adjusted": bool(state.get("v2_matrix_overrides")),
         },
         "provenance_note": (
-            "This JSON is a MERIT-derived assessment summary. It intentionally excludes "
+            "This JSON is a MERIT-ML-derived assessment summary. It intentionally excludes "
             "source-deposited metadata fields, per-sample labels, and tabular matrix values."
         ),
     }
@@ -874,7 +961,7 @@ def _citation_card_html(summary: dict[str, Any], precomputed_root: str | Path) -
     else:
         doi_sentence = (
             "Project DOI was not detected in the parsed source metadata at the time of "
-            "MERIT access. This limits automated citation completeness for ML-reuse "
+            "MERIT-ML access. This limits automated citation completeness for ML-reuse "
             "reporting. Please verify the current Project DOI status on the original "
             f"Metabolomics Workbench project page. {verify_button} "
         )
@@ -1391,7 +1478,7 @@ def _study_browser_data_payload(precomputed_root: str | Path, query: dict[str, s
         bulk_offset = int(query.get("bulk_offset", 0) or 0)
     except ValueError:
         bulk_offset = 0
-    # Keep each Bulk MERIT run bounded, but expose all matched studies as
+    # Keep each Bulk MERIT-ML run bounded, but expose all matched studies as
     # navigable batches so broad filters can be processed 500 at a time.
     bulk_limit = max(1, min(bulk_limit, 500))
     bulk_batch_count = ((len(filtered) + bulk_limit - 1) // bulk_limit) if filtered else 0
@@ -1474,7 +1561,7 @@ def _study_browser_html(precomputed_root: str | Path, limit: int = 500) -> str:
 	        "<p style='margin:0 0 7px;color:#6d7f84;font-size:.7rem;line-height:1.35'>"
 	        "Query grammar: comma = AND; pipe = OR; tags include organism:, disease:, analysis:, title:, instrument:, chromatography:, sample:, project:. "
 	        "Examples: <code>alzheimers, human, ms</code> or <code>disease:cancer|tumor|carcinoma, organism:human, analysis:ms</code>. "
-	        "Bulk MERIT runs are capped at 500 studies per run; use batch controls for studies 1-500, 501-1000, etc."
+	        "Bulk MERIT-ML runs are capped at 500 studies per run; use batch controls for studies 1-500, 501-1000, etc."
 	        "</p>"
 	        "<div id='study-browser-list' style='max-height:min(56vh,620px);overflow:auto;border:1px solid var(--line);"
         "border-radius:10px;padding:6px;background:rgba(255,255,255,.84)'>"
@@ -1499,7 +1586,7 @@ def _bulk_workspace_html(precomputed_root: str | Path) -> str:
         "border-radius:14px;background:linear-gradient(180deg,rgba(13,110,110,.09),rgba(255,255,255,.72))'>"
         "<div style='display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px'>"
         "<h3 style='margin:0;font-size:.88rem;text-transform:uppercase;letter-spacing:.07em;color:#123135'>"
-        "Bulk MERIT Analysis</h3>"
+        "Bulk MERIT-ML Analysis</h3>"
         "</div>"
         "<p style='margin:0 0 10px;color:#51656a;font-size:.78rem;line-height:1.45'>"
         "Build a study set from Find Similar Studies, save per-study matrix/threshold edits, then run one sortable report."
@@ -1533,7 +1620,7 @@ def _bulk_workspace_html(precomputed_root: str | Path) -> str:
         "<button id='bulk-run-button' type='submit' style='width:100%;border:0;border-radius:13px;"
         "background:#0d6e6e;color:white;padding:10px 12px;font:inherit;font-size:.82rem;"
         "font-weight:900;cursor:pointer;box-shadow:0 10px 20px rgba(13,110,110,.18)'>"
-        "Run Bulk MERIT</button>"
+        "Run Bulk MERIT-ML</button>"
         "</form>"
         "<button id='bulk-download-session' type='button' style='width:100%;margin-top:8px;border:1px solid rgba(19,35,39,.14);"
         "border-radius:12px;background:rgba(255,255,255,.82);color:#51656a;padding:8px 9px;"
@@ -1870,14 +1957,14 @@ def _study_design_context_notice(
         if feasibility_limited:
             body = (
                 "Small replicate numbers may be appropriate for the original experimental objective. "
-                "MERIT still applies supervised-classification feasibility rules; the readiness band describes "
+                "MERIT-ML still applies supervised-classification feasibility rules; the readiness band describes "
                 "reuse for classifier training, validation, and feature selection."
             )
         else:
             body = (
                 "The metadata suggests an experimental or replicate-based design. This context helps interpret "
                 "whether n primarily represents biological replicates, engineered perturbations, time points, "
-                "or related experimental units; it does not change MERIT scores or bands."
+                "or related experimental units; it does not change MERIT-ML scores or bands."
             )
     elif primary == "cohort_or_subject_based":
         if feasibility_limited:
@@ -1889,7 +1976,7 @@ def _study_design_context_notice(
             body = (
                 "The metadata suggests a subject/specimen-based design. This context helps interpret n as "
                 "samples, subjects, or specimens for supervised-classification reuse; it does not change "
-                "MERIT scores or bands."
+                "MERIT-ML scores or bands."
             )
     elif primary == "metadata_only_or_no_usable_matrix":
         body = (
@@ -1906,7 +1993,7 @@ def _study_design_context_notice(
             body = (
                 "The available metadata was not explicit enough to confidently distinguish cohort/specimen-based "
                 "from experimental/replicate-based design. This context is shown for transparency and does not "
-                "change MERIT scores or bands."
+                "change MERIT-ML scores or bands."
             )
 
     confidence = str(study_design_context.get("confidence") or "low").strip().lower()
@@ -1930,11 +2017,11 @@ def _study_design_context_notice(
         n_text += f" · n interpreted as {_e(n_term)}"
 
     tooltip = (
-        "Study-design context is a MERIT-derived label, not a native Metabolomics Workbench field. It was inferred "
+        "Study-design context is a MERIT-ML-derived label, not a native Metabolomics Workbench field. It was inferred "
         "from multiple Metabolomics Workbench metadata fields including title, summary, project type, organism, "
         "disease field, sample source, tissue or sample matrix, factors, class labels, and design terms "
         "such as time-course, cell culture, in vitro, treatment, dose response, and isotope tracing. "
-        "It does not change MERIT scores, gates, or bands."
+        "It does not change MERIT-ML scores, gates, or bands."
     )
     disclaimer = (
         "Note: this label is inferred from multiple metadata fields and is not directly provided by "
@@ -2013,7 +2100,7 @@ def _source_sample_count_notice(study_id: str) -> str:
     reason = str(note.get("possible_reason", "")).strip()
     user_note = str(note.get("user_note", "")).strip()
     tooltip = (
-        "This is a display-only source-comparison note. MERIT scores each deposited source independently "
+        "This is a display-only source-comparison note. MERIT-ML scores each deposited source independently "
         "using the usable samples present in that source's feature matrix. The note does not change any "
         "score, gate, band, or downloaded result JSON."
     )
@@ -2180,7 +2267,7 @@ def _study_header(summary: dict[str, Any]) -> str:
         )
 
     # Prefer source-aware missingness from the scored metric. The ingestion
-    # summary can undercount mwTab/untarg zeros, which MERIT treats as missing.
+    # summary can undercount mwTab/untarg zeros, which MERIT-ML treats as missing.
     _source_aware_missing = summary.get("_overview_missingness_rate")
     if _source_aware_missing is not None:
         _miss_pct = _safe_missing_rate(_source_aware_missing) * 100
@@ -2283,7 +2370,7 @@ def _study_header(summary: dict[str, Any]) -> str:
         f"{_design_summary_sentence(summary)}"
         f"{row('Study ID', summary.get('study_id', ''), 'study_id')}"
         f"{study_link_html}"
-        f"{row('Repository', (summary.get('source') or '').upper(), 'repository')}"
+        f"{row('Repository', _repository_display_label(summary.get('source')), 'repository')}"
         f"{row('Title', summary.get('title', ''), 'title')}"
         f"{row('Disease / Condition', summary.get('disease', ''), 'disease')}"
         f"{row('Organism', summary.get('organism', ''), 'organism')}"
@@ -2437,7 +2524,7 @@ def _per_analysis_table(
                 endpoint_label=matrix_label,
                 compact=True,
                 title=(
-                    "Verify the source-specific table that MERIT parsed for samples, features, "
+                    "Verify the source-specific table that MERIT-ML parsed for samples, features, "
                     f"and missingness. Endpoint: {matrix_label}"
                 ),
             )
@@ -2521,7 +2608,7 @@ def _per_analysis_table(
         + _hdr("Units", "Abundance unit declared in source metadata/table. Verify via the row Metadata link, and where needed the row Matrix link.")
         + _hdr("Samples", "Total sample rows parsed from this source matrix. Verify via the row Matrix link to the active source-specific REST endpoint.", "right")
         + _hdr("Features", "Total number of features parsed from this source matrix, excluding sample-ID, class, and metadata columns. Verify via the row Matrix link.", "right")
-        + _hdr("Missingness", "Fraction of abundance cells MERIT parsed as missing in this source matrix. Verify the underlying source table via the row Matrix link.")
+        + _hdr("Missingness", "Fraction of abundance cells MERIT-ML parsed as missing in this source matrix. Verify the underlying source table via the row Matrix link.")
         + _hdr("Verify source", "Metadata opens /rest/study/analysis_id/<AN>/mwtab/txt. Matrix opens the active source-specific endpoint used for samples, features, and missingness.")
     )
     return (
@@ -3041,7 +3128,7 @@ _METRIC_DESCRIPTORS: dict[str, str] = {
     "metabatch_batch_annotation_compatibility": (
         "Reports whether Metabolomics Workbench factor annotations can be converted into MetaBatch-style batch/covariate tables for the active matrix samples. "
         "A factor is considered usable if it has at least two non-empty levels, covers at least 60% of samples, and is not nearly one unique value per sample (>90% distinct). "
-        "Technical-like keys are a conservative MERIT add-on based on explicit batch/run/order/plate/injection/acquisition-like text in factor names or values; "
+        "Technical-like keys are a conservative MERIT-ML add-on based on explicit batch/run/order/plate/injection/acquisition-like text in factor names or values; "
         "generic biological covariates are not treated as proven technical batch metadata. Informational only."
     ),
     "assay_platform_comparability": (
@@ -3256,11 +3343,11 @@ def _v2_display_text(text: Any) -> Any:
     for old, new in (
         (
             "Add a DOI to the PROJECT block (PROJECT.DOI in mwtab). Metabolomics Workbench assigns dataset DOIs under the 10.21228/ prefix at submission; contact Metabolomics Workbench support if the field is missing. A linked publication DOI is also accepted.",
-            "Project DOI was not detected in the parsed source metadata at the time of MERIT access. This limits automated citation completeness for ML-reuse reporting. Please verify the current Project DOI status on the original Metabolomics Workbench project page.",
+            "Project DOI was not detected in the parsed source metadata at the time of MERIT-ML access. This limits automated citation completeness for ML-reuse reporting. Please verify the current Project DOI status on the original Metabolomics Workbench project page.",
         ),
         (
             "Link a publication (PUBLICATIONS field) so the methodology is traceable to peer-reviewed documentation.",
-            "Associated publication metadata was not detected in the parsed source record. MERIT flags methodology provenance as limited for automated reuse; users should verify publications on the original Metabolomics Workbench study page.",
+            "Associated publication metadata was not detected in the parsed source record. MERIT-ML flags methodology provenance as limited for automated reuse; users should verify publications on the original Metabolomics Workbench study page.",
         ),
         (
             "Declare the funding source (FUNDING_SOURCE) to meet standard RDM requirements and enable cross-study funding-body filtering.",
@@ -3288,7 +3375,7 @@ def _v2_display_text(text: Any) -> Any:
         ),
         (
             "Inspect outlier samples separately before training and verify no acquisition artifacts dominate.",
-            "Outlier samples were detected by MERIT diagnostics. Users should inspect whether these reflect biological signal, acquisition artifacts, or preprocessing effects before supervised ML reuse.",
+            "Outlier samples were detected by MERIT-ML diagnostics. Users should inspect whether these reflect biological signal, acquisition artifacts, or preprocessing effects before supervised ML reuse.",
         ),
         (
             "Rebalance or stratify the cohort before training predictive models.",
@@ -3296,7 +3383,7 @@ def _v2_display_text(text: Any) -> Any:
         ),
         (
             "At least 2 labeled classes are required to assess class-size support.",
-            "At least two labeled groups are needed for MERIT to assess supervised-classification class support.",
+            "At least two labeled groups are needed for MERIT-ML to assess supervised-classification class support.",
         ),
         (
             "Use labels with >=2 classes and enough samples per class.",
@@ -3335,12 +3422,12 @@ def _v2_display_text(text: Any) -> Any:
 
     text = re.sub(
         r"Only\s+(\d+/\d+)\s+metabolites have a RefMet match\. Submit missing metabolites to RefMet for standardised annotation\.",
-        r"Only \1 named metabolites were matched to RefMet in MERIT parsing. Identifier-level reuse may therefore be limited; users should verify metabolite identifiers and mappings at the source.",
+        r"Only \1 named metabolites were matched to RefMet in MERIT-ML parsing. Identifier-level reuse may therefore be limited; users should verify metabolite identifiers and mappings at the source.",
         text,
     )
     text = re.sub(
         r"Drop or impute\s+([0-9,]+)\s+features with >30% missingness before training\.",
-        r"\1 features exceed the high-missingness threshold used by MERIT. Downstream users may need imputation, filtering, or sensitivity analysis before supervised ML reuse.",
+        r"\1 features exceed the high-missingness threshold used by MERIT-ML. Downstream users may need imputation, filtering, or sensitivity analysis before supervised ML reuse.",
         text,
     )
     text = re.sub(
@@ -3350,7 +3437,7 @@ def _v2_display_text(text: Any) -> Any:
     )
     text = re.sub(
         r"Fewer than\s+(\d+)\s+ML-eligible samples detected\. ML models may be unreliable at this scale\.",
-        r"Fewer than \1 ML-eligible samples were detected. MERIT treats this as limited support for reliable supervised-classification training, validation, or feature selection.",
+        r"Fewer than \1 ML-eligible samples were detected. MERIT-ML treats this as limited support for reliable supervised-classification training, validation, or feature selection.",
         text,
     )
     text = re.sub(
@@ -4629,7 +4716,7 @@ def _metric_info_tooltip(
             "</div>"
             "<div style='color:#51656a;font-size:.78rem;line-height:1.45;margin-top:6px'>"
             f"Rule source: {_e(source_rule)}. "
-            "The separate <strong>technical-like key</strong> flag is MERIT-specific: it scans factor "
+            "The separate <strong>technical-like key</strong> flag is MERIT-ML-specific: it scans factor "
             "names and values for explicit batch/run/order/plate/injection/acquisition-like text, so "
             "generic biological factors are not overinterpreted as technical batch metadata."
             "</div>"
@@ -5749,7 +5836,7 @@ def _analytical_breakdown_html(m: Any) -> str:
             f"<div style='color:#51656a;margin-top:4px'><strong>Explicit technical batch-like keys:</strong> {'Yes' if technical else 'No'}</div>"
             "<div style='color:#51656a;margin-top:6px;line-height:1.45'>"
             "This ports the StdMW/MetaBatch idea of converting Metabolomics Workbench allfactors into a batches/covariates table. "
-            "MERIT keeps the interpretation conservative: generic factors may be useful covariates, but only factor names or values containing explicit batch/run/order/plate/injection/acquisition-like text are treated as technical-like metadata. "
+            "MERIT-ML keeps the interpretation conservative: generic factors may be useful covariates, but only factor names or values containing explicit batch/run/order/plate/injection/acquisition-like text are treated as technical-like metadata. "
             "<a href='https://bioinformatics.mdanderson.org/public-software/metabatch/' target='_blank' rel='noopener noreferrer' style='color:#0d6e6e;font-weight:700'>Original MetaBatch tool</a>."
             "</div>"
             f"{table}"
@@ -6406,7 +6493,7 @@ def _risks_panel(report: Any) -> str:
             "<h4 style='margin:0 0 8px;font-size:.9rem;text-transform:uppercase;letter-spacing:.06em;color:#196b4a'>"
             "ML-reuse caveats</h4>"
             "<p style='font-size:.85rem;color:#196b4a;margin:0'>"
-            "No major ML-reuse caveats detected under the current MERIT profile.</p>"
+            "No major ML-reuse caveats detected under the current MERIT-ML profile.</p>"
             "</div>"
         )
 
@@ -6429,7 +6516,7 @@ def _risks_panel(report: Any) -> str:
                 return ("Not detected in parsed source", "#995b00", "#fdf3e3")
             if section in {"Structural", "Label Structure and Class Support", "ML Task Readiness"}:
                 return ("ML-reuse blocker", "#8f2d2d", "#fdeaea")
-            return ("Required for selected MERIT profile", "#8f2d2d", "#fdeaea")
+            return ("Required for selected MERIT-ML profile", "#8f2d2d", "#fdeaea")
         if section in {"Metadata and FAIR Reusability", "Annotation / Interoperability"} or metric_name in parsed_source_metrics:
             return ("Verification recommended", "#995b00", "#fdf3e3")
         return ("ML-reuse caveat", "#995b00", "#fdf3e3")
@@ -6463,7 +6550,7 @@ def _risks_panel(report: Any) -> str:
         "<h4 style='margin:0 0 8px;font-size:.9rem;text-transform:uppercase;letter-spacing:.06em;"
         "color:#995b00'>ML-reuse caveats</h4>"
         "<p style='margin:0 0 10px;color:#51656a;font-size:.82rem;line-height:1.5'>"
-        "These caveats are derived from MERIT parsing of public source metadata and tabular matrices. "
+        "These caveats are derived from MERIT-ML parsing of public source metadata and tabular matrices. "
         "They are not judgments of the original study purpose, scientific value, or repository quality. "
         "Source-sensitive items should be verified on the original Metabolomics Workbench record.</p>"
         f"<ul style='list-style:none;margin:0;padding:0'>{items}</ul>{more}"
@@ -6640,7 +6727,7 @@ def _matrix_adjust_tab_html(
         "</table>"
         "</div>"
         "<div style='display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-top:12px'>"
-        "<p style='margin:0;color:#7b8b90;font-size:.78rem;line-height:1.45'>Default values come from MERIT's parsed sample metadata and current QC/blank filtering. "
+        "<p style='margin:0;color:#7b8b90;font-size:.78rem;line-height:1.45'>Default values come from MERIT-ML's parsed sample metadata and current QC/blank filtering. "
         "Use Reset to discard all manual matrix-property overrides.</p>"
         "<button type='submit' form='run-form' class='v2-reset matrix-reset-overrides'>Reset sample overrides</button>"
         "</div>"
@@ -6665,7 +6752,7 @@ def _download_tabular_data_tab_html(
         analysis_list_html = (
             "<div style='margin:0 0 12px;padding:10px 12px;border-radius:13px;background:rgba(255,255,255,.72);"
             "border:1px solid rgba(19,35,39,.08)'>"
-            "<strong style='display:block;color:#132327;margin-bottom:6px;font-size:.86rem'>Analyses detected in this MERIT report</strong>"
+            "<strong style='display:block;color:#132327;margin-bottom:6px;font-size:.86rem'>Analyses detected in this MERIT-ML report</strong>"
             "<div style='display:flex;gap:6px;flex-wrap:wrap'>"
             + "".join(
                 f"<span style='padding:3px 8px;border-radius:999px;background:rgba(13,110,110,.08);color:#0d6e6e;font-weight:800;font-size:.74rem'>{_e(aid)}</span>"
@@ -6686,18 +6773,18 @@ def _download_tabular_data_tab_html(
         "<div style='display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px'>"
         "<div>"
         "<h4 style='margin:0 0 6px;font-size:.95rem;text-transform:uppercase;letter-spacing:.06em'>"
-        "DOWNLOAD MERIT-DERIVED TABULAR EXPORT</h4>"
+        "DOWNLOAD MERIT-ML-DERIVED TABULAR EXPORT</h4>"
         "<p style='margin:0;color:#51656a;line-height:1.55;max-width:920px'>"
-        "MERIT uses the Metabolomics Workbench REST API at download time to generate source-specific tabular "
+        "MERIT-ML uses the Metabolomics Workbench REST API at download time to generate source-specific tabular "
         "exports for reproducibility of this assessment. Each parseable source table is used to create a "
-        "MERIT-derived, machine-learning-compatible TSV with rows as samples and columns as metabolite features. "
-        "Source matrix measurement values are preserved, while MERIT may add aligned class labels, sample "
+        "MERIT-ML-derived, machine-learning-compatible TSV with rows as samples and columns as metabolite features. "
+        "Source matrix measurement values are preserved, while MERIT-ML may add aligned class labels, sample "
         "inclusion/exclusion indicators, and source manifests."
         "</p>"
         "<p style='margin:8px 0 0;color:#51656a;line-height:1.55;max-width:920px'>"
         "Only ML-eligible samples under the current assessment settings are exported. Any active Adjust Matrix "
         "Properties settings are applied before TSV files are generated. The exported files should be interpreted "
-        "together with the downloaded MERIT Assessment JSON, which records the source, settings, scoring profile, "
+        "together with the downloaded MERIT-ML Assessment JSON, which records the source, settings, scoring profile, "
         "and citation/provenance summary."
         "</p>"
         "</div>"
@@ -6708,7 +6795,7 @@ def _download_tabular_data_tab_html(
         "<ul style='margin:0;padding-left:18px;color:#51656a;line-height:1.5;font-size:.86rem'>"
         "<li>Parseable source-specific tables accessible through the Metabolomics Workbench REST response at download time.</li>"
         "<li>One TSV per source and analysis when a parseable matrix is returned.</li>"
-        "<li>Source and citation manifests including Study ID, Project ID, Project DOI where detected, REST source URL, access date, MERIT version, and matrix dimensions.</li>"
+        "<li>Source and citation manifests including Study ID, Project ID, Project DOI where detected, REST source URL, access date, MERIT-ML version, and matrix dimensions.</li>"
         "<li>Skipped-sample and label-alignment manifests for reproducibility.</li>"
         "</ul>"
         "</div>"
@@ -6717,8 +6804,8 @@ def _download_tabular_data_tab_html(
         "<ul style='margin:0;padding-left:18px;color:#51656a;line-height:1.5;font-size:.86rem'>"
         "<li>Source matrix measurement values are not transformed, normalized, scaled, imputed, or feature-remediated.</li>"
         "<li>No Metabolomics Workbench repository files are modified.</li>"
-        "<li>MERIT does not maintain a persistent server-side mirror of generated exports.</li>"
-        "<li>Exported files are MERIT-derived assessment inputs, not official Metabolomics Workbench files.</li>"
+        "<li>MERIT-ML does not maintain a persistent server-side mirror of generated exports.</li>"
+        "<li>Exported files are MERIT-ML-derived assessment inputs, not official Metabolomics Workbench files.</li>"
         "</ul>"
         "</div>"
         "<div style='padding:13px;border:1px solid rgba(143,45,45,.16);border-radius:14px;background:rgba(143,45,45,.055)'>"
@@ -6726,7 +6813,7 @@ def _download_tabular_data_tab_html(
         "<p style='margin:0;color:#51656a;line-height:1.5;font-size:.86rem'>"
         "This export is generated from public Metabolomics Workbench/NMDR source records. Users should cite the "
         "original Metabolomics Workbench study/project, including the Study ID/accession, Project ID, Project DOI where available, "
-        "and associated publication(s) where applicable. MERIT-derived assessment scores and exports should be cited "
+        "and associated publication(s) where applicable. MERIT-ML-derived assessment scores and exports should be cited "
         "separately from the original source data."
         "</p>"
         "</div>"
@@ -6746,7 +6833,7 @@ def _download_tabular_data_tab_html(
         f"<input type='hidden' name='analysis_ids' value='{_e(json.dumps(analysis_ids))}'>"
         "<input type='hidden' name='matrix_overrides' class='ml-download-overrides' value='{}'>"
         "<button type='submit' class='v2-apply' style='padding:10px 14px;border-radius:13px'>"
-        "Generate MERIT Export ZIP</button>"
+        "Generate MERIT-ML Export ZIP</button>"
         "<span style='display:inline-block;margin-left:10px;color:#7b8b90;font-size:.78rem;line-height:1.4'>"
         "Generated on demand from Metabolomics Workbench REST; large studies may take a moment."
         "</span>"
@@ -6966,12 +7053,12 @@ def _tabbed_report(report: Any, readiness_score: dict[str, Any],
         f"background:rgba(245,241,232,.72);border:1px solid rgba(19,35,39,.08);text-align:left'>"
         f"<div style='display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap'>"
         f"<span style='font-size:.72rem;color:#51656a;text-transform:uppercase;letter-spacing:.05em'>"
-        f"MERIT extraction confidence</span>"
+        f"MERIT-ML extraction confidence</span>"
         f"<span style='font-size:.75rem;font-weight:700;padding:2px 9px;border-radius:20px;"
         f"background:{conf_color}22;color:{conf_color};border:1px solid {conf_color}55'>{_e(conf_level)}</span>"
         f"</div>"
         f"<div style='font-size:.72rem;color:#51656a;line-height:1.45;margin-top:6px;text-align:center'>"
-        "Confidence reflects how completely MERIT could parse the public source metadata and matrix structure. "
+        "Confidence reflects how completely MERIT-ML could parse the public source metadata and matrix structure. "
         "It does not represent confidence in the biological conclusions of the original study."
         f"</div>"
         f"<div style='font-size:.7rem;color:#7b8b90;line-height:1.4;margin-top:4px;text-align:center'>"
@@ -7678,15 +7765,15 @@ def _result_panel(
         f"<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:16px'>"
         f"<div>"
         f"<h2 style='margin:0;font-family:\"Iowan Old Style\",Georgia,serif;font-size:1.5rem'>"
-        f"MERIT Assessment Report — {_e(summary.get('study_id',''))}</h2>"
+        f"MERIT-ML Assessment Report — {_e(summary.get('study_id',''))}</h2>"
         f"<p style='margin:4px 0 0;color:#51656a;font-size:.88rem'>"
-        f"{_e(summary.get('title','')[:100])} &bull; {_e((summary.get('source') or '').upper())}</p>"
+        f"{_e(summary.get('title','')[:100])} &bull; {_e(_repository_display_label(summary.get('source')))}</p>"
         f"</div>"
         f"<div style='display:flex;gap:8px;align-items:center'>"
         f"<button onclick='downloadRenderedState()' style='border:1px solid rgba(13,110,110,.35);border-radius:12px;"
         f"padding:9px 14px;background:rgba(13,110,110,.08);color:#0d6e6e;font:inherit;font-size:.82rem;"
-        f"font-weight:700;cursor:pointer;white-space:nowrap' title='Download the compact public MERIT assessment JSON'>"
-        f"Download MERIT Assessment JSON</button>"
+        f"font-weight:700;cursor:pointer;white-space:nowrap' title='Download the compact public MERIT-ML assessment JSON'>"
+        f"Download MERIT-ML Assessment JSON</button>"
         f"</div>"
         f"</div>"
     )
@@ -7702,7 +7789,7 @@ def _result_panel(
     return (
         f"<div style='margin-top:26px'>"
         f"<div style='margin:0 0 10px;color:#51656a;font-size:.86rem'>"
-        f"Please download and keep this MERIT Assessment JSON for reproducibility.</div>"
+        f"Please download and keep this MERIT-ML Assessment JSON for reproducibility.</div>"
         f"{pdf_header}"
         f"{scope_note_html}"
         f"{parsing_issue_html}"
@@ -7712,7 +7799,7 @@ def _result_panel(
         f"<script>"
         f"window.__MERIT_STATE_JSON = {state_json_js};"
         f"window.downloadRenderedState = function() {{"
-        f"  if (!window.__MERIT_STATE_JSON) {{ alert('No MERIT Assessment JSON available to download.'); return; }}"
+        f"  if (!window.__MERIT_STATE_JSON) {{ alert('No MERIT-ML Assessment JSON available to download.'); return; }}"
         f"  var blob = new Blob([JSON.stringify(window.__MERIT_STATE_JSON, null, 2)], {{type:'application/json'}});"
         f"  var a = document.createElement('a');"
         f"  a.href = URL.createObjectURL(blob);"
@@ -7770,9 +7857,9 @@ def _bulk_clean_session(raw: str) -> dict[str, Any]:
     try:
         payload = json.loads(raw or "{}")
     except Exception as exc:
-        raise ValueError("Bulk MERIT session JSON could not be parsed.") from exc
+        raise ValueError("Bulk MERIT-ML session JSON could not be parsed.") from exc
     if not isinstance(payload, dict):
-        raise ValueError("Bulk MERIT session must be a JSON object.")
+        raise ValueError("Bulk MERIT-ML session must be a JSON object.")
     studies_raw = payload.get("studies")
     if isinstance(studies_raw, dict):
         iterable = studies_raw.values()
@@ -7805,7 +7892,7 @@ def _bulk_clean_session(raw: str) -> dict[str, Any]:
             }
         )
     if not studies:
-        raise ValueError("Bulk MERIT session contains no valid ST study IDs.")
+        raise ValueError("Bulk MERIT-ML session contains no valid ST study IDs.")
     return {
         "version": payload.get("version", 1),
         "created_at": payload.get("created_at", ""),
@@ -7891,8 +7978,8 @@ def _ml_export_derivation_metadata(
         "generated_at_utc": generated_at,
         "merit_version": MERIT_VERSION,
         "derivation_note": (
-            "This file was generated by MERIT from public Metabolomics Workbench tabular data "
-            "for ML-readiness assessment. It is a MERIT-derived representation and does not "
+            "This file was generated by MERIT-ML from public Metabolomics Workbench tabular data "
+            "for ML-readiness assessment. It is a MERIT-ML-derived representation and does not "
             "replace the original Metabolomics Workbench record."
         ),
         "citation_note": (
@@ -7994,7 +8081,7 @@ def _ml_export_untarg_registry_analyses(study_id: str) -> tuple[list[str], list[
 
 
 def _ml_export_cached_analysis_ids(study_id: str) -> tuple[list[str], list[str]]:
-    """Fallback to MERIT assessment metadata for IDs only; matrix values still use REST."""
+    """Fallback to MERIT-ML assessment metadata for IDs only; matrix values still use REST."""
     try:
         state = _load_precomputed_state(
             study_id=study_id,
@@ -8022,14 +8109,14 @@ def _ml_export_cached_analysis_ids(study_id: str) -> tuple[list[str], list[str]]
     if not analysis_ids:
         return [], []
     return analysis_ids, [
-        "Recovered analysis IDs from the current MERIT assessment metadata; exported matrix values were fetched live from Metabolomics Workbench REST."
+        "Recovered analysis IDs from the current MERIT-ML assessment metadata; exported matrix values were fetched live from Metabolomics Workbench REST."
     ]
 
 
 def _ml_export_study_analyses(study_id: str, analysis_ids: Any = None) -> tuple[list[str], list[str]]:
     explicit_ids = _ml_export_clean_analysis_ids(analysis_ids)
     if explicit_ids:
-        return explicit_ids, ["Using analysis IDs from the current MERIT report."]
+        return explicit_ids, ["Using analysis IDs from the current MERIT-ML report."]
     url = f"{_WB_REST_BASE}/study/study_id/{study_id}/analysis"
     warnings: list[str] = []
     try:
@@ -8152,7 +8239,7 @@ def _ml_export_mwtab_table(text: str) -> tuple[list[str], list[list[str]], dict[
 
 
 def _ml_export_mwtab_matrix_rows(text: str) -> tuple[list[dict[str, Any]], list[str], list[str]]:
-    """Parse mwTab with the same row-oriented conversion used by MERIT ingestion."""
+    """Parse mwTab with the same row-oriented conversion used by MERIT-ML ingestion."""
     labels: dict[str, str] = {}
     lines = text.splitlines()
     for line in lines:
@@ -8414,14 +8501,14 @@ def _ml_export_write_tsv(zf: zipfile.ZipFile, path: str, header: list[str], rows
 def _ml_export_build_zip(studies: list[dict[str, Any]], *, bulk: bool = False) -> tuple[bytes, str]:
     generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     manifest: dict[str, Any] = {
-        "export_type": "MERIT-derived ML assessment inputs",
+        "export_type": "MERIT-ML-derived ML assessment inputs",
         "generated_at_utc": generated_at,
         "rest_api_base": _WB_REST_BASE,
         "source_repository": "Metabolomics Workbench",
         "merit_version": MERIT_VERSION,
         "derivation_note": (
-            "This ZIP contains MERIT-derived representations of public Metabolomics Workbench tabular data "
-            "for reproducibility of MERIT ML-readiness assessment. It does not replace the original Metabolomics Workbench record."
+            "This ZIP contains MERIT-ML-derived representations of public Metabolomics Workbench tabular data "
+            "for reproducibility of MERIT-ML readiness assessment. It does not replace the original Metabolomics Workbench record."
         ),
         "citation_note": (
             "Users should cite the original Metabolomics Workbench Project ID, Project DOI where available, "
@@ -8432,7 +8519,7 @@ def _ml_export_build_zip(studies: list[dict[str, Any]], *, bulk: bool = False) -
             "storage": "No server-side copy is saved for this export.",
             "matrix_orientation": "Derived TSV files use rows as samples and columns as metabolite features.",
             "sample_filter": "Only samples marked ML-eligible and carrying usable class labels are exported.",
-            "data_values": "Original matrix values are preserved; MERIT does not impute, normalize, or remediate values in this ZIP.",
+            "data_values": "Original matrix values are preserved; MERIT-ML does not impute, normalize, or remediate values in this ZIP.",
             "citation": "The export is not a Metabolomics Workbench mirror; users must consult and cite the original Metabolomics Workbench record.",
         },
         "studies": [],
@@ -8440,14 +8527,14 @@ def _ml_export_build_zip(studies: list[dict[str, Any]], *, bulk: bool = False) -
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
         readme = (
-            "MERIT-derived ML assessment inputs\n"
+            "MERIT-ML-derived ML assessment inputs\n"
             f"Generated UTC: {generated_at}\n\n"
-            "This ZIP was built dynamically from the Metabolomics Workbench REST API and contains MERIT-derived\n"
-            "representations of public Metabolomics Workbench source data for reproducibility of the MERIT assessment.\n"
-            "It does not replace the original Metabolomics Workbench record, and MERIT does not save a server-side copy of this ZIP.\n\n"
-            "For each available source and analysis, MERIT fetches the source-specific tabular dataset from Metabolomics Workbench REST,\n"
+            "This ZIP was built dynamically from the Metabolomics Workbench REST API and contains MERIT-ML-derived\n"
+            "representations of public Metabolomics Workbench source data for reproducibility of the MERIT-ML assessment.\n"
+            "It does not replace the original Metabolomics Workbench record, and MERIT-ML does not save a server-side copy of this ZIP.\n\n"
+            "For each available source and analysis, MERIT-ML fetches the source-specific tabular dataset from Metabolomics Workbench REST,\n"
             "then converts it on the fly into an assessment-ready TSV with rows as samples and columns as metabolite features.\n"
-            "The first two columns are Sample ID and Class Label. Class labels are aligned to MERIT sample names and reflect\n"
+            "The first two columns are Sample ID and Class Label. Class labels are aligned to MERIT-ML sample names and reflect\n"
             "the default Metabolomics Workbench factor labels plus any current UI-session edits made in Adjust Matrix Properties.\n"
             "Only ML-eligible samples with usable class labels are included. Original matrix values are preserved; no imputation, scaling, normalization, or feature remediation is applied.\n\n"
             "Citation responsibility: users must cite the original Metabolomics Workbench Project ID, Project DOI where available,\n"
@@ -8728,7 +8815,7 @@ def _bulk_export_columns(columns: list[str]) -> list[str]:
 
 def _bulk_export_readme_text() -> str:
     return (
-        "This bulk export contains MERIT-derived assessment metrics for public repository records. "
+        "This bulk export contains MERIT-ML-derived assessment metrics for public repository records. "
         "It does not replace the original repository records. Users must cite the original "
         "Metabolomics Workbench/NMDR Project ID, Project DOI where available, Study ID/accession, "
         "and associated publication(s) where applicable."
@@ -8769,7 +8856,7 @@ def _bulk_citation_text(study_id: str, project_id: str, project_doi: str, public
         "This data is available at the NIH Common Fund's National Metabolomics Data Repository "
         "(NMDR) website, the Metabolomics Workbench, https://www.metabolomicsworkbench.org "
         f"where it has been assigned Study ID {study_id or 'NA'} and Project ID {project_display}. "
-        f"The Project DOI parsed by MERIT is {doi_display}. "
+        f"The Project DOI parsed by MERIT-ML is {doi_display}. "
         "Please cite the Metabolomics Workbench as: "
         "\"The Metabolomics Workbench, https://www.metabolomicsworkbench.org/\"."
         f"{pub_note}"
@@ -8973,7 +9060,7 @@ def _bulk_run_from_session(session: dict[str, Any], precomputed_root: str | Path
                 requested_profile="full",
             )
             if state is None:
-                raise ValueError("study not found in the selected MERIT assessment set")
+                raise ValueError("study not found in the selected MERIT-ML assessment set")
             adjusted = _v2_apply_scoring_profile(state, params, matrix_overrides=matrix_overrides) or state
             selected_source, report, score_payload = _bulk_pick_source(adjusted, str(item.get("selected_source", "") or ""))
             if report is None:
@@ -9104,7 +9191,7 @@ def _bulk_run_from_session(session: dict[str, Any], precomputed_root: str | Path
                 "lowest_metric_status": "",
                 "matrix_override_count": len(matrix_overrides),
                 "custom_thresholds_applied": "yes" if not _v2_is_default_params(item.get("scoring_params", {})) else "no",
-                "recommendation": "Check whether this study exists in the selected MERIT assessment set.",
+                "recommendation": "Check whether this study exists in the selected MERIT-ML assessment set.",
                 "_priority_tuple": (-1, -1, 0),
             }
             error_row.update(
@@ -9142,7 +9229,7 @@ def _bulk_chunk_payload(raw_session: str, precomputed_root: str | Path) -> dict[
 
 
 def _bulk_runner_page(session: dict[str, Any], precomputed_root: str | Path) -> str:
-    """Return an immediate page that computes Bulk MERIT in small API chunks.
+    """Return an immediate page that computes Bulk MERIT-ML in small API chunks.
 
     Vercel kills a single long-running request after the configured function
     limit. The runner keeps each request bounded while preserving a 500-study
@@ -9165,7 +9252,7 @@ def _bulk_runner_page(session: dict[str, Any], precomputed_root: str | Path) -> 
         "score": "Core ML readiness score after any local threshold or matrix-property adjustments, shown on a 0-100 scale.",
         "band": "Final readiness band after applying feasibility-gate ceilings.",
         "gate": "First failed or warning gate driving the action priority.",
-        "lowest_metric": "Lowest-scoring active MERIT metric for this study/source.",
+        "lowest_metric": "Lowest-scoring active MERIT-ML metric for this study/source.",
     }
 
     def _th(label: str, key: str, sort: str = "") -> str:
@@ -9187,7 +9274,8 @@ def _bulk_runner_page(session: dict[str, Any], precomputed_root: str | Path) -> 
 <head>
 <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width,initial-scale=1'>
-<title>Bulk MERIT Analysis</title>
+<title>Bulk MERIT-ML Analysis</title>
+{_merit_analytics_head_script()}
 <style>
 :root{{--ink:#132327;--muted:#51656a;--paper:#f5f1e8;--line:rgba(19,35,39,.12);--accent:#0d6e6e;--accent2:#d27d2d}}
 *{{box-sizing:border-box}}
@@ -9217,15 +9305,16 @@ td{{vertical-align:top;padding:8px 9px;border-bottom:1px solid rgba(19,35,39,.08
 .pill{{display:inline-flex;border-radius:999px;padding:3px 9px;background:rgba(13,110,110,.09);color:#0d6e6e;font-weight:800;font-size:.75rem}}
 #bulk-errors{{display:none;margin:14px 0;padding:12px 14px;border-radius:14px;background:#fdeaea;color:#8f2d2d;border:1px solid rgba(143,45,45,.22);font-size:.86rem;line-height:1.45}}
 code{{background:rgba(19,35,39,.08);border-radius:6px;padding:1px 4px}}
+{_merit_analytics_consent_css()}
 </style>
 </head>
 <body>
 <main>
   <section class='panel'>
-    <h1>Bulk MERIT Analysis</h1>
-    <p class='sub'>Running MERIT for {total} selected studies. Keep this tab open until the run completes; downloadable tables will appear here.</p>
+    <h1>Bulk MERIT-ML Analysis</h1>
+    <p class='sub'>Running MERIT-ML for {total} selected studies. Keep this tab open until the run completes; downloadable tables will appear here.</p>
     <div class='actions'>
-      <a class='btn' href='/'>Back to MERIT UI</a>
+      <a class='btn' href='/'>Back to MERIT-ML UI</a>
       <button id='download-summary' type='button' disabled>Download summary TSV</button>
       <button id='download-metrics' type='button' disabled>Download metrics-long TSV</button>
       <button id='download-session' type='button'>Download session JSON</button>
@@ -9233,7 +9322,7 @@ code{{background:rgba(19,35,39,.08);border-radius:6px;padding:1px 4px}}
       <span class='pill'>{total} studies selected</span>
     </div>
     <div class='progress-shell'><div id='progress-bar'></div></div>
-    <p id='bulk-status' class='sub'>Starting Bulk MERIT run...</p>
+    <p id='bulk-status' class='sub'>Starting Bulk MERIT-ML run...</p>
     <div class='status-grid'>
       <div class='stat'><b id='stat-done'>0</b><span>Studies processed</span></div>
       <div class='stat'><b id='stat-total'>{total}</b><span>Total studies</span></div>
@@ -9266,7 +9355,7 @@ code{{background:rgba(19,35,39,.08);border-radius:6px;padding:1px 4px}}
         <tbody></tbody>
       </table>
     </div>
-    <p class='sub' style='margin-top:14px'>The summary table is compact. The metrics-long TSV contains every displayed MERIT metric per study/source, sorted by fail, warn, and pass status followed by score.</p>
+    <p class='sub' style='margin-top:14px'>The summary table is compact. The metrics-long TSV contains every displayed MERIT-ML metric per study/source, sorted by fail, warn, and pass status followed by score.</p>
   </section>
 </main>
 <script id='bulk-session-json' type='application/json'>{session_json}</script>
@@ -9392,7 +9481,7 @@ code{{background:rgba(19,35,39,.08);border-radius:6px;padding:1px 4px}}
       return '<tr>'
         + '<td style="text-align:right">' + esc(row.study_priority_rank) + '</td>'
         + '<td>' + sid + '</td>'
-        + '<td title="' + esc(row.title || '') + '" style="max-width:260px;min-width:210px"><div style="line-height:1.28;color:#51656a;font-size:.78rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden"><a href="' + href + '" target="_blank" rel="noopener noreferrer" style="color:#0d6e6e;text-decoration:none;font-weight:700">' + esc(row.title || 'Open MERIT report') + '</a></div></td>'
+        + '<td title="' + esc(row.title || '') + '" style="max-width:260px;min-width:210px"><div style="line-height:1.28;color:#51656a;font-size:.78rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden"><a href="' + href + '" target="_blank" rel="noopener noreferrer" style="color:#0d6e6e;text-decoration:none;font-weight:700">' + esc(row.title || 'Open MERIT-ML report') + '</a></div></td>'
         + '<td>' + esc(row.organism || '') + '</td>'
         + '<td>' + esc(row.source || '') + '</td>'
         + '<td style="text-align:right">' + esc(row.n_ml_eligible_samples || '') + '</td>'
@@ -9471,7 +9560,7 @@ code{{background:rgba(19,35,39,.08);border-radius:6px;padding:1px 4px}}
     finalized = true;
     sortRows();
     renderTable();
-    updateStatus('Bulk MERIT complete: ' + summaryRows.length + ' studies summarized, ' + metricRows.length + ' metric rows generated.');
+    updateStatus('Bulk MERIT-ML complete: ' + summaryRows.length + ' studies summarized, ' + metricRows.length + ' metric rows generated.');
     document.getElementById('download-summary').disabled = false;
     document.getElementById('download-metrics').disabled = false;
   }}
@@ -9536,6 +9625,7 @@ code{{background:rgba(19,35,39,.08);border-radius:6px;padding:1px 4px}}
   pump();
 }})();
 </script>
+{_merit_analytics_consent_banner()}
 </body>
 </html>"""
 
@@ -9621,7 +9711,7 @@ def _bulk_results_page(
         "score": "Core ML readiness score after any local threshold or matrix-property adjustments, shown on a 0-100 scale.",
         "band": "Final readiness band after applying feasibility-gate ceilings.",
         "gate": "First failed or warning gate driving the action priority.",
-        "lowest_metric": "Lowest-scoring active MERIT metric for this study/source.",
+        "lowest_metric": "Lowest-scoring active MERIT-ML metric for this study/source.",
     }
 
     def _th(label: str, key: str, sort: str = "") -> str:
@@ -9644,7 +9734,7 @@ def _bulk_results_page(
         text = _bulk_text_cell(value)
         sid = _bulk_text_cell(study_id).upper()
         href = f"/?study_id={_e(sid)}&profile=full" if sid else "#"
-        link_text = text or "Open MERIT report"
+        link_text = text or "Open MERIT-ML report"
         return (
             f"<td title='{_e(text)}' style='padding:8px 9px;border-bottom:1px solid rgba(19,35,39,.08);"
             "max-width:260px;min-width:210px'>"
@@ -9692,7 +9782,8 @@ def _bulk_results_page(
 <head>
 <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width,initial-scale=1'>
-<title>Bulk MERIT Analysis</title>
+<title>Bulk MERIT-ML Analysis</title>
+{_merit_analytics_head_script()}
 <style>
 :root{{--ink:#132327;--muted:#51656a;--paper:#f5f1e8;--line:rgba(19,35,39,.12);--accent:#0d6e6e;--accent2:#d27d2d}}
 *{{box-sizing:border-box}}
@@ -9713,14 +9804,15 @@ td{{vertical-align:top}}
 .table-wrap{{max-height:68vh;overflow:auto;border:1px solid var(--line);border-radius:14px}}
 .table-wrap table{{min-width:1680px}}
 .pill{{display:inline-flex;border-radius:999px;padding:3px 9px;background:rgba(13,110,110,.09);color:#0d6e6e;font-weight:800;font-size:.75rem}}
+{_merit_analytics_consent_css()}
 </style>
 </head>
 <body>
 <main>
   <section class='panel'>
-    <h1>Bulk MERIT Analysis</h1>
+    <h1>Bulk MERIT-ML Analysis</h1>
     <div class='actions'>
-      <a class='btn' href='/'>Back to MERIT UI</a>
+      <a class='btn' href='/'>Back to MERIT-ML UI</a>
       <button type='button' onclick="downloadBulk('bulk_merit_summary.tsv')">Download summary TSV</button>
       <button type='button' onclick="downloadBulk('bulk_merit_metrics_long.tsv')">Download metrics-long TSV</button>
       <button type='button' onclick="downloadBulk('bulk_merit_session.json')">Download session JSON</button>
@@ -9754,7 +9846,7 @@ td{{vertical-align:top}}
         <tbody>{table_rows}</tbody>
       </table>
     </div>
-    <p class='sub' style='margin-top:14px'>The summary table is intentionally compact. The metrics-long TSV contains every displayed MERIT metric per study/source, sorted by fail, warn, and pass status followed by score.</p>
+    <p class='sub' style='margin-top:14px'>The summary table is intentionally compact. The metrics-long TSV contains every displayed MERIT-ML metric per study/source, sorted by fail, warn, and pass status followed by score.</p>
   </section>
 </main>
 <script>
@@ -9798,6 +9890,7 @@ function downloadBulk(name) {{
   }});
 }})();
 </script>
+{_merit_analytics_consent_banner()}
 </body>
 </html>"""
 
@@ -9850,7 +9943,7 @@ def _v2_scoring_controls_html(params: dict[str, float]) -> str:
             "Structural and gates",
             "Controls the feasibility gates that can cap the final band.",
             [
-                ("g2_sample_pass", "Preferred ML-eligible samples", "Minimum ML-eligible sample count for the sample-size gate to pass. MERIT defaults are for supervised classification / feature-selection reuse; triplicate time-course or isotope-tracing designs may be valid experimentally but remain underpowered for reliable ML validation."),
+                ("g2_sample_pass", "Preferred ML-eligible samples", "Minimum ML-eligible sample count for the sample-size gate to pass. MERIT-ML defaults are for supervised classification / feature-selection reuse; triplicate time-course or isotope-tracing designs may be valid experimentally but remain underpowered for reliable ML validation."),
                 ("g2_sample_fail_below", "Sample fail-below threshold", "ML-eligible sample count below this is treated as fail for the sample-size gate. This does not judge original-study validity; it flags that very small ML-eligible sample sets cannot support reliable supervised classifier training or feature selection."),
                 ("g4_class_pass", "Minimum class target", "Smallest class size required for the class-support gate and label-suitability metric to pass; protects cross-validation from under-filled classes."),
                 ("g4_class_warn_min", "Class warning floor", "Smallest class size needed to avoid a fail class-support gate; below this, minority-class learning is treated as infeasible for supervised ML reuse."),
@@ -9910,7 +10003,7 @@ def _v2_scoring_controls_html(params: dict[str, float]) -> str:
             f"{control_html}"
             "</details>"
         )
-    profile_label = "Default MERIT" if _v2_is_default_params(params) else "Custom active"
+    profile_label = "Default MERIT-ML" if _v2_is_default_params(params) else "Custom active"
     return (
         "<div class='v2-tune'>"
         "<div class='v2-tune-title'>"
@@ -9919,7 +10012,7 @@ def _v2_scoring_controls_html(params: dict[str, float]) -> str:
         "</div>"
         "<p class='v2-tune-note'>Change thresholds, then apply to recalculate the same study with updated scores, gates, bands, and tooltip text.</p>"
         "<p class='v2-tune-note' style='background:rgba(13,110,110,.06);border-radius:10px;padding:7px 8px'>"
-        "<strong style='color:#132327'>Default scope:</strong> MERIT scores supervised classification and feature-selection readiness. "
+        "<strong style='color:#132327'>Default scope:</strong> MERIT-ML scores supervised classification and feature-selection readiness. "
         "Small-n designs such as triplicate time-course, cell-culture, or 13C-tracing experiments may be scientifically valid for their original aim, "
         "but they remain limited for reliable supervised ML training, validation, and feature selection.</p>"
         f"{''.join(group_html)}"
@@ -9994,20 +10087,21 @@ def _page(state: dict[str, Any] | None = None, error: str | None = None, default
     if logo_uri:
         sidebar_brand_html = (
             "<div style='display:flex;align-items:flex-start;justify-content:flex-start;margin:0 0 10px'>"
-            f"<img src='{_e(logo_uri)}' alt='MERIT logo' "
+            f"<img src='{_e(logo_uri)}' alt='MERIT-ML logo' "
             "loading='lazy' decoding='async' "
             "style='width:100%;max-width:285px;height:auto;display:block;object-fit:contain;object-position:left center'/>"
             "</div>"
         )
     else:
-        sidebar_brand_html = "<h1>MERIT</h1>"
+        sidebar_brand_html = "<h1>MERIT-ML</h1>"
 
     return f"""<!doctype html>
 <html lang='en'>
 <head>
 <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width,initial-scale=1'>
-<title>MERIT — Metabolomics Workbench Readiness Assessment</title>
+<title>MERIT-ML — Metabolomics Workbench Readiness Assessment</title>
+{_merit_analytics_head_script()}
 <script>
 (function(){{
   window.loadPlotlyOnce = function() {{
@@ -10268,6 +10362,7 @@ body.report-tools-expanded.report-analytical-active .analytical-page-scroll.has-
 body.report-tools-expanded.report-analytical-active .tool-rail-toggle{{bottom:38px}}
 @media(max-width:1100px){{.tool-rail-toggle{{left:14px;bottom:14px}}}}
 @media(prefers-reduced-motion:reduce){{.tool-rail-toggle{{animation:none!important;transition:none!important}}}}
+{_merit_analytics_consent_css()}
 </style>
 </head>
 <body class='{body_class}'>
@@ -10278,14 +10373,14 @@ body.report-tools-expanded.report-analytical-active .tool-rail-toggle{{bottom:38
     <section class='panel'>
       {sidebar_brand_html}
       <p class='brand-sub'>Machine Learning Readiness for Tabular Metabolomics Data focused on Metabolomics Workbench.</p>
-      <div class='ribbon'>MERIT web app</div>
+      <div class='ribbon'>MERIT-ML web app</div>
       {scoring_controls_html}
       {bulk_workspace_html}
     </section>
   </aside>
   <section class='content'>
     <section class='panel'>
-      <h2 style='margin:0 0 4px;font-family:"Iowan Old Style",Georgia,serif;font-size:clamp(1.6rem,2.5vw,2.6rem);line-height:1'>Run a MERIT Assessment</h2>
+      <h2 style='margin:0 0 4px;font-family:"Iowan Old Style",Georgia,serif;font-size:clamp(1.6rem,2.5vw,2.6rem);line-height:1'>Run a MERIT-ML Assessment</h2>
       <p style='margin:0 0 22px;color:var(--muted);max-width:66ch;line-height:1.55'>Evaluate the machine-learning readiness of tabular metabolomics datasets from Metabolomics Workbench.</p>
       {error_html}
       <form id='run-form' method='post' action='/workflow/run'>
@@ -10308,7 +10403,7 @@ body.report-tools-expanded.report-analytical-active .tool-rail-toggle{{bottom:38
           </div>
         </section>
         <div class='actions'>
-          <p class='caption'>MERIT pipeline: <strong>acquire → normalize → assess → Readiness Score</strong>. Results are written to the run output directory and shown below.</p>
+          <p class='caption'>MERIT-ML pipeline: <strong>acquire → normalize → assess → Readiness Score</strong>. Results are written to the run output directory and shown below.</p>
           <button class='btn' type='submit'>Run Assessment</button>
         </div>
       </form>
@@ -10958,13 +11053,13 @@ window.addEventListener('afterprint', function() {{
       "<div style='position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9999;" +
       "width:min(620px,calc(100vw - 34px));background:#fff;border-radius:22px;border:1px solid rgba(19,35,39,.14);" +
       "box-shadow:0 28px 80px rgba(19,35,39,.28);padding:22px;color:#132327'>" +
-      "<h3 style='margin:0 0 10px;font-family:Georgia,serif;font-size:1.28rem'>Generate MERIT export ZIP?</h3>" +
+      "<h3 style='margin:0 0 10px;font-family:Georgia,serif;font-size:1.28rem'>Generate MERIT-ML export ZIP?</h3>" +
       "<p style='margin:0 0 12px;color:#51656a;line-height:1.6'>" +
-      "This download contains MERIT-derived assessment data generated from public Metabolomics Workbench source records. " +
+      "This download contains MERIT-ML-derived assessment data generated from public Metabolomics Workbench source records. " +
       "It does not replace the original Metabolomics Workbench record, and source matrix measurement values are preserved.</p>" +
       "<p style='margin:0 0 16px;color:#51656a;line-height:1.6'>" +
       "Please cite the original Metabolomics Workbench/NMDR project and study, including Project ID, Project DOI where available, " +
-      "and associated publication(s), and cite MERIT separately if using the assessment scores.</p>" +
+      "and associated publication(s), and cite MERIT-ML separately if using the assessment scores.</p>" +
       "<div style='display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap'>" +
       "<button type='button' id='merit-derived-download-cancel' style='border:1px solid rgba(19,35,39,.14);border-radius:12px;" +
       "background:white;color:#51656a;padding:9px 13px;font:inherit;font-weight:800;cursor:pointer'>Cancel</button>" +
@@ -11150,10 +11245,10 @@ window.addEventListener('afterprint', function() {{
       addFilteredBtn.title = 'No studies are available in the current batch.';
     }} else if (batchCount > 1) {{
       addFilteredBtn.textContent = 'Use batch ' + batchIndex + ' (' + start + '-' + end + ')';
-      addFilteredBtn.title = 'Replace the current Bulk MERIT selection with this 500-study batch, then run or download it.';
+      addFilteredBtn.title = 'Replace the current Bulk MERIT-ML selection with this 500-study batch, then run or download it.';
     }} else {{
       addFilteredBtn.textContent = 'Use all ' + n + ' filtered';
-      addFilteredBtn.title = 'Replace the current Bulk MERIT selection with every currently filtered study.';
+      addFilteredBtn.title = 'Replace the current Bulk MERIT-ML selection with every currently filtered study.';
     }}
   }}
 
@@ -11360,7 +11455,7 @@ window.addEventListener('afterprint', function() {{
 	  updateFilteredBulkButton();
 	}})();
 
-	// Bulk MERIT workspace
+	// Bulk MERIT-ML workspace
 	(function() {{
 	  var KEY = 'merit_bulk_session_v2';
 	  var listEl = document.getElementById('bulk-study-list');
@@ -11751,7 +11846,7 @@ window.addEventListener('afterprint', function() {{
 	      added_at: existing.added_at || nowIso()
 	    }});
 	    writeSession(session);
-	    status(includeCurrentEdits ? ('Saved edits for ' + entry.study_id + '.') : ('Added ' + entry.study_id + ' to Bulk MERIT.'), '#0d6e6e');
+	    status(includeCurrentEdits ? ('Saved edits for ' + entry.study_id + '.') : ('Added ' + entry.study_id + ' to Bulk MERIT-ML.'), '#0d6e6e');
 	  }}
 	  function addMany(rowsToAdd, replaceExisting) {{
 	    var rowsList = Array.isArray(rowsToAdd) ? rowsToAdd : [];
@@ -11761,7 +11856,7 @@ window.addEventListener('afterprint', function() {{
 	    }}
 	    var maxRun = 500;
 	    if (rowsList.length > maxRun) {{
-	      var proceed = confirm('This selected batch contains ' + rowsList.length + ' studies. Bulk MERIT is capped at ' + maxRun + ' studies per run. Use the first ' + maxRun + ' studies from this batch?');
+	      var proceed = confirm('This selected batch contains ' + rowsList.length + ' studies. Bulk MERIT-ML is capped at ' + maxRun + ' studies per run. Use the first ' + maxRun + ' studies from this batch?');
 	      if (!proceed) {{
 	        status('Choose a smaller batch or narrower filter, then try again.', '#51656a');
 	        return;
@@ -11788,7 +11883,7 @@ window.addEventListener('afterprint', function() {{
 	    }});
 	    writeSession(session);
 	    var capped = rowsList.length > maxRun ? (' Capped at ' + maxRun + ' studies for this run.') : '';
-	    var prefix = replaceExisting ? 'Loaded current batch into Bulk MERIT, replacing the previous selection. ' : '';
+	    var prefix = replaceExisting ? 'Loaded current batch into Bulk MERIT-ML, replacing the previous selection. ' : '';
 	    status(prefix + 'Added ' + added + ' studies and refreshed ' + updated + ' already-selected studies.' + capped, '#0d6e6e');
 	  }}
 	  window.addStudyToBulk = function(studyId) {{
@@ -11849,7 +11944,7 @@ window.addEventListener('afterprint', function() {{
 	        var session = readSession();
 	        delete session.studies[sid];
 	        writeSession(session);
-	        status('Removed ' + sid + ' from Bulk MERIT.', '#51656a');
+	        status('Removed ' + sid + ' from Bulk MERIT-ML.', '#51656a');
 	      }});
 	    }});
 	    listEl.querySelectorAll('.bulk-load-study').forEach(function(btn) {{
@@ -11877,10 +11972,10 @@ window.addEventListener('afterprint', function() {{
 	  var clearBtn = document.getElementById('bulk-clear');
 	  if (clearBtn) clearBtn.addEventListener('click', function(ev) {{
 	    ev.preventDefault();
-	    if (!confirm('Clear the current Bulk MERIT study set from this browser?')) return;
+	    if (!confirm('Clear the current Bulk MERIT-ML study set from this browser?')) return;
 	    try {{ localStorage.removeItem(KEY); }} catch(e) {{}}
 	    renderBulk();
-	    status('Bulk MERIT study set cleared.', '#51656a');
+	    status('Bulk MERIT-ML study set cleared.', '#51656a');
 	  }});
 	  if (sortEl) sortEl.addEventListener('change', renderBulk);
 	  var form = document.getElementById('bulk-run-form');
@@ -11888,12 +11983,12 @@ window.addEventListener('afterprint', function() {{
 	    var session = readSession();
 	    if (!Object.keys(session.studies || {{}}).length) {{
 	      ev.preventDefault();
-	      status('Add at least one study before running Bulk MERIT.', '#8f2d2d');
+	      status('Add at least one study before running Bulk MERIT-ML.', '#8f2d2d');
 	      return;
 	    }}
 	    var field = document.getElementById('bulk-session-field');
 	    if (field) field.value = JSON.stringify(session);
-	    status('Opening Bulk MERIT runner. Keep the next page open until it finishes.', '#0d6e6e');
+	    status('Opening Bulk MERIT-ML runner. Keep the next page open until it finishes.', '#0d6e6e');
 	  }});
 	  var dl = document.getElementById('bulk-download-session');
 	  if (dl) dl.addEventListener('click', function(ev) {{
@@ -11911,6 +12006,7 @@ window.addEventListener('afterprint', function() {{
 	  renderBulk();
 	}})();
 	</script>
+{_merit_analytics_consent_banner()}
 </body>
 </html>"""
 
@@ -12002,7 +12098,7 @@ class MetaboUIHandler(BaseHTTPRequestHandler):
                 self._send_html(_page(state=cached_state, defaults=defaults))
                 return
             self._send_html(
-                _page(error=f"The study {study_id} is not available in the current version of MERIT.", defaults=defaults),
+                _page(error=f"The study {study_id} is not available in the current version of MERIT-ML.", defaults=defaults),
                 HTTPStatus.NOT_FOUND,
             )
             return
@@ -12096,7 +12192,7 @@ class MetaboUIHandler(BaseHTTPRequestHandler):
             # In cached-workbench mode, do not silently fall back to a fresh workflow run.
             # If the study is not present in the current precomputed bundle, return
             # a clear user-facing message.
-            raise ValueError("The study is not available in the current version of MERIT.")
+            raise ValueError("The study is not available in the current version of MERIT-ML.")
 
             from merit.workflow import run_guided_workflow
             state = run_guided_workflow(
@@ -12124,7 +12220,7 @@ def serve_ui(host: str = "0.0.0.0", port: int = 8765) -> None:
         server.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
     except (AttributeError, OSError):
         pass  # SO_REUSEPORT not available on all platforms
-    print(f"MERIT UI → http://{host}:{port}")
+    print(f"MERIT-ML UI → http://{host}:{port}")
     try:
         server.serve_forever()
     except KeyboardInterrupt:

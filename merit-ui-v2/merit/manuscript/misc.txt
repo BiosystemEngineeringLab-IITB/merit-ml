@@ -1,0 +1,3 @@
+rsync -avz /home/shayantan/metabolomics/ML-ready/  sbanerjee@10.198.63.17:/Nasbackup/lab_wangikar/shayantan_backup/backup-from-10.102.38.42/ML-ready
+
+kill $(ps aux | grep "merit ui" | grep -v grep | awk '{print $2}') 2>/dev/null; nohup python -m merit ui --host 127.0.0.1 --port 8765 > /tmp/merit_ui.log 2>&1 &
