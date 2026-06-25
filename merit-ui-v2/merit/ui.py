@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import csv
+import hashlib
 import html
 import io
 import json
@@ -18,13 +19,14 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from math import log
 from pathlib import Path
 from typing import Any
-from urllib.parse import parse_qs, urljoin, urlparse
+from urllib.parse import parse_qs, quote, urljoin, urlparse
 from urllib.request import Request, urlopen
 
 from merit.models import dataclass_to_dict
 from merit.readiness_score import compute_readiness_score
 from merit.serialization import assessment_report_from_dict, load_assessment_report, read_json
 from merit.utils import is_usable_class_label, normalize_label, sample_is_qc_like
+from merit.version import __version__ as MERIT_VERSION
 
 
 # ---------------------------------------------------------------------------
@@ -50,6 +52,27 @@ _V2_BAND_ORDER: dict[str, int] = {
     "Conditional": 3,
     "Ready": 4,
 }
+
+_SCOPE_NOTE_TEXT = (
+    "MERIT is an independent, source-aware ML-readiness assessment of public metabolomics "
+    "tabular data. This report is derived from publicly available Metabolomics Workbench "
+    "records and does not evaluate the scientific validity, analytical quality, or "
+    "biological importance of the original study. Users should verify the current source "
+    "record on Metabolomics Workbench and cite the original Project ID, Project DOI where "
+    "available, Study ID/accession, and associated publication(s)."
+)
+
+_INDEPENDENCE_NOTE_TEXT = (
+    "MERIT is an independent research tool developed for source-aware assessment of "
+    "supervised ML-readiness in public metabolomics tabular data. MERIT is not affiliated "
+    "with, endorsed by, or maintained by Metabolomics Workbench, NMDR, NIH, or the original "
+    "data submitters. Original data and metadata remain attributable to their source "
+    "repositories and study authors. We gratefully acknowledge the "
+    "Metabolomics Workbench/NMDR team for maintaining the public repository infrastructure that makes "
+    "this type of secondary assessment possible."
+)
+
+_MERIT_PARSING_ISSUE_FORM_URL = "https://forms.gle/devGeKVKQTxJRceH7"
 
 _V2_DEFAULT_PARAMS: dict[str, float] = {
     # Band cutoffs
@@ -135,6 +158,8 @@ _V2_HIDDEN_LEGACY_METRICS = {
 }
 
 _V2_DEFAULT_MW_DUMP_ROOT = "/home/shayantan/metabolomics/ML-ready/mw-dump-latest-confirmation-latest-version"
+_WB_STUDY_PAGE_BASE = "https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID="
+_WB_REST_BASE = "https://www.metabolomicsworkbench.org/rest"
 
 _EMBARGOED_STUDIES: dict[str, str] = {
     "ST002866": "2026-08-29",
@@ -146,6 +171,193 @@ _EMBARGOED_STUDIES: dict[str, str] = {
 
 def _study_id_key(study_id: Any) -> str:
     return str(study_id or "").strip().upper()
+
+
+def _workbench_study_url(study_id: Any) -> str:
+    sid = _study_id_key(study_id)
+    return f"{_WB_STUDY_PAGE_BASE}{sid}" if sid else "https://www.metabolomicsworkbench.org/"
+
+
+def _workbench_rest_url(*parts: Any) -> str:
+    cleaned = [quote(str(part).strip("/")) for part in parts if str(part or "").strip("/")]
+    return f"{_WB_REST_BASE}/{'/'.join(cleaned)}" if cleaned else _WB_REST_BASE
+
+
+def _workbench_study_rest_url(study_id: Any, endpoint: str) -> str:
+    sid = _study_id_key(study_id)
+    endpoint = str(endpoint or "").strip("/") or "summary"
+    return _workbench_rest_url("study", "study_id", sid, endpoint)
+
+
+def _workbench_analysis_rest_url(analysis_id: Any, endpoint: str = "mwtab/txt") -> str:
+    aid = _analysis_id_label(str(analysis_id or "")).strip().upper()
+    endpoint = str(endpoint or "").strip("/") or "mwtab/txt"
+    return _workbench_rest_url("study", "analysis_id", aid, *endpoint.split("/"))
+
+
+def _source_matrix_rest_endpoint(source_key: Any) -> str:
+    source = str(source_key or "").strip().lower()
+    if source == "datatable":
+        return "datatable/file"
+    if source == "untarg_data":
+        return "untarg_data/file"
+    return "mwtab/txt"
+
+
+def _source_matrix_rest_label(source_key: Any) -> str:
+    source = str(source_key or "").strip().lower()
+    if source == "datatable":
+        return "datatable/file"
+    if source == "untarg_data":
+        return "untarg_data/file"
+    return "mwtab/txt"
+
+
+def _verify_rest_chip(
+    url: str,
+    *,
+    label: str = "Verify from source",
+    endpoint_label: str | None = None,
+    compact: bool = True,
+    title: str | None = None,
+) -> str:
+    url = str(url or "").strip()
+    if not url:
+        return ""
+    size = ".67rem" if compact else ".74rem"
+    padding = "2px 7px" if compact else "4px 9px"
+    margin = "margin-left:6px;" if compact else "margin-left:8px;"
+    tooltip = title or (
+        f"Verify parsed source field in Metabolomics Workbench REST endpoint: {endpoint_label or url}"
+    )
+    return (
+        f"<a href='{_e(url)}' target='_blank' rel='noopener noreferrer' "
+        f"title='{_e(tooltip)}' aria-label='{_e(label)}' "
+        "style='display:inline-flex;align-items:center;gap:4px;"
+        f"{margin}padding:{padding};border-radius:999px;"
+        "border:1px solid rgba(13,110,110,.24);background:rgba(13,110,110,.06);"
+        f"color:#0d6e6e;font-size:{size};font-weight:800;text-decoration:none;"
+        "white-space:nowrap;line-height:1.2'>"
+        f"{_e(label)}</a>"
+    )
+
+
+def _overview_rest_source(study_id: Any, field_key: str) -> tuple[str, str, str]:
+    """Return (url, endpoint label, short explanation) for overview-field verification."""
+    sid = _study_id_key(study_id)
+    field = str(field_key or "").strip().lower()
+    endpoint = "summary"
+    note = "Study-level metadata endpoint"
+    if field in {"disease", "disease_condition"}:
+        endpoint = "disease"
+        note = "Study disease/condition metadata endpoint"
+    elif field in {"sample_matrices", "factor_variables", "factor_examples", "class_labels"}:
+        endpoint = "factors"
+        note = "Sample-level factors endpoint"
+    elif field in {"annotations", "ion_mode", "polarities"}:
+        endpoint = "analysis"
+        note = "Study analysis list; exact assay metadata is linked in Analytical QC"
+    elif field == "repository":
+        return _workbench_study_url(sid), "Metabolomics Workbench study page", "Repository source page"
+    label = f"/rest/study/study_id/{sid}/{endpoint}" if sid else f"/rest/study/study_id/<study>/{endpoint}"
+    return _workbench_study_rest_url(sid, endpoint), label, note
+
+
+def _overview_verify_chip(study_id: Any, field_key: str) -> str:
+    url, endpoint_label, note = _overview_rest_source(study_id, field_key)
+    return _verify_rest_chip(
+        url,
+        label="Verify from source",
+        endpoint_label=endpoint_label,
+        compact=True,
+        title=f"{note}. MERIT parsed or derived this displayed field from public Metabolomics Workbench source metadata. Endpoint: {endpoint_label}",
+    )
+
+
+def _verify_workbench_button(
+    study_id: Any,
+    label: str = "Verify from source",
+    *,
+    compact: bool = False,
+) -> str:
+    sid = _study_id_key(study_id)
+    if not sid:
+        return ""
+    if compact:
+        style = (
+            "display:inline-flex;align-items:center;gap:4px;margin-left:6px;padding:2px 7px;"
+            "border-radius:999px;border:1px solid rgba(13,110,110,.28);"
+            "background:rgba(13,110,110,.07);color:#0d6e6e;font-size:.68rem;"
+            "font-weight:800;text-decoration:none;white-space:nowrap"
+        )
+    else:
+        style = (
+            "display:inline-flex;align-items:center;gap:5px;margin-left:8px;padding:4px 9px;"
+            "border-radius:999px;border:1px solid rgba(13,110,110,.28);"
+            "background:rgba(13,110,110,.07);color:#0d6e6e;font-size:.75rem;"
+            "font-weight:800;text-decoration:none;white-space:nowrap"
+        )
+    return (
+        f"<a href='{_e(_workbench_study_url(sid))}' target='_blank' "
+        f"rel='noopener noreferrer' style='{style}'>{_e(label)}</a>"
+    )
+
+
+def _report_merit_parsing_issue_card(summary: dict[str, Any]) -> str:
+    study_id = _study_id_key(summary.get("study_id", ""))
+    source = str(summary.get("source") or "").strip()
+    form_url = _MERIT_PARSING_ISSUE_FORM_URL.strip()
+    if form_url:
+        action_html = (
+            f"<a href='{_e(form_url)}' target='_blank' rel='noopener noreferrer' "
+            "style='display:inline-flex;align-items:center;justify-content:center;border-radius:12px;"
+            "border:1px solid rgba(13,110,110,.32);background:#0d6e6e;color:white;"
+            "padding:8px 12px;font-weight:800;text-decoration:none;font-size:.8rem'>"
+            "Report a MERIT parsing issue</a>"
+        )
+    else:
+        action_html = (
+            "<span aria-disabled='true' title='Report form link not configured yet' "
+            "style='display:inline-flex;align-items:center;justify-content:center;border-radius:12px;"
+            "border:1px solid rgba(13,110,110,.22);background:rgba(13,110,110,.08);"
+            "color:#0d6e6e;padding:8px 12px;font-weight:800;font-size:.8rem'>"
+            "Report a MERIT parsing issue</span>"
+        )
+    chips = []
+    if study_id:
+        chips.append(f"Study ID: <strong>{_e(study_id)}</strong>")
+    if source:
+        chips.append(f"Source matrix: <strong>{_e(source)}</strong>")
+    chip_html = (
+        "<div style='display:flex;flex-wrap:wrap;gap:7px;margin-top:8px'>"
+        + "".join(
+            "<span style='display:inline-flex;border-radius:999px;padding:3px 8px;"
+            "background:rgba(255,255,255,.82);border:1px solid rgba(13,110,110,.16);"
+            f"color:#51656a;font-size:.74rem'>{chip}</span>"
+            for chip in chips
+        )
+        + "</div>"
+        if chips
+        else ""
+    )
+    return (
+        "<div style='margin:0 0 16px;padding:13px 15px;border-radius:16px;"
+        "background:rgba(255,255,255,.72);border:1px solid rgba(13,110,110,.18);"
+        "display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:flex-start;"
+        "box-shadow:0 10px 26px rgba(19,35,39,.05)'>"
+        "<div style='min-width:0;color:#2e474d;font-size:.86rem;line-height:1.5'>"
+        "<strong style='display:block;color:#132327;margin-bottom:3px'>Report a MERIT parsing issue</strong>"
+        "If you believe MERIT has mis-parsed a Metabolomics Workbench record, please report the issue "
+        "with the Study ID, source matrix, and expected correction. MERIT does not modify "
+        "original Metabolomics Workbench records."
+        "<div style='margin-top:5px;color:#51656a;font-size:.8rem'>"
+        "Reports help distinguish MERIT parsing errors, missing or ambiguous source metadata, "
+        "and possible repository/API inconsistencies.</div>"
+        f"{chip_html}"
+        "</div>"
+        f"<div style='flex:0 0 auto'>{action_html}</div>"
+        "</div>"
+    )
 
 
 def _embargoed_study_message(study_id: Any) -> str:
@@ -316,7 +528,7 @@ def _logo_asset_url() -> str:
 
 
 def _json_safe_state_payload(state: dict[str, Any] | None) -> dict[str, Any] | None:
-    """Build a JSON-serialisable workflow-state payload for download/export."""
+    """Build a derived-only public MERIT assessment JSON payload."""
     if not state:
         return None
 
@@ -364,23 +576,147 @@ def _json_safe_state_payload(state: dict[str, Any] | None) -> dict[str, Any] | N
             return dataclass_to_dict(value)
         return str(value)
 
-    payload: dict[str, Any] = {}
-    for key, value in state.items():
-        if key.startswith("__"):
-            continue
-        if key == "source_assessments" and isinstance(value, dict):
-            packed: dict[str, Any] = {}
-            for src, item in value.items():
-                if not item:
-                    packed[src] = None
+    def _report_field(report: Any, key: str, default: Any = None) -> Any:
+        if isinstance(report, dict):
+            return report.get(key, default)
+        return getattr(report, key, default)
+
+    def _score_payload(score: Any) -> dict[str, Any]:
+        if not isinstance(score, dict):
+            return {}
+        keep = (
+            "score",
+            "core_ml_readiness_score",
+            "reusability_score",
+            "section_scores",
+            "core_section_scores",
+            "reusability_section_scores",
+            "band",
+            "band_label",
+            "final_band",
+            "final_band_label",
+            "provisional_band",
+            "provisional_band_label",
+            "gate_ceiling",
+            "gate_ceiling_label",
+            "gate_summary",
+            "recommendation",
+            "status_note",
+            "source_tier",
+        )
+        return {key: _jsonable(score.get(key)) for key in keep if key in score}
+
+    def _gate_payload(gates: Any) -> list[dict[str, Any]]:
+        out: list[dict[str, Any]] = []
+        if not isinstance(gates, list):
+            return out
+        for gate in gates:
+            if not isinstance(gate, dict):
+                continue
+            out.append(
+                {
+                    "id": gate.get("id", ""),
+                    "name": gate.get("name", ""),
+                    "status": gate.get("status", ""),
+                    "rule": gate.get("rule", ""),
+                    "value": _jsonable(gate.get("value")),
+                }
+            )
+        return out
+
+    def _metric_summaries(report: Any) -> list[dict[str, Any]]:
+        rows: list[dict[str, Any]] = []
+        sections = (
+            "metadata_readiness",
+            "analytical_readiness",
+            "annotation_readiness",
+            "cohort_bias",
+            "ml_readiness",
+            "class_separability",
+            "cross_study_harmonization",
+        )
+        for section in sections:
+            metrics = _report_field(report, section, []) or []
+            if not isinstance(metrics, list):
+                continue
+            for metric in metrics:
+                metric_dict = metric if isinstance(metric, dict) else dataclass_to_dict(metric)
+                if not isinstance(metric_dict, dict):
                     continue
-                src_payload = {k: _jsonable(v) for k, v in item.items() if k not in {"_report", "report"}}
-                if item.get("_report") is not None:
-                    src_payload["report"] = dataclass_to_dict(item["_report"])
-                packed[src] = src_payload
-            payload[key] = packed
+                # Informational analytical-QC entries may encode source-deposited metadata
+                # such as platform/instrument descriptors. Public JSON keeps scored MERIT
+                # outputs only.
+                if bool(metric_dict.get("informational", False)):
+                    continue
+                score = metric_dict.get("score")
+                score_0_100 = None
+                if isinstance(score, (int, float)) and not isinstance(score, bool):
+                    score_0_100 = round(float(score) * 100.0, 3)
+                rows.append(
+                    {
+                        "section": section,
+                        "family": metric_dict.get("family", ""),
+                        "metric_id": metric_dict.get("name", ""),
+                        "status": metric_dict.get("status", ""),
+                        "score": score,
+                        "score_0_100": score_0_100,
+                    }
+                )
+        return rows
+
+    def _source_counts(source_availability: Any) -> dict[str, Any]:
+        if not isinstance(source_availability, dict):
+            return {}
+        counts = {
+            "datatable": int(source_availability.get("datatable_count") or 0),
+            "mwtab": int(source_availability.get("mwtab_count") or 0),
+            "untarg_data": int(source_availability.get("untarg_data_count") or 0),
+        }
+        return {
+            "available_sources": [src for src, count in counts.items() if count > 0],
+            "source_counts": counts,
+            "priority_tier": source_availability.get("priority_tier", ""),
+        }
+
+    readiness = state.get("readiness_score") or {}
+    final_report = state.get("final_report")
+    study_id = str(state.get("study_id") or "").strip().upper()
+    source_assessments: dict[str, Any] = {}
+    for src, item in (state.get("source_assessments") or {}).items():
+        if not isinstance(item, dict) or not item:
+            source_assessments[str(src)] = None
             continue
-        payload[key] = _jsonable(value)
+        source_score = item.get("readiness_score") or {}
+        source_assessments[str(src)] = {
+            "source": item.get("source", src),
+            "source_tier": item.get("source_tier", ""),
+            "readiness_score": _score_payload(source_score),
+            "gate_feasibility": _gate_payload(source_score.get("gates")),
+            "metric_scores": _metric_summaries(item.get("_report") or item.get("report")),
+        }
+
+    payload: dict[str, Any] = {
+        "schema": "merit_assessment_derived_v1",
+        "study_id": study_id,
+        "repository": "Metabolomics Workbench",
+        "merit_version": MERIT_VERSION,
+        "generated_at_utc": state.get("generated_at_utc", ""),
+        "primary_source": state.get("primary_source", ""),
+        "source_tier": state.get("source_tier", ""),
+        "source_availability_summary": _source_counts(state.get("source_availability")),
+        "readiness_score": _score_payload(readiness),
+        "gate_feasibility": _gate_payload(readiness.get("gates")),
+        "section_metric_scores": _metric_summaries(final_report),
+        "source_assessments": source_assessments,
+        "assessment_settings": {
+            "scoring_params": _jsonable(state.get("v2_scoring_params", {})),
+            "matrix_properties_adjusted": bool(state.get("v2_matrix_overrides")),
+        },
+        "provenance_note": (
+            "This JSON is a MERIT-derived assessment summary. It intentionally excludes "
+            "source-deposited metadata fields, per-sample labels, and tabular matrix values."
+        ),
+    }
     return _strip_local_paths(payload)
 
 
@@ -435,6 +771,82 @@ def _load_citation_index(precomputed_root: str | Path) -> dict[str, Any]:
     return studies if isinstance(studies, dict) else {}
 
 
+def _related_publications_html(
+    publications: Any,
+    study_id: str,
+) -> str:
+    workbench_url = _workbench_study_url(study_id)
+    verify_button = _verify_workbench_button(study_id)
+    if isinstance(publications, list) and publications:
+        items: list[str] = []
+        for publication in publications[:8]:
+            if not isinstance(publication, dict):
+                continue
+            citation = str(publication.get("citation") or "").strip()
+            if not citation:
+                continue
+            doi = str(publication.get("doi") or "").strip()
+            doi_url = str(publication.get("doi_url") or "").strip() or (
+                f"https://doi.org/{doi}" if doi else ""
+            )
+            pubmed_id = str(publication.get("pubmed_id") or "").strip()
+            pubmed_url = str(publication.get("pubmed_url") or "").strip() or (
+                f"https://pubmed.ncbi.nlm.nih.gov/{pubmed_id}/" if pubmed_id else ""
+            )
+            links: list[str] = []
+            if doi:
+                links.append(
+                    f"<a href='{_e(doi_url)}' target='_blank' rel='noopener noreferrer' "
+                    "style='color:#0d6e6e;font-weight:800;text-decoration:none'>"
+                    f"DOI: {_e(doi)}</a>"
+                )
+            if pubmed_id:
+                links.append(
+                    f"<a href='{_e(pubmed_url)}' target='_blank' rel='noopener noreferrer' "
+                    "style='color:#0d6e6e;font-weight:800;text-decoration:none'>"
+                    f"PubMed: {_e(pubmed_id)}</a>"
+                )
+            link_html = (
+                "<div style='margin-top:3px;font-size:.78rem;color:#51656a'>"
+                + " · ".join(links)
+                + "</div>"
+                if links
+                else ""
+            )
+            items.append(
+                "<li style='margin:0 0 7px;padding-left:2px'>"
+                f"<span>{_e(citation)}</span>{link_html}</li>"
+            )
+        if items:
+            return (
+                "<div style='margin-top:10px;padding-top:10px;border-top:1px solid rgba(13,110,110,.16)'>"
+                "<h5 style='margin:0 0 5px;font-size:.82rem;text-transform:uppercase;"
+                "letter-spacing:.06em;color:#123135'>Related publications from Metabolomics Workbench</h5>"
+                "<p style='margin:0 0 6px;color:#51656a;font-size:.82rem'>"
+                "Associated publication(s) detected from source metadata.</p>"
+                "<ol style='margin:0 0 0 18px;padding:0;color:#263a3f;font-size:.82rem'>"
+                + "".join(items)
+                + "</ol>"
+                "<p style='margin:8px 0 0;color:#51656a;font-size:.82rem'>"
+                "Users should cite both the Metabolomics Workbench accession/project and the associated "
+                "publication where applicable.</p>"
+                "</div>"
+            )
+    return (
+        "<div style='margin-top:10px;padding-top:10px;border-top:1px solid rgba(13,110,110,.16)'>"
+        "<h5 style='margin:0 0 5px;font-size:.82rem;text-transform:uppercase;"
+        "letter-spacing:.06em;color:#123135'>Related publications from Metabolomics Workbench</h5>"
+        "<p style='margin:0;color:#51656a;font-size:.82rem'>"
+        "Associated publication(s): none detected in parsed Metabolomics Workbench metadata. Users should "
+        "verify on the "
+        f"<a href='{_e(workbench_url)}' target='_blank' rel='noopener noreferrer' "
+        "style='color:#0d6e6e;font-weight:800;text-decoration:none'>"
+        "original Metabolomics Workbench study page</a> before publication."
+        f"{verify_button}</p>"
+        "</div>"
+    )
+
+
 def _citation_card_html(summary: dict[str, Any], precomputed_root: str | Path) -> str:
     study_id = str(summary.get("study_id") or "").strip().upper()
     citation_index = _load_citation_index(str(precomputed_root))
@@ -444,6 +856,8 @@ def _citation_card_html(summary: dict[str, Any], precomputed_root: str | Path) -
     project_id = str(citation.get("project_id") or "").strip()
     project_doi = str(citation.get("project_doi") or "").strip()
     doi_url = str(citation.get("doi_url") or "").strip()
+    related_publications = citation.get("related_publications")
+    verify_button = _verify_workbench_button(study_id)
     project_id_html = (
         f"<strong>{_e(project_id)}</strong>"
         if project_id
@@ -456,8 +870,15 @@ def _citation_card_html(summary: dict[str, Any], precomputed_root: str | Path) -
             "style='color:#0d6e6e;font-weight:800;text-decoration:none'>"
             f"{_e(project_doi)}</a>"
         )
+        doi_sentence = f"The data can be accessed directly via its Project DOI: {doi_html}. "
     else:
-        doi_html = "<strong>NA</strong>"
+        doi_sentence = (
+            "Project DOI was not detected in the parsed source metadata at the time of "
+            "MERIT access. This limits automated citation completeness for ML-reuse "
+            "reporting. Please verify the current Project DOI status on the original "
+            f"Metabolomics Workbench project page. {verify_button} "
+        )
+    related_publications_block = _related_publications_html(related_publications, study_id)
     return (
         "<section style='margin-top:14px;padding:13px 14px;border-radius:16px;"
         "background:rgba(13,110,110,.055);border:1px solid rgba(13,110,110,.18);"
@@ -470,12 +891,19 @@ def _citation_card_html(summary: dict[str, Any], precomputed_root: str | Path) -
         "<a href='https://www.metabolomicsworkbench.org' target='_blank' rel='noopener noreferrer' "
         "style='color:#0d6e6e;font-weight:800;text-decoration:none'>https://www.metabolomicsworkbench.org</a> "
         f"where it has been assigned Project ID {project_id_html}. "
-        f"The data can be accessed directly via its Project DOI: {doi_html}. "
+        f"{doi_sentence}"
         "This work is supported by Metabolomics Workbench/National Metabolomics Data Repository "
-        "(NMDR) (grant# U2C-DK119886), Common Fund Data Ecosystem (CFDE) "
-        "(grant# 3OT2OD030544) and Metabolomics Consortium Coordinating Center "
-        "(M3C) (grant# 1U2C-DK119889)."
+        "(NMDR), Common Fund Data Ecosystem (CFDE), and Metabolomics Consortium "
+        "Coordinating Center (M3C)."
         "</p>"
+        "<p style='margin:8px 0 0;color:#51656a;font-size:.82rem'>"
+        "Please cite the Metabolomics Workbench as: "
+        "<strong>The Metabolomics Workbench, "
+        "<a href='https://www.metabolomicsworkbench.org/' target='_blank' rel='noopener noreferrer' "
+        "style='color:#0d6e6e;font-weight:800;text-decoration:none'>"
+        "https://www.metabolomicsworkbench.org/</a></strong>"
+        "</p>"
+        f"{related_publications_block}"
         "</section>"
     )
 
@@ -1211,14 +1639,23 @@ def _score_100_text(score: Any, digits: int = 1) -> str:
         return "n/a"
 
 
+def _status_display_label(status: str) -> str:
+    return {
+        "pass": "pass",
+        "warn": "warn",
+        "fail": "fail",
+    }.get(str(status or "").strip().lower(), str(status or "").strip() or "not assessed")
+
+
 def _status_badge(status: str) -> str:
     colors = {"pass": ("#196b4a", "#e6f4ed"), "warn": ("#995b00", "#fdf3e3"), "fail": ("#8f2d2d", "#fdeaea")}
     fg, bg = colors.get(status.lower(), ("#51656a", "#f0f0f0"))
+    label = _status_display_label(status)
     return (
         f"<span style='display:inline-flex;align-items:center;justify-content:center;"
-        f"min-width:48px;white-space:nowrap;line-height:1;background:{bg};color:{fg};"
+        f"min-width:74px;white-space:nowrap;line-height:1;background:{bg};color:{fg};"
         f"padding:3px 9px;border-radius:999px;font-size:0.75rem;font-weight:700;"
-        f"letter-spacing:.04em;text-transform:uppercase'>{_e(status)}</span>"
+        f"letter-spacing:.02em'>{_e(label)}</span>"
     )
 
 
@@ -1493,15 +1930,15 @@ def _study_design_context_notice(
         n_text += f" · n interpreted as {_e(n_term)}"
 
     tooltip = (
-        "Study-design context is a MERIT-derived label, not a native Workbench field. It was inferred "
-        "from multiple Workbench metadata fields including title, summary, project type, organism, "
+        "Study-design context is a MERIT-derived label, not a native Metabolomics Workbench field. It was inferred "
+        "from multiple Metabolomics Workbench metadata fields including title, summary, project type, organism, "
         "disease field, sample source, tissue or sample matrix, factors, class labels, and design terms "
         "such as time-course, cell culture, in vitro, treatment, dose response, and isotope tracing. "
         "It does not change MERIT scores, gates, or bands."
     )
     disclaimer = (
         "Note: this label is inferred from multiple metadata fields and is not directly provided by "
-        "Workbench; use it as contextual guidance."
+        "Metabolomics Workbench; use it as contextual guidance."
     )
 
     reason_html = (
@@ -1597,6 +2034,8 @@ def _source_sample_count_notice(study_id: str) -> str:
 
 def _study_header(summary: dict[str, Any]) -> str:
     disease_flag = ""
+    study_id = summary.get("study_id")
+    verify_button = _verify_workbench_button(study_id)
     n_bio = int(summary.get("n_biological_samples") or summary.get("n_samples") or 0)
     n_classes = int(summary.get("n_classes") or len(summary.get("class_counts") or {}))
     n_labeled = int(summary.get("n_labeled_samples") or 0)
@@ -1608,35 +2047,37 @@ def _study_header(summary: dict[str, Any]) -> str:
             "<div style='background:#fdeaea;border:1px solid #f5b5b5;border-radius:12px;"
             "padding:12px 16px;margin-bottom:16px;color:#8f2d2d;font-weight:600'>"
             "&#9888; No disease endpoint detected in metadata or sample labels — the dataset may not support supervised classification. "
-            "The report is generated, but interpret readiness scores with caution."
+            f"The report is generated, but interpret readiness scores with caution.{verify_button}"
             "</div>"
         )
     elif not summary.get("has_disease_endpoint") and has_label_endpoint:
         disease_flag = (
             "<div style='background:#fdf3e3;border:1px solid #f6d19b;border-radius:12px;"
             "padding:12px 16px;margin-bottom:16px;color:#995b00;font-weight:600'>"
-            "&#9432; No study-level disease metadata detected. Label-based endpoint is inferred from sample labels."
+            f"&#9432; No study-level disease metadata detected. Label-based endpoint is inferred from sample labels.{verify_button}"
             "</div>"
         )
 
-    def row(label: str, value: Any) -> str:
+    def row(label: str, value: Any, field_key: str | None = None) -> str:
         val_str = str(value).strip()
         if not val_str:
             return ""
+        verify = _overview_verify_chip(study_id, field_key) if field_key else ""
         return (
-            f"<div style='display:flex;gap:12px;padding:6px 0;border-bottom:1px solid rgba(19,35,39,.06)'>"
+            f"<div style='display:flex;align-items:flex-start;gap:12px;padding:6px 0;border-bottom:1px solid rgba(19,35,39,.06)'>"
             f"<span style='min-width:160px;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:#51656a'>{label}</span>"
-            f"<span style='font-size:.9rem'>{_e(val_str)}</span></div>"
+            f"<span style='font-size:.9rem;flex:1;min-width:0'>{_e(val_str)}</span>{verify}</div>"
         )
 
-    def pills_row(label: str, items: list) -> str:
+    def pills_row(label: str, items: list, field_key: str | None = None) -> str:
         if not items:
             return ""
         pills = "".join(_pill(str(i)) for i in items)
+        verify = _overview_verify_chip(study_id, field_key) if field_key else ""
         return (
-            f"<div style='display:flex;gap:12px;padding:6px 0;border-bottom:1px solid rgba(19,35,39,.06)'>"
+            f"<div style='display:flex;align-items:flex-start;gap:12px;padding:6px 0;border-bottom:1px solid rgba(19,35,39,.06)'>"
             f"<span style='min-width:160px;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:#51656a'>{label}</span>"
-            f"<span>{pills}</span></div>"
+            f"<span style='flex:1;min-width:0'>{pills}</span>{verify}</div>"
         )
 
     # Annotation coverage row — pill per analysis showing tier
@@ -1665,7 +2106,10 @@ def _study_header(summary: dict[str, Any]) -> str:
         total_a = len(per_analysis)
         has_named = named_count + mixed_count
         if has_named == 0:
-            ann_note = f"<span style='font-size:.78rem;color:#8f2d2d;margin-left:6px'>⚠ No named metabolite annotations on any analysis — mz/RT only.</span>"
+            ann_note = (
+                "<span style='font-size:.78rem;color:#8f2d2d;margin-left:6px'>"
+                "⚠ No named metabolite annotations on any analysis — mz/RT only.</span>"
+            )
         elif has_named < total_a:
             ann_note = f"<span style='font-size:.78rem;color:#995b00;margin-left:6px'>Named annotations available on {has_named}/{total_a} analyses.</span>"
         else:
@@ -1673,7 +2117,8 @@ def _study_header(summary: dict[str, Any]) -> str:
     ann_row = (
         f"<div style='display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding:6px 0;border-bottom:1px solid rgba(19,35,39,.06)'>"
         f"<span style='min-width:160px;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:#51656a;flex-shrink:0'>Annotations</span>"
-        f"<span style='display:flex;flex-wrap:wrap;gap:2px;align-items:center'>{ann_pills_html}{ann_note}</span>"
+        f"<span style='display:flex;flex-wrap:wrap;gap:2px;align-items:center;flex:1;min-width:0'>{ann_pills_html}{ann_note}</span>"
+        f"{_overview_verify_chip(study_id, 'annotations')}"
         f"</div>"
     ) if per_analysis else ""
 
@@ -1721,14 +2166,16 @@ def _study_header(summary: dict[str, Any]) -> str:
         class_row = (
             f"<div style='display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding:6px 0;border-bottom:1px solid rgba(19,35,39,.06)'>"
             f"<span style='min-width:160px;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:#51656a;flex-shrink:0'>Class Labels</span>"
-            f"<span style='display:flex;flex-wrap:wrap;gap:2px;align-items:center'>{class_pills_html}{imbalance_badge}{discrepancy_note}</span>"
+            f"<span style='display:flex;flex-wrap:wrap;gap:2px;align-items:center;flex:1;min-width:0'>{class_pills_html}{imbalance_badge}{discrepancy_note}</span>"
+            f"{_overview_verify_chip(study_id, 'class_labels')}"
             f"</div>"
         )
     elif summary.get("n_classes", 0) == 0:
         class_row = (
             f"<div style='display:flex;gap:12px;padding:6px 0;border-bottom:1px solid rgba(19,35,39,.06)'>"
             f"<span style='min-width:160px;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:#51656a'>Class Labels</span>"
-            f"<span style='font-size:.85rem;color:#8f2d2d;font-style:italic'>No class labels detected</span>"
+            f"<span style='font-size:.85rem;color:#8f2d2d;font-style:italic;flex:1;min-width:0'>No class labels detected</span>"
+            f"{_overview_verify_chip(study_id, 'class_labels')}"
             f"</div>"
         )
 
@@ -1834,18 +2281,18 @@ def _study_header(summary: dict[str, Any]) -> str:
         f"{disease_flag}"
         f"<div style='background:rgba(255,255,255,.82);border:1px solid rgba(19,35,39,.1);border-radius:20px;padding:20px'>"
         f"{_design_summary_sentence(summary)}"
-        f"{row('Study ID', summary.get('study_id', ''))}"
+        f"{row('Study ID', summary.get('study_id', ''), 'study_id')}"
         f"{study_link_html}"
-        f"{row('Repository', (summary.get('source') or '').upper())}"
-        f"{row('Title', summary.get('title', ''))}"
-        f"{row('Disease / Condition', summary.get('disease', ''))}"
-        f"{row('Organism', summary.get('organism', ''))}"
-        f"{row('Analysis Type', _analysis_type_text(summary))}"
-        f"{row('Ion Mode', summary.get('polarity_label', ''))}"
-        f"{''.join([pills_row('Polarities (per assay)', summary.get('polarities', []))] if len(set(str(p).upper() for p in (summary.get('polarities') or []) if p)) > 1 else [])}"
-        f"{pills_row('Sample Matrices', summary.get('tissues', []))}"
-        f"{pills_row('Factor Variables', summary.get('factor_variables', []))}"
-        f"{row('Factor Examples', ' ; '.join(summary.get('factor_examples', [])))}"
+        f"{row('Repository', (summary.get('source') or '').upper(), 'repository')}"
+        f"{row('Title', summary.get('title', ''), 'title')}"
+        f"{row('Disease / Condition', summary.get('disease', ''), 'disease')}"
+        f"{row('Organism', summary.get('organism', ''), 'organism')}"
+        f"{row('Analysis Type', _analysis_type_text(summary), 'analysis_type')}"
+        f"{row('Ion Mode', summary.get('polarity_label', ''), 'ion_mode')}"
+        f"{''.join([pills_row('Polarities (per assay)', summary.get('polarities', []), 'polarities')] if len(set(str(p).upper() for p in (summary.get('polarities') or []) if p)) > 1 else [])}"
+        f"{pills_row('Sample Matrices', summary.get('tissues', []), 'sample_matrices')}"
+        f"{pills_row('Factor Variables', summary.get('factor_variables', []), 'factor_variables')}"
+        f"{row('Factor Examples', ' ; '.join(summary.get('factor_examples', [])), 'factor_examples')}"
         f"{ann_row}"
         f"{class_row}"
         f"{stats}"
@@ -1922,7 +2369,11 @@ def _nmr_analysis_table(per_analysis: list[Any]) -> str:
     )
 
 
-def _per_analysis_table(per_analysis: list[Any]) -> str:
+def _per_analysis_table(
+    per_analysis: list[Any],
+    study_id: Any | None = None,
+    source_key: str | None = None,
+) -> str:
     if not per_analysis:
         return ""
 
@@ -1949,6 +2400,49 @@ def _per_analysis_table(per_analysis: list[Any]) -> str:
             return f"{analysis_type} / {ms_type}"
         return analysis_type or ms_type or "—"
 
+    def _analysis_verify_links(row: dict[str, Any]) -> str:
+        aid = _analysis_id_label(row.get("analysis_id", ""))
+        if not aid:
+            return ""
+        metadata_url = _workbench_analysis_rest_url(aid, "mwtab/txt")
+        matrix_endpoint = _source_matrix_rest_endpoint(source_key)
+        matrix_url = _workbench_analysis_rest_url(aid, matrix_endpoint)
+        metadata_label = f"/rest/study/analysis_id/{aid}/mwtab/txt"
+        matrix_label = f"/rest/study/analysis_id/{aid}/{_source_matrix_rest_label(source_key)}"
+        if matrix_url == metadata_url:
+            return _verify_rest_chip(
+                metadata_url,
+                label="mwTab REST",
+                endpoint_label=metadata_label,
+                compact=True,
+                title=(
+                    "Verify analysis-level Metabolomics Workbench REST source for analytical metadata, "
+                    f"declared units, and mwTab-derived matrix fields. Endpoint: {metadata_label}"
+                ),
+            )
+        return (
+            _verify_rest_chip(
+                metadata_url,
+                label="Metadata",
+                endpoint_label=metadata_label,
+                compact=True,
+                title=(
+                    "Verify analysis/MS type, ion mode, chromatography, instrument, and declared units "
+                    f"in the Metabolomics Workbench mwTab REST endpoint: {metadata_label}"
+                ),
+            )
+            + _verify_rest_chip(
+                matrix_url,
+                label="Matrix",
+                endpoint_label=matrix_label,
+                compact=True,
+                title=(
+                    "Verify the source-specific table that MERIT parsed for samples, features, "
+                    f"and missingness. Endpoint: {matrix_label}"
+                ),
+            )
+        )
+
     rows_html = ""
     _td = "padding:10px 9px;border-bottom:1px solid rgba(19,35,39,.06);font-size:.82rem;line-height:1.35;vertical-align:top"
     _no_data = "<span style='color:#999'>&#8212;</span>"
@@ -1966,7 +2460,11 @@ def _per_analysis_table(per_analysis: list[Any]) -> str:
         units_html = (
             _pill(_e(a.get("units", "")), "#0d6e6e")
             if a.get("units")
-            else (_pill("N/A", "#51656a") if is_nmr else _no_data)
+            else (
+                _pill("N/A", "#51656a")
+                if is_nmr
+                else f"{_no_data}{_verify_workbench_button(study_id, compact=True)}"
+            )
         )
         chromatography_text = a.get("chromatography", "") or ("N/A (NMR)" if is_nmr else "—")
         chromatography_system = a.get("chromatography_system", "") or ("N/A (NMR)" if is_nmr else "—")
@@ -1996,6 +2494,7 @@ def _per_analysis_table(per_analysis: list[Any]) -> str:
             + "<td style='" + _td + ";text-align:right'>" + _e(str(a.get("n_samples", "—"))) + "</td>"
             + "<td style='" + _td + ";text-align:right'>" + (actual or "—") + "</td>"
             + "<td style='" + _td + "'>" + _miss_bar(a.get("missing_rate", 0.0)) + "</td>"
+            + "<td style='" + _td + ";white-space:nowrap'>" + _analysis_verify_links(a) + "</td>"
             + "</tr>"
         )
 
@@ -2011,24 +2510,25 @@ def _per_analysis_table(per_analysis: list[Any]) -> str:
         return f"<th style='{_th};text-align:{align}'>{label} {icon}</th>"
 
     headers_html = (
-        _hdr("Analysis ID", "Unique analysis accession (e.g. AN000001). One row per data file / assay matrix.")
-        + _hdr("Analysis / MS Type", "Analytical platform as declared in the repository (e.g. MS, LC-MS, GC-MS, NMR). May also include MS acquisition mode.")
-        + _hdr("Ion Mode", "Electrospray ion polarity: positive, negative, or mixed. Not applicable for NMR.")
-        + _hdr("Chromatography Type", "Separation technique (e.g. RPLC, HILIC, GC). Not applicable for NMR or direct infusion.")
-        + _hdr("Chromatography System", "LC system / instrument used for separation (e.g. Agilent 1290 Infinity, Waters Acquity).")
-        + _hdr("Column", "Analytical column model (e.g. Zorbax RRHD Eclipse Plus C18). Relevant for method reproducibility assessment.")
-        + _hdr("MS Instrument Type", "Mass spectrometer type (e.g. TOF, Orbitrap, QqQ, Triple Quad). Affects mass accuracy and dynamic range.")
-        + _hdr("MS Instrument Name", "Specific instrument model name as declared in metadata.")
-        + _hdr("Units", "Abundance unit as declared (e.g. peak area, peak height, uM, nM). Drives value-scale interpretation.")
-        + _hdr("Samples", "Total sample rows in this analysis matrix, including QC, pool, blank, and reference controls.", "right")
-        + _hdr("Features", "Total number of features (named metabolites, unannotated features, NMR bins) parsed from the deposited tabular file, excluding sample-ID, class, and metadata columns.", "right")
-        + _hdr("Missingness", "Fraction of abundance cells that are missing (empty, non-numeric, or below-detection tokens) in this analysis matrix.")
+        _hdr("Analysis ID", "Unique analysis accession (e.g. AN000001). Use this row's Metabolomics Workbench REST link to verify the exact analysis endpoint.")
+        + _hdr("Analysis / MS Type", "Analytical platform as declared in Metabolomics Workbench metadata. Verify via the row Metadata link: /rest/study/analysis_id/<AN>/mwtab/txt.")
+        + _hdr("Ion Mode", "Electrospray ion polarity parsed from analysis metadata. Verify via the row Metadata link: /rest/study/analysis_id/<AN>/mwtab/txt.")
+        + _hdr("Chromatography Type", "Separation technique parsed from analysis metadata. Verify via the row Metadata link: /rest/study/analysis_id/<AN>/mwtab/txt.")
+        + _hdr("Chromatography System", "LC/GC system or instrument metadata. Verify via the row Metadata link: /rest/study/analysis_id/<AN>/mwtab/txt.")
+        + _hdr("Column", "Analytical column metadata. Verify via the row Metadata link: /rest/study/analysis_id/<AN>/mwtab/txt.")
+        + _hdr("MS Instrument Type", "Mass spectrometer type parsed from analysis metadata. Verify via the row Metadata link: /rest/study/analysis_id/<AN>/mwtab/txt.")
+        + _hdr("MS Instrument Name", "Specific instrument model name parsed from analysis metadata. Verify via the row Metadata link: /rest/study/analysis_id/<AN>/mwtab/txt.")
+        + _hdr("Units", "Abundance unit declared in source metadata/table. Verify via the row Metadata link, and where needed the row Matrix link.")
+        + _hdr("Samples", "Total sample rows parsed from this source matrix. Verify via the row Matrix link to the active source-specific REST endpoint.", "right")
+        + _hdr("Features", "Total number of features parsed from this source matrix, excluding sample-ID, class, and metadata columns. Verify via the row Matrix link.", "right")
+        + _hdr("Missingness", "Fraction of abundance cells MERIT parsed as missing in this source matrix. Verify the underlying source table via the row Matrix link.")
+        + _hdr("Verify source", "Metadata opens /rest/study/analysis_id/<AN>/mwtab/txt. Matrix opens the active source-specific endpoint used for samples, features, and missingness.")
     )
     return (
         "<div style='margin-bottom:22px'>"
         "<h4 style='margin:0 0 10px;font-size:.88rem;text-transform:uppercase;letter-spacing:.06em'>Per-Analysis Data Summary</h4>"
         "<div style='overflow-x:auto;border:1px solid rgba(19,35,39,.1);border-radius:14px;background:rgba(255,255,255,.92)'>"
-        "<table style='width:100%;min-width:1760px;border-collapse:collapse;font-size:.86rem'>"
+        "<table style='width:100%;min-width:1940px;border-collapse:collapse;font-size:.86rem'>"
         "<thead><tr>" + headers_html + "</tr></thead>"
         "<tbody>" + rows_html + "</tbody>"
         "</table></div></div>"
@@ -2039,7 +2539,11 @@ def _per_analysis_table(per_analysis: list[Any]) -> str:
 # RefMet chemical class distribution chart
 # ---------------------------------------------------------------------------
 
-def _refmet_class_charts(per_analysis: list[Any], chart_suffix: str = "") -> str:
+def _refmet_class_charts(
+    per_analysis: list[Any],
+    chart_suffix: str = "",
+    study_id: Any | None = None,
+) -> str:
     """Render a RefMet super-class distribution dropdown + Plotly donut pie per analysis."""
     analyses_with_data = [
         a for a in per_analysis
@@ -2079,7 +2583,8 @@ def _refmet_class_charts(per_analysis: list[Any], chart_suffix: str = "") -> str
         + (
             "<div style='font-size:.78rem;color:#995b00;margin:-4px 0 10px'>"
             "All detected entries are currently Unclassified. "
-            "No explicit RefMet super_class values were found in the Workbench metabolite metadata for this study/analysis."
+            "No explicit RefMet super_class values were found in the Metabolomics Workbench metabolite metadata for this study/analysis."
+            f"{_verify_workbench_button(study_id, compact=True)}"
             "</div>"
             if all_unclassified else ""
         )
@@ -2276,7 +2781,7 @@ def _class_separability_panel(metrics: list[Any], chart_suffix: str = "") -> str
     header_specs = [
         (
             "Analysis ID",
-            "Workbench analysis accession (ANxxxxxx).",
+            "Metabolomics Workbench analysis accession (ANxxxxxx).",
         ),
         (
             "CV linear AUROC",
@@ -2502,7 +3007,7 @@ _METRIC_DESCRIPTORS: dict[str, str] = {
     "mass_rt_like_metadata_presence": (
         "Binary reuse signal: 1 if populated mass-, m/z-, retention-time-, or retention-index-like metabolite metadata "
         "fields are present in the mwTab Metabolites block; otherwise 0. This is deliberately labeled mass/RT-like "
-        "because Workbench deposits use heterogeneous field names such as m/z, moverz, RI, RT, retention time, "
+        "because Metabolomics Workbench deposits use heterogeneous field names such as m/z, moverz, RI, RT, retention time, "
         "or exact mass. Repository-wide prevalence: 1,833/4,121 studies (44.49%)."
     ),
     # Backward compatibility for older report artifacts
@@ -2534,7 +3039,7 @@ _METRIC_DESCRIPTORS: dict[str, str] = {
     "missingness": "Legacy overall missing-value metric kept for older report artifacts.",
     "scale_diagnostics": "Summarizes observed value-scale and distribution characteristics (e.g., raw-like vs compressed/likely_transformed) from min/median/p90/max over ML-eligible samples. Declared units (value scale) are reported separately from mwTab JSON and are not used directly in inference. P50/P90 is used as a skewness-like distribution-shape proxy: lower ratios indicate stronger right-skew (median far below upper-tail), while higher ratios indicate a more compressed/less-skewed distribution. Near-zero variance (NZV) and low-signal features are diagnostics only. This metric is informational and does not affect the ML readiness score.",
     "metabatch_batch_annotation_compatibility": (
-        "Reports whether Workbench factor annotations can be converted into MetaBatch-style batch/covariate tables for the active matrix samples. "
+        "Reports whether Metabolomics Workbench factor annotations can be converted into MetaBatch-style batch/covariate tables for the active matrix samples. "
         "A factor is considered usable if it has at least two non-empty levels, covers at least 60% of samples, and is not nearly one unique value per sample (>90% distinct). "
         "Technical-like keys are a conservative MERIT add-on based on explicit batch/run/order/plate/injection/acquisition-like text in factor names or values; "
         "generic biological covariates are not treated as proven technical batch metadata. Informational only."
@@ -2620,7 +3125,7 @@ def _metric_descriptor(metric_name: str, params: dict[str, float] | None = None)
             "Counts ML-eligible samples after excluding QC pools, blanks, NIST references, and other non-biological rows. "
             "This criterion is calibrated for supervised classification and feature-selection reuse, not for judging "
             "whether a small triplicate time-course, isotope-tracing, or mechanistic experiment was adequate for its original purpose. "
-            f"Current preferred threshold: {_v2_fmt_param(params['g2_sample_pass'])}; severe below "
+            f"Current pass threshold: {_v2_fmt_param(params['g2_sample_pass'])}; fail below "
             f"{_v2_fmt_param(params['g2_sample_fail_below'])}."
         )
     if metric_name == "missingness_structure":
@@ -2652,7 +3157,7 @@ def _metric_descriptor(metric_name: str, params: dict[str, float] | None = None)
         return (
             "Checks whether every class has enough samples for supervised ML. "
             f"Current minimum class target: {_v2_fmt_param(params['g4_class_pass'])}; "
-            f"warning floor: {_v2_fmt_param(params['g4_class_warn_min'])}."
+            f"warn floor: {_v2_fmt_param(params['g4_class_warn_min'])}."
         )
     if metric_name == "feature_to_sample_ratio":
         return (
@@ -2747,6 +3252,113 @@ def _v2_display_text(text: Any) -> Any:
         ("biological samples", "ML-eligible samples"),
     ):
         text = text.replace(old, new)
+
+    for old, new in (
+        (
+            "Add a DOI to the PROJECT block (PROJECT.DOI in mwtab). Metabolomics Workbench assigns dataset DOIs under the 10.21228/ prefix at submission; contact Metabolomics Workbench support if the field is missing. A linked publication DOI is also accepted.",
+            "Project DOI was not detected in the parsed source metadata at the time of MERIT access. This limits automated citation completeness for ML-reuse reporting. Please verify the current Project DOI status on the original Metabolomics Workbench project page.",
+        ),
+        (
+            "Link a publication (PUBLICATIONS field) so the methodology is traceable to peer-reviewed documentation.",
+            "Associated publication metadata was not detected in the parsed source record. MERIT flags methodology provenance as limited for automated reuse; users should verify publications on the original Metabolomics Workbench study page.",
+        ),
+        (
+            "Declare the funding source (FUNDING_SOURCE) to meet standard RDM requirements and enable cross-study funding-body filtering.",
+            "Funding-source metadata was not detected in the parsed source record. This may limit automated metadata reuse and filtering; users should verify the original Metabolomics Workbench record.",
+        ),
+        (
+            "Add populated m/z, retention time/index, or mass-like metabolite metadata fields to the mwTab Metabolites block when available. This improves reuse and independent reannotation.",
+            "Mass/RT-like metabolite metadata was not detected in the parsed source fields. This may limit independent reannotation or harmonization; users should verify whether such metadata is available in the source record.",
+        ),
+        (
+            "Fill missing disease, sample type, and descriptive fields to improve comparability.",
+            "Some disease, sample-type, or descriptive metadata fields were not detected in parsed metadata. This may limit automated cohort filtering or reuse; users should verify the original Metabolomics Workbench record.",
+        ),
+        (
+            "Filter or impute high-missingness features before modeling.",
+            "High-missingness patterns may require preprocessing or sensitivity analysis before supervised ML reuse.",
+        ),
+        (
+            "Class-dependent missingness gap >= 10%; audit acquisition/preprocessing artifacts before ML.",
+            "Class-dependent missingness differs across labels. Users should check whether acquisition or preprocessing artifacts could influence supervised ML reuse.",
+        ),
+        (
+            "Collapse redundant features before benchmarking to reduce leakage and instability.",
+            "Highly redundant features may affect model stability or feature-selection interpretation; users may consider collapsing, filtering, or regularized modeling.",
+        ),
+        (
+            "Inspect outlier samples separately before training and verify no acquisition artifacts dominate.",
+            "Outlier samples were detected by MERIT diagnostics. Users should inspect whether these reflect biological signal, acquisition artifacts, or preprocessing effects before supervised ML reuse.",
+        ),
+        (
+            "Rebalance or stratify the cohort before training predictive models.",
+            "Class imbalance may affect supervised-classification reuse. Users should consider stratified evaluation, class weighting, label merging, or additional validation.",
+        ),
+        (
+            "At least 2 labeled classes are required to assess class-size support.",
+            "At least two labeled groups are needed for MERIT to assess supervised-classification class support.",
+        ),
+        (
+            "Use labels with >=2 classes and enough samples per class.",
+            "Supervised-classification reuse requires at least two usable label groups with sufficient per-group support.",
+        ),
+        (
+            "Only one distinct label group found — binary or multi-class classification is not possible.",
+            "Only one label group was detected in the parsed ML-eligible samples. Supervised classification reuse is not supported unless an alternative valid label definition is provided.",
+        ),
+        (
+            "Increase minority-class size or merge labels before benchmarking.",
+            "The smallest parsed label group has limited support for benchmarking. Users may consider label merging, exploratory-only use, or additional validation data.",
+        ),
+        (
+            "Simplify or curate label strings before building ML models.",
+            "Parsed label strings may require curation before supervised ML reuse so that class definitions are unambiguous.",
+        ),
+        (
+            "Named metabolites are preferred for ML interpretability and cross-study reuse. Consider studies with higher annotation coverage.",
+            "Named metabolite annotations were limited in the parsed source. This may constrain biological interpretation and cross-study reuse.",
+        ),
+        (
+            "Flag unresolved isomers and unknowns before interpretation-heavy analyses.",
+            "Unresolved isomers or unknown feature labels may limit interpretation-heavy analyses; users should verify annotations before biological interpretation.",
+        ),
+        (
+            "Improve annotation quality for better interpretability and transfer.",
+            "Annotation coverage may limit interpretability and cross-study reuse.",
+        ),
+        (
+            "Proceed to external validation and holdout analysis.",
+            "Proceed with external validation, holdout analysis, and appropriate sensitivity checks.",
+        ),
+    ):
+        text = text.replace(old, new)
+
+    text = re.sub(
+        r"Only\s+(\d+/\d+)\s+metabolites have a RefMet match\. Submit missing metabolites to RefMet for standardised annotation\.",
+        r"Only \1 named metabolites were matched to RefMet in MERIT parsing. Identifier-level reuse may therefore be limited; users should verify metabolite identifiers and mappings at the source.",
+        text,
+    )
+    text = re.sub(
+        r"Drop or impute\s+([0-9,]+)\s+features with >30% missingness before training\.",
+        r"\1 features exceed the high-missingness threshold used by MERIT. Downstream users may need imputation, filtering, or sensitivity analysis before supervised ML reuse.",
+        text,
+    )
+    text = re.sub(
+        r"Increase samples in the smallest class \(target >=10, ideally >=20\) for reliable modeling\.",
+        "The smallest parsed class has limited sample support for supervised classification. Consider whether labels should be merged, restricted to exploratory use, or validated with additional data.",
+        text,
+    )
+    text = re.sub(
+        r"Fewer than\s+(\d+)\s+ML-eligible samples detected\. ML models may be unreliable at this scale\.",
+        r"Fewer than \1 ML-eligible samples were detected. MERIT treats this as limited support for reliable supervised-classification training, validation, or feature selection.",
+        text,
+    )
+    text = re.sub(
+        r"High feature-to-sample ratio \(worst ([^)]+)\)\. Use regularised models \(LASSO, Ridge, Elastic Net\) or apply feature selection before training\.",
+        r"High feature-to-sample ratio was detected (worst \1). Supervised ML reuse may require regularized models, feature selection, or sensitivity analysis.",
+        text,
+    )
+
     # Cached summaries often contain normalized score phrases such as
     # "score is 0.700"; v2 displays user-facing scores on a 0-100 scale.
     def _score_phrase_repl(match: re.Match[str]) -> str:
@@ -3595,7 +4207,7 @@ def _v2_compute_readiness_score(report: Any, params: dict[str, float], source_av
         "name": "sufficient_biological_sample_count",
         "status": g2_status,
         "value": n_bio,
-        "rule": f">= {g2_pass} preferred; < {g2_fail_below} severe",
+        "rule": f">= {g2_pass} pass; {g2_fail_below}-{g2_pass - 1} warn; < {g2_fail_below} fail",
         "summary": f"{n_bio} ML-eligible samples.",
     }
 
@@ -3633,7 +4245,7 @@ def _v2_compute_readiness_score(report: Any, params: dict[str, float], source_av
         "name": "minimum_per_group_support",
         "status": g4_status,
         "value": min_class_n,
-        "rule": f"min class >= {class_pass}; warn floor >= {class_warn}",
+        "rule": f"min class >= {class_pass} pass; {class_warn}-{class_pass - 1} warn; < {class_warn} fail",
         "summary": f"Smallest class has {min_class_n} samples across {len(counts_dict)} labeled groups.",
     }
 
@@ -3653,10 +4265,10 @@ def _v2_compute_readiness_score(report: Any, params: dict[str, float], source_av
             g5_status = "fail"
     g5 = {
         "id": "G5",
-        "name": "non_catastrophic_missingness",
+        "name": "missingness_within_reuse_range",
         "status": g5_status,
         "value": float(median_missing),
-        "rule": f"median sample missingness <= {params['g5_missing_pass_pct']:.0f}% preferred; >{params['g5_missing_fail_pct']:.0f}% catastrophic",
+        "rule": f"median sample missingness <= {params['g5_missing_pass_pct']:.0f}% pass; <={params['g5_missing_fail_pct']:.0f}% warn; >{params['g5_missing_fail_pct']:.0f}% fail",
         "summary": f"Median sample missingness {float(median_missing):.1%}.",
     }
     gates = [g1, g2, g3, g4, g5]
@@ -3709,15 +4321,15 @@ def _v2_compute_readiness_score(report: Any, params: dict[str, float], source_av
     weak_sections = [name for name, value in sections.items() if value < params["band_conditional_min"]]
     actions: list[str] = []
     if gate_counts["fail"] > 0:
-        actions.append("Review failed feasibility gates before relying on the band assignment.")
+        actions.append("Review feasibility gates that limit the final band before relying on automated supervised-ML reuse.")
     elif gate_counts["warn"] > 0:
-        actions.append("Review warning gates; they cap the final band even when section scores are strong.")
+        actions.append("Review gate warnings; they can limit the final band even when section scores are strong.")
     if "cohort" in weak_sections or "ml_feasibility" in weak_sections:
-        actions.append("Strengthen class support, label balance, and split feasibility before publication-grade ML.")
+        actions.append("For supervised-classification reuse, consider whether class support, label balance, and train/test split feasibility are sufficient.")
     if "analytical" in weak_sections:
-        actions.append("Review missingness, outlier burden, redundancy, and assay comparability before modeling.")
+        actions.append("Review missingness, outlier burden, redundancy, and assay comparability before supervised ML reuse.")
     if "annotation" in weak_sections:
-        actions.append("Improve annotation quality for better interpretability and transfer.")
+        actions.append("Annotation coverage may limit interpretability and cross-study reuse.")
     if not actions:
         actions.append("Proceed to external validation and holdout analysis.")
 
@@ -3824,10 +4436,15 @@ def _checks_list_html(checks: dict[str, bool]) -> str:
     return "".join(items)
 
 
-def _metric_info_tooltip(m: Any, params: dict[str, float] | None = None) -> str:
+def _metric_info_tooltip(
+    m: Any,
+    params: dict[str, float] | None = None,
+    study_id: Any | None = None,
+) -> str:
     """Return the inner HTML for the metric's ⓘ hover tooltip, or '' if not applicable."""
     params = params or _V2_DEFAULT_PARAMS
     details = m.details or {}
+    verify_button_compact = _verify_workbench_button(study_id, compact=True)
 
     # schema_integrity + FAIR study checklist metrics: generic "checks" dict
     if m.name in ("schema_integrity", "fair_metadata_coverage", "fair_study_metadata_compliance"):
@@ -3847,16 +4464,17 @@ def _metric_info_tooltip(m: Any, params: dict[str, float] | None = None) -> str:
                     raw_formats = evidence.get("raw_data_formats", [])
 
                     # Each row: (check_key, label, value_html)
-                    def _val(v: str, truncate: int = 110) -> str:
+                    def _val(v: str, truncate: int = 110, verify_missing: bool = False) -> str:
                         v = v.strip()
                         if not v:
-                            return "<span style='color:#c0392b;font-style:italic'>missing</span>"
+                            suffix = verify_button_compact if verify_missing else ""
+                            return f"<span style='color:#c0392b;font-style:italic'>missing</span>{suffix}"
                         display = _e(v[:truncate] + ("…" if len(v) > truncate else ""))
                         return f"<span style='color:#1a7a4a;overflow-wrap:anywhere'>{display}</span>"
 
                     rows = [
-                        ("f1_doi_registered",            "DOI",               _val(str(evidence.get("doi", "") or ""))),
-                        ("r1_2_linked_publication",      "Publication",       _val(str(evidence.get("publications", "") or ""))),
+                        ("f1_doi_registered",            "DOI",               _val(str(evidence.get("doi", "") or ""), verify_missing=True)),
+                        ("r1_2_linked_publication",      "Publication",       _val(str(evidence.get("publications", "") or ""), verify_missing=True)),
                         ("r1_funding_source_declared",   "Funding source",    _val(str(evidence.get("funding_source", "") or ""))),
                         ("r1_contributors_listed",       "Contributors",      _val(str(evidence.get("contributors", "") or ""))),
                         ("r1_study_type_declared",       "Project type / experimental design", _val(str(evidence.get("project_type", "") or ""))),
@@ -3968,14 +4586,15 @@ def _metric_info_tooltip(m: Any, params: dict[str, float] | None = None) -> str:
             rt_units_html = (
                 "<div style='font-weight:600;margin:8px 0 4px;color:#132327'>RT unit metadata</div>"
                 "<div style='color:#51656a;font-size:.76rem;line-height:1.45'>"
-                "RT units not available in mwTab MS_RESULTS_FILE metadata.</div>"
+                f"RT units not available in mwTab MS_RESULTS_FILE metadata.{verify_button_compact}</div>"
             )
         html = (
             "<div style='font-weight:600;margin-bottom:6px;color:#132327'>"
             "Mass/RT-like metabolite metadata"
             "</div>"
             f"<div style='color:#132327;padding:2px 0'>Status: "
-            f"<strong style='color:{status_color}'>{_e(status_label)}</strong></div>"
+            f"<strong style='color:{status_color}'>{_e(status_label)}</strong>"
+            f"{verify_button_compact if not present else ''}</div>"
             f"<div style='color:#51656a;font-size:.78rem;line-height:1.45;padding-top:4px'>"
             f"Source: {_e(source_text)}. Scanned {_e(str(files_scanned))} mwTab JSON file(s) "
             f"and {_e(str(blocks_scanned))} Metabolites block(s). "
@@ -3997,13 +4616,13 @@ def _metric_info_tooltip(m: Any, params: dict[str, float] | None = None) -> str:
 
     if m.name == "metabatch_batch_annotation_compatibility":
         rules = details.get("rules", {}) if isinstance(details, dict) else {}
-        source_rule = str(rules.get("source", "StdMW/MetaBatch-style Workbench allfactors to batches.tsv filtering") or "")
+        source_rule = str(rules.get("source", "StdMW/MetaBatch-style Metabolomics Workbench allfactors to batches.tsv filtering") or "")
         return (
             "<div style='font-weight:600;margin-bottom:6px;color:#132327'>"
             "MetaBatch annotation compatibility"
             "</div>"
             "<div style='color:#132327;font-size:.78rem;line-height:1.45'>"
-            "This metric asks whether Workbench factor annotations can be converted into a "
+            "This metric asks whether Metabolomics Workbench factor annotations can be converted into a "
             "MetaBatch-style batch/covariate table for the samples in the active feature matrix. "
             "It uses the StdMW/MetaBatch filtering rules for factor usability: at least two "
             "non-empty levels, at least 60% sample coverage, and not more than 90% distinct values."
@@ -4292,10 +4911,11 @@ def _metric_info_tooltip(m: Any, params: dict[str, float] | None = None) -> str:
                     seen_units.add(text)
                     declared_units.append(text)
         units_text = ", ".join(declared_units) if declared_units else "unknown"
+        units_verify = verify_button_compact if "unknown" in {u.casefold() for u in declared_units} or units_text == "unknown" else ""
         return (
             "<div style='font-weight:600;margin-bottom:6px;color:#132327'>Global Value Distribution</div>"
             f"<div style='color:#132327;padding:2px 0'>Status: <strong>{_e(status_label)}</strong></div>"
-            f"<div style='color:#132327;padding:2px 0'>Declared value scale (mwTab JSON units): <strong>{_e(units_text)}</strong></div>"
+            f"<div style='color:#132327;padding:2px 0'>Declared value scale (mwTab JSON units): <strong>{_e(units_text)}</strong>{units_verify}</div>"
             f"<div style='color:#132327;padding:2px 0'>min={_e(min_text)}, median={_e(median_text)}, p90={_e(p90_text)}, max={_e(max_text)}</div>"
             f"<div style='color:#132327;padding:2px 0'>median/p90 ratio: <strong>{_e(ratio_text)}</strong></div>"
             f"<div style='color:#132327;padding:2px 0'>log&#8321;&#8320;(global median intensity): <strong>{_e(log10_med_text)}</strong></div>"
@@ -4897,7 +5517,11 @@ def _metric_info_tooltip(m: Any, params: dict[str, float] | None = None) -> str:
 # Metric table per section
 # ---------------------------------------------------------------------------
 
-def _metric_rows(metrics: list[Any], params: dict[str, float] | None = None) -> str:
+def _metric_rows(
+    metrics: list[Any],
+    params: dict[str, float] | None = None,
+    study_id: Any | None = None,
+) -> str:
     params = params or _V2_DEFAULT_PARAMS
     metrics = [
         m for m in metrics
@@ -4922,7 +5546,7 @@ def _metric_rows(metrics: list[Any], params: dict[str, float] | None = None) -> 
             f"{_e(descriptor)}</div>"
         ) if descriptor else ""
 
-        tooltip_content = _metric_info_tooltip(m, params)
+        tooltip_content = _metric_info_tooltip(m, params, study_id=study_id)
         popup_class = (
             "minfo-popup fair-metadata-popup" if m.name == "fair_study_metadata_compliance"
             else "minfo-popup feature-sample-popup" if m.name == "feature_to_sample_ratio"
@@ -5124,7 +5748,7 @@ def _analytical_breakdown_html(m: Any) -> str:
             f"<div style='color:#132327'><strong>MetaBatch-style factor table possible:</strong> {'Yes' if compatible else 'No'}</div>"
             f"<div style='color:#51656a;margin-top:4px'><strong>Explicit technical batch-like keys:</strong> {'Yes' if technical else 'No'}</div>"
             "<div style='color:#51656a;margin-top:6px;line-height:1.45'>"
-            "This ports the StdMW/MetaBatch idea of converting Workbench allfactors into a batches/covariates table. "
+            "This ports the StdMW/MetaBatch idea of converting Metabolomics Workbench allfactors into a batches/covariates table. "
             "MERIT keeps the interpretation conservative: generic factors may be useful covariates, but only factor names or values containing explicit batch/run/order/plate/injection/acquisition-like text are treated as technical-like metadata. "
             "<a href='https://bioinformatics.mdanderson.org/public-software/metabatch/' target='_blank' rel='noopener noreferrer' style='color:#0d6e6e;font-weight:700'>Original MetaBatch tool</a>."
             "</div>"
@@ -5491,7 +6115,11 @@ def _analytical_breakdown_html(m: Any) -> str:
     return _analysis_table(["Analysis ID", "Score (0-100)"], rows)
 
 
-def _analytical_metric_rows(metrics: list[Any], params: dict[str, float] | None = None) -> str:
+def _analytical_metric_rows(
+    metrics: list[Any],
+    params: dict[str, float] | None = None,
+    study_id: Any | None = None,
+) -> str:
     params = params or _V2_DEFAULT_PARAMS
     if not metrics:
         return "<p style='color:#51656a;font-style:italic;padding:8px'>No metrics in this section.</p>"
@@ -5504,7 +6132,7 @@ def _analytical_metric_rows(metrics: list[Any], params: dict[str, float] | None 
             if descriptor
             else ""
         )
-        tooltip_content = _metric_info_tooltip(m, params)
+        tooltip_content = _metric_info_tooltip(m, params, study_id=study_id)
         popup_class = (
             "minfo-popup fair-metadata-popup" if m.name == "fair_study_metadata_compliance"
             else "minfo-popup feature-sample-popup" if m.name == "feature_to_sample_ratio"
@@ -5614,7 +6242,7 @@ def _ml_difficulty(summary: dict[str, Any]) -> tuple[str, str, str]:
         hard.append("fewer than 2 classes — classification not possible")
     elif balance is not None:
         if balance < 0.2:
-            hard.append(f"severe class imbalance ({balance:.2f})")
+            hard.append(f"strong class imbalance ({balance:.2f})")
         elif balance < 0.4:
             hard.append(f"moderate class imbalance ({balance:.2f})")
         elif balance >= 0.5:
@@ -5731,7 +6359,7 @@ def _readiness_confidence(summary: dict[str, Any], section_scores: dict[str, flo
 
 
 def _risks_panel(report: Any) -> str:
-    """Collect all warn/fail recommendations across all sections into a compact risks list."""
+    """Collect reuse caveats across all sections into a compact, source-aware list."""
     risks: list[dict[str, str]] = []
     all_sections: list[tuple[str, Any]] = [
         ("Structural", report.schema_validation),
@@ -5751,11 +6379,12 @@ def _risks_panel(report: Any) -> str:
                         "status": m.status,
                         "section": section_name,
                         "metric": _metric_display_name(m.name),
+                        "metric_name": str(getattr(m, "name", "")),
                         "recommendation": str(m.recommendations[0]),
                     }
                 )
 
-    # De-duplicate repeated recommendation text; keep FAIL over WARN if both exist.
+    # De-duplicate repeated recommendation text; keep fail items over warn items.
     dedup: dict[str, dict[str, str]] = {}
     for item in risks:
         key = item["recommendation"].strip().lower()
@@ -5775,33 +6404,68 @@ def _risks_panel(report: Any) -> str:
             "<div style='background:rgba(255,255,255,.82);border:1px solid rgba(19,35,39,.1);"
             "border-radius:20px;padding:18px;margin-top:14px'>"
             "<h4 style='margin:0 0 8px;font-size:.9rem;text-transform:uppercase;letter-spacing:.06em;color:#196b4a'>"
-            "Key Dataset Risks</h4>"
-            "<p style='font-size:.85rem;color:#196b4a;margin:0'>No critical issues detected.</p>"
+            "ML-reuse caveats</h4>"
+            "<p style='font-size:.85rem;color:#196b4a;margin:0'>"
+            "No major ML-reuse caveats detected under the current MERIT profile.</p>"
             "</div>"
         )
 
+    def _caveat_label(item: dict[str, str]) -> tuple[str, str, str]:
+        status = str(item.get("status", "")).strip().lower()
+        section = str(item.get("section", ""))
+        metric_name = str(item.get("metric_name", ""))
+        parsed_source_metrics = {
+            "fair_study_metadata_compliance",
+            "fair_metabolite_identifier_resolvability",
+            "mass_rt_like_metadata_presence",
+            "required_field_completeness",
+            "feature_annotation_type",
+            "annotation_ambiguity_burden",
+            "unknown_feature_fraction",
+            "redundancy",
+        }
+        if status == "fail":
+            if section in {"Metadata and FAIR Reusability", "Annotation / Interoperability"} or metric_name in parsed_source_metrics:
+                return ("Not detected in parsed source", "#995b00", "#fdf3e3")
+            if section in {"Structural", "Label Structure and Class Support", "ML Task Readiness"}:
+                return ("ML-reuse blocker", "#8f2d2d", "#fdeaea")
+            return ("Required for selected MERIT profile", "#8f2d2d", "#fdeaea")
+        if section in {"Metadata and FAIR Reusability", "Annotation / Interoperability"} or metric_name in parsed_source_metrics:
+            return ("Verification recommended", "#995b00", "#fdf3e3")
+        return ("ML-reuse caveat", "#995b00", "#fdf3e3")
+
     items = "".join(
-        f"<li style='display:flex;gap:8px;align-items:flex-start;padding:5px 0;"
-        f"border-bottom:1px solid rgba(19,35,39,.05)'>"
-        f"<span style='font-size:.72rem;font-weight:700;padding:2px 6px;border-radius:5px;flex-shrink:0;margin-top:2px;"
-        f"background:{'#fdeaea' if item['status'] == 'fail' else '#fdf3e3'};"
-        f"color:{'#8f2d2d' if item['status'] == 'fail' else '#995b00'}'>"
-        f"{'FAIL' if item['status'] == 'fail' else 'WARN'}</span>"
-        f"<span style='font-size:.82rem;line-height:1.45;color:#132327'>"
-        f"<strong style='color:#263a3e'>{_e(item['section'])} · {_e(item['metric'])}</strong><br>"
-        f"{_e(item['recommendation'])}</span>"
-        f"</li>"
+        (
+            lambda label, fg, bg: (
+                f"<li style='display:flex;flex-wrap:wrap;gap:8px 9px;align-items:flex-start;padding:8px 0;"
+                f"border-bottom:1px solid rgba(19,35,39,.06)'>"
+                f"<span style='font-size:.68rem;font-weight:800;padding:3px 7px;border-radius:999px;"
+                f"flex-shrink:0;margin-top:1px;background:{bg};color:{fg};border:1px solid {fg}22;"
+                f"white-space:nowrap;max-width:100%;overflow-wrap:anywhere'>{_e(label)}</span>"
+                f"<span style='font-size:.82rem;line-height:1.48;color:#132327;flex:1 1 260px;min-width:0'>"
+                f"<strong style='color:#263a3e'>{_e(item['section'])} · {_e(item['metric'])}</strong><br>"
+                f"{_e(item['recommendation'])}</span>"
+                f"</li>"
+            )
+        )(*_caveat_label(item))
         for item in risks_unique[:6]
     )
     more = ""
     if len(risks_unique) > 6:
-        more = f"<p style='font-size:.78rem;color:#51656a;margin:6px 0 0'>+{len(risks_unique) - 6} more issues — see section tabs for details.</p>"
+        more = (
+            f"<p style='font-size:.78rem;color:#51656a;margin:8px 0 0'>"
+            f"+{len(risks_unique) - 6} additional caveats — see section tabs for parsed evidence and verification links.</p>"
+        )
 
     return (
         "<div style='background:rgba(255,255,255,.82);border:1px solid rgba(19,35,39,.1);"
         "border-radius:20px;padding:18px;margin-top:14px'>"
-        "<h4 style='margin:0 0 10px;font-size:.9rem;text-transform:uppercase;letter-spacing:.06em;"
-        "color:#8f2d2d'>Key Dataset Risks</h4>"
+        "<h4 style='margin:0 0 8px;font-size:.9rem;text-transform:uppercase;letter-spacing:.06em;"
+        "color:#995b00'>ML-reuse caveats</h4>"
+        "<p style='margin:0 0 10px;color:#51656a;font-size:.82rem;line-height:1.5'>"
+        "These caveats are derived from MERIT parsing of public source metadata and tabular matrices. "
+        "They are not judgments of the original study purpose, scientific value, or repository quality. "
+        "Source-sensitive items should be verified on the original Metabolomics Workbench record.</p>"
         f"<ul style='list-style:none;margin:0;padding:0'>{items}</ul>{more}"
         "</div>"
     )
@@ -6014,7 +6678,7 @@ def _download_tabular_data_tab_html(
         analysis_list_html = (
             "<div style='margin:0 0 12px;padding:10px 12px;border-radius:13px;background:rgba(255,255,255,.72);"
             "border:1px solid rgba(19,35,39,.08);color:#51656a;font-size:.84rem'>"
-            "Analyses will be discovered from the Workbench REST API when the ZIP is generated.</div>"
+            "Analyses will be discovered from the Metabolomics Workbench REST API when the ZIP is generated.</div>"
         )
     return (
         "<div class='ml-data-download-panel' "
@@ -6022,30 +6686,49 @@ def _download_tabular_data_tab_html(
         "<div style='display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px'>"
         "<div>"
         "<h4 style='margin:0 0 6px;font-size:.95rem;text-transform:uppercase;letter-spacing:.06em'>"
-        "Download Tabular Data</h4>"
+        "DOWNLOAD MERIT-DERIVED TABULAR EXPORT</h4>"
         "<p style='margin:0;color:#51656a;line-height:1.55;max-width:920px'>"
-        "Create a machine-learning compatible ZIP directly from Metabolomics Workbench REST endpoints. "
-        "The export uses rows as samples, columns as metabolite features, includes a <strong>Class Label</strong> column, "
-        "keeps only ML-eligible samples, and applies any current Adjust Matrix Properties edits for this browser session."
+        "MERIT uses the Metabolomics Workbench REST API at download time to generate source-specific tabular "
+        "exports for reproducibility of this assessment. Each parseable source table is used to create a "
+        "MERIT-derived, machine-learning-compatible TSV with rows as samples and columns as metabolite features. "
+        "Source matrix measurement values are preserved, while MERIT may add aligned class labels, sample "
+        "inclusion/exclusion indicators, and source manifests."
+        "</p>"
+        "<p style='margin:8px 0 0;color:#51656a;line-height:1.55;max-width:920px'>"
+        "Only ML-eligible samples under the current assessment settings are exported. Any active Adjust Matrix "
+        "Properties settings are applied before TSV files are generated. The exported files should be interpreted "
+        "together with the downloaded MERIT Assessment JSON, which records the source, settings, scoring profile, "
+        "and citation/provenance summary."
         "</p>"
         "</div>"
         "</div>"
-        "<div style='display:grid;grid-template-columns:minmax(260px,1fr) minmax(260px,1fr);gap:12px;margin-bottom:14px'>"
+        "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-bottom:14px'>"
         "<div style='padding:13px;border:1px solid rgba(13,110,110,.16);border-radius:14px;background:rgba(13,110,110,.06)'>"
         "<strong style='display:block;color:#0d6e6e;margin-bottom:5px'>What is exported</strong>"
         "<ul style='margin:0;padding-left:18px;color:#51656a;line-height:1.5;font-size:.86rem'>"
-        f"<li>All available sources for this study, not only the active {_e(source_label)} tab.</li>"
-        "<li>One TSV per source and analysis when Workbench REST returns a parseable matrix.</li>"
-        "<li>Study/sample manifests describing included samples, skipped samples, REST URLs, and matrix dimensions.</li>"
+        "<li>Parseable source-specific tables accessible through the Metabolomics Workbench REST response at download time.</li>"
+        "<li>One TSV per source and analysis when a parseable matrix is returned.</li>"
+        "<li>Source and citation manifests including Study ID, Project ID, Project DOI where detected, REST source URL, access date, MERIT version, and matrix dimensions.</li>"
+        "<li>Skipped-sample and label-alignment manifests for reproducibility.</li>"
         "</ul>"
         "</div>"
         "<div style='padding:13px;border:1px solid rgba(210,125,45,.18);border-radius:14px;background:rgba(210,125,45,.08)'>"
         "<strong style='display:block;color:#995b00;margin-bottom:5px'>What is not changed</strong>"
         "<ul style='margin:0;padding-left:18px;color:#51656a;line-height:1.5;font-size:.86rem'>"
-        "<li>No imputation, normalization, scaling, or feature remediation is applied.</li>"
-        "<li>No server-side copy is saved, and no Workbench repository files are modified.</li>"
-        "<li>Original matrix values are preserved; labels and sample inclusion reflect the current browser session.</li>"
+        "<li>Source matrix measurement values are not transformed, normalized, scaled, imputed, or feature-remediated.</li>"
+        "<li>No Metabolomics Workbench repository files are modified.</li>"
+        "<li>MERIT does not maintain a persistent server-side mirror of generated exports.</li>"
+        "<li>Exported files are MERIT-derived assessment inputs, not official Metabolomics Workbench files.</li>"
         "</ul>"
+        "</div>"
+        "<div style='padding:13px;border:1px solid rgba(143,45,45,.16);border-radius:14px;background:rgba(143,45,45,.055)'>"
+        "<strong style='display:block;color:#8f2d2d;margin-bottom:5px'>Citation and reuse</strong>"
+        "<p style='margin:0;color:#51656a;line-height:1.5;font-size:.86rem'>"
+        "This export is generated from public Metabolomics Workbench/NMDR source records. Users should cite the "
+        "original Metabolomics Workbench study/project, including the Study ID/accession, Project ID, Project DOI where available, "
+        "and associated publication(s) where applicable. MERIT-derived assessment scores and exports should be cited "
+        "separately from the original source data."
+        "</p>"
         "</div>"
         "</div>"
         "<div style='margin:0 0 12px;padding:10px 12px;border-radius:13px;background:rgba(245,241,232,.74);"
@@ -6063,9 +6746,9 @@ def _download_tabular_data_tab_html(
         f"<input type='hidden' name='analysis_ids' value='{_e(json.dumps(analysis_ids))}'>"
         "<input type='hidden' name='matrix_overrides' class='ml-download-overrides' value='{}'>"
         "<button type='submit' class='v2-apply' style='padding:10px 14px;border-radius:13px'>"
-        "Download ML-ready ZIP</button>"
+        "Generate MERIT Export ZIP</button>"
         "<span style='display:inline-block;margin-left:10px;color:#7b8b90;font-size:.78rem;line-height:1.4'>"
-        "The ZIP is generated on demand from Workbench REST; large studies may take a moment."
+        "Generated on demand from Metabolomics Workbench REST; large studies may take a moment."
         "</span>"
         "</form>"
         "</div>"
@@ -6091,6 +6774,7 @@ def _tabbed_report(report: Any, readiness_score: dict[str, Any],
     scoring_params = scoring_params or _V2_DEFAULT_PARAMS
     precomputed_root = precomputed_root or _default_precomputed_root()
     summary = dict(report.ingestion_summary or {})
+    study_id = summary.get("study_id")
     source_aware_missingness = _source_aware_missingness_rate(report)
     if source_aware_missingness is not None:
         summary["_overview_missingness_rate"] = source_aware_missingness
@@ -6105,7 +6789,7 @@ def _tabbed_report(report: Any, readiness_score: dict[str, Any],
         ("Annotation / Interoperability", "annotation", report.annotation_readiness),
         ("Label Structure and Class Support", "cohort", report.cohort_bias),
         ("ML Task Readiness", "ml", report.ml_readiness),
-        ("Download Tabular Data", "download", None),
+        ("Derived ML Assessment Inputs", "download", None),
     ]
 
     tab_buttons = "".join(
@@ -6204,17 +6888,17 @@ def _tabbed_report(report: Any, readiness_score: dict[str, Any],
     )
     provisional_band_tip = _mini_info_icon(
         "Provisional band is derived from the core ML readiness score before feasibility-gate ceilings are applied. "
-        "Final band may be capped by gate warnings/failures.",
+        "Final band may be limited by warn or fail gate outcomes.",
         size=11,
     )
     gate_summary_tip = _mini_info_icon(
-        "Gate summary counts feasibility-gate outcomes. Warn/fail gates can cap the final readiness band "
-        "even when section scores are strong.",
+        "Gate summary counts feasibility-gate outcomes. Warn or fail gates can limit the final "
+        "readiness band even when section scores are strong.",
         size=11,
     )
     recommendation_tip = _mini_info_icon(
         "This recommendation is generated from weak section scores and gate outcomes. "
-        f"Sections scoring below {_v2_fmt_score(scoring_params['band_conditional_min'])} and any gate warnings/failures "
+        f"Sections scoring below {_v2_fmt_score(scoring_params['band_conditional_min'])} and any warn/fail gates "
         "are translated into priority actions.",
         size=11,
     )
@@ -6223,7 +6907,7 @@ def _tabbed_report(report: Any, readiness_score: dict[str, Any],
         "G2": "sufficient ML-eligible sample count",
         "G3": "deposited groups",
         "G4": "minimum per group support",
-        "G5": "non-catastrophic missingness",
+        "G5": "missingness within reuse range",
     }
     gate_tips = {
         "G1": "Passes when at least one usable tabular feature matrix is present.",
@@ -6237,13 +6921,19 @@ def _tabbed_report(report: Any, readiness_score: dict[str, Any],
         "G3": "Passes when at least two deposited label groups define a supervised endpoint.",
         "G4": (
             f"Passes when the smallest class has at least {_v2_fmt_param(scoring_params['g4_class_pass'])} samples "
-            f"and there are at least 2 classes; warns down to {_v2_fmt_param(scoring_params['g4_class_warn_min'])}; otherwise fails."
+            f"and there are at least 2 classes; warns down to {_v2_fmt_param(scoring_params['g4_class_warn_min'])}; "
+            "fails below that range."
         ),
         "G5": (
             f"Passes when median sample-level missingness is <= {_v2_fmt_param(scoring_params['g5_missing_pass_pct'], pct=True)}; "
             f"warns through {_v2_fmt_param(scoring_params['g5_missing_fail_pct'], pct=True)}; "
             f"fails above {_v2_fmt_param(scoring_params['g5_missing_fail_pct'], pct=True)}."
         ),
+    }
+    gate_status_labels = {
+        "pass": "pass",
+        "warn": "warn",
+        "fail": "fail",
     }
 
     gate_rows = "".join(
@@ -6258,7 +6948,7 @@ def _tabbed_report(report: Any, readiness_score: dict[str, Any],
         f"<span style='font-size:.74rem;font-weight:700;padding:1px 8px;border-radius:999px;"
         f"background:{'#e8f4ee' if g.get('status') == 'pass' else '#fdf3e3' if g.get('status') == 'warn' else '#fdeaea'};"
         f"color:{'#196b4a' if g.get('status') == 'pass' else '#995b00' if g.get('status') == 'warn' else '#8f2d2d'}'>"
-        f"{_e(str(g.get('status', '')).upper())}</span>"
+        f"{_e(gate_status_labels.get(str(g.get('status', '')).lower(), str(g.get('status', ''))))}</span>"
         f"</li>"
         for g in gates
     )
@@ -6271,21 +6961,21 @@ def _tabbed_report(report: Any, readiness_score: dict[str, Any],
     conf_level, conf_color, conf_reason = _readiness_confidence(summary, readiness_score.get("section_scores", {}))
     diff_level, diff_color, diff_reason = _ml_difficulty(summary)
 
-    confidence_tip = _mini_info_icon(
-        "Score confidence is an assessment-confidence label, not part of the ReadinessScore math. "
-        "It does not change metric values, section scores, readiness bands, or feasibility gates. "
-        "It summarizes how interpretable the automated report is from source-local matrix availability, "
-        "ML-eligible sample count, informative section-level signal, metadata quality, and analytical QC strength. "
-        "Reason: " + conf_reason,
-        size=11,
-    )
     confidence_html = (
-        f"<div style='display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;flex-wrap:wrap'>"
-        f"<span style='font-size:.75rem;color:#51656a;text-transform:uppercase;letter-spacing:.05em'>Score confidence</span>"
-        f"{confidence_tip}"
+        f"<div style='margin-top:10px;padding:9px 10px;border-radius:11px;"
+        f"background:rgba(245,241,232,.72);border:1px solid rgba(19,35,39,.08);text-align:left'>"
+        f"<div style='display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap'>"
+        f"<span style='font-size:.72rem;color:#51656a;text-transform:uppercase;letter-spacing:.05em'>"
+        f"MERIT extraction confidence</span>"
         f"<span style='font-size:.75rem;font-weight:700;padding:2px 9px;border-radius:20px;"
-        f"background:{conf_color}22;color:{conf_color};border:1px solid {conf_color}55' "
-        f"title='{_e(conf_reason)}'>{_e(conf_level)}</span>"
+        f"background:{conf_color}22;color:{conf_color};border:1px solid {conf_color}55'>{_e(conf_level)}</span>"
+        f"</div>"
+        f"<div style='font-size:.72rem;color:#51656a;line-height:1.45;margin-top:6px;text-align:center'>"
+        "Confidence reflects how completely MERIT could parse the public source metadata and matrix structure. "
+        "It does not represent confidence in the biological conclusions of the original study."
+        f"</div>"
+        f"<div style='font-size:.7rem;color:#7b8b90;line-height:1.4;margin-top:4px;text-align:center'>"
+        f"Reason: {_e(conf_reason)}</div>"
         f"</div>"
     )
 
@@ -6521,11 +7211,15 @@ def _tabbed_report(report: Any, readiness_score: dict[str, Any],
         ),
     }
     for tid, metrics, extra in section_data:
-        extra_html = _per_analysis_table(extra) if extra is not None else ""
+        extra_html = _per_analysis_table(extra, study_id=study_id, source_key=source_key) if extra is not None else ""
         if tid == "analytical":
             extra_html = _nmr_analysis_table(per_analysis) + extra_html
         if tid == "annotation":
-            extra_html = _refmet_class_charts(per_analysis, chart_suffix=chart_suffix) + extra_html
+            extra_html = _refmet_class_charts(
+                per_analysis,
+                chart_suffix=chart_suffix,
+                study_id=study_id,
+            ) + extra_html
         if tid == "separability":
             extra_html = _class_separability_panel(metrics, chart_suffix=chart_suffix) + extra_html
         print_title = f"<span class='print-section-title' style='display:none'>{_e(_section_labels.get(tid, tid))}</span>"
@@ -6535,7 +7229,7 @@ def _tabbed_report(report: Any, readiness_score: dict[str, Any],
             f"padding-bottom:14px;border-bottom:1px solid rgba(19,35,39,.08)'>{_e(intro_text)}</p>"
         ) if intro_text else ""
         if tid == "analytical":
-            metric_html = _analytical_metric_rows(metrics, scoring_params)
+            metric_html = _analytical_metric_rows(metrics, scoring_params, study_id=study_id)
         elif tid == "ml":
             allowed_metric_names = {
                 "disease_endpoint_extractability",
@@ -6561,7 +7255,7 @@ def _tabbed_report(report: Any, readiness_score: dict[str, Any],
                     "<h4 style='margin:0 0 8px;font-size:.88rem;text-transform:uppercase;letter-spacing:.06em'>"
                     "Label Usability</h4>"
                 )
-                blocks.append(_metric_rows(label_metrics, scoring_params))
+                blocks.append(_metric_rows(label_metrics, scoring_params, study_id=study_id))
             if core_ml_metrics:
                 if label_metrics:
                     blocks.append("<div style='height:14px'></div>")
@@ -6569,11 +7263,11 @@ def _tabbed_report(report: Any, readiness_score: dict[str, Any],
                     "<h4 style='margin:0 0 8px;font-size:.88rem;text-transform:uppercase;letter-spacing:.06em'>"
                     "Core ML Task Readiness</h4>"
                 )
-                blocks.append(_metric_rows(core_ml_metrics, scoring_params))
+                blocks.append(_metric_rows(core_ml_metrics, scoring_params, study_id=study_id))
 
-            metric_html = "".join(blocks) if blocks else _metric_rows(ml_metrics, scoring_params)
+            metric_html = "".join(blocks) if blocks else _metric_rows(ml_metrics, scoring_params, study_id=study_id)
         else:
-            metric_html = _metric_rows(metrics, scoring_params)
+            metric_html = _metric_rows(metrics, scoring_params, study_id=study_id)
         panel_content = f"{print_title}{intro_html}{extra_html}{metric_html}"
         if tid == "analytical":
             panel_content = (
@@ -6744,7 +7438,7 @@ def _result_panel(
             "border:1px dashed rgba(19,35,39,.16);background:rgba(255,255,255,.6)'>"
             "<h3 style='margin:0 0 8px'>Workflow Ready</h3>"
             "<p style='margin:0;color:#51656a;line-height:1.6'>"
-            "Enter a Workbench accession ID and run the pipeline. "
+            "Enter a Metabolomics Workbench accession ID and run the pipeline. "
             "The report will display all readiness dimensions, a Readiness Score radar chart, "
             "per-source data availability, and per-metric recommendations."
             "</p></section>"
@@ -6979,7 +7673,7 @@ def _result_panel(
     state_payload = _json_safe_state_payload(state)
     state_json_js = json.dumps(state_payload).replace("</", "<\\/") if isinstance(state_payload, dict) else "null"
     study_label = str(summary.get("study_id", "") or state.get("study_id", "study")).strip() or "study"
-    state_filename = f"{study_label.lower()}_merit_result.json"
+    state_filename = f"{study_label.lower()}_merit_assessment.json"
     pdf_header = (
         f"<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:16px'>"
         f"<div>"
@@ -6991,24 +7685,34 @@ def _result_panel(
         f"<div style='display:flex;gap:8px;align-items:center'>"
         f"<button onclick='downloadRenderedState()' style='border:1px solid rgba(13,110,110,.35);border-radius:12px;"
         f"padding:9px 14px;background:rgba(13,110,110,.08);color:#0d6e6e;font:inherit;font-size:.82rem;"
-        f"font-weight:700;cursor:pointer;white-space:nowrap' title='Download the exact JSON payload used to render this UI'>"
-        f"Download Result JSON</button>"
+        f"font-weight:700;cursor:pointer;white-space:nowrap' title='Download the compact public MERIT assessment JSON'>"
+        f"Download MERIT Assessment JSON</button>"
         f"</div>"
         f"</div>"
     )
+    scope_note_html = (
+        "<div style='margin:0 0 16px;padding:13px 15px;border-radius:16px;"
+        "background:rgba(13,110,110,.07);border:1px solid rgba(13,110,110,.22);"
+        "color:#2e474d;font-size:.88rem;line-height:1.55'>"
+        f"{_e(_SCOPE_NOTE_TEXT)}"
+        "</div>"
+    )
+    parsing_issue_html = _report_merit_parsing_issue_card(summary)
 
     return (
         f"<div style='margin-top:26px'>"
         f"<div style='margin:0 0 10px;color:#51656a;font-size:.86rem'>"
-        f"Please download and keep this run JSON for reproducibility.</div>"
+        f"Please download and keep this MERIT Assessment JSON for reproducibility.</div>"
         f"{pdf_header}"
+        f"{scope_note_html}"
+        f"{parsing_issue_html}"
         f"<div style='display:grid;grid-template-columns:1fr;gap:18px;align-items:start'>"
         f"<div>{tabbed}</div>"
         f"</div>"
         f"<script>"
         f"window.__MERIT_STATE_JSON = {state_json_js};"
         f"window.downloadRenderedState = function() {{"
-        f"  if (!window.__MERIT_STATE_JSON) {{ alert('No run JSON available to download.'); return; }}"
+        f"  if (!window.__MERIT_STATE_JSON) {{ alert('No MERIT Assessment JSON available to download.'); return; }}"
         f"  var blob = new Blob([JSON.stringify(window.__MERIT_STATE_JSON, null, 2)], {{type:'application/json'}});"
         f"  var a = document.createElement('a');"
         f"  a.href = URL.createObjectURL(blob);"
@@ -7135,7 +7839,6 @@ def _raise_if_embargoed_bulk_session(raw: str | dict[str, Any]) -> None:
         raise ValueError(" ".join(messages))
 
 
-_WB_REST_BASE = "https://www.metabolomicsworkbench.org/rest"
 _ML_EXPORT_SAMPLE_ALIASES = {"samples", "sample", "sample_id", "sample id", "local_sample_id", "local sample id"}
 _ML_EXPORT_LABEL_ALIASES = {"class", "label", "group", "groups", "factor", "factors", "class label", "class_label"}
 _ML_EXPORT_SOURCE_ENDPOINTS: dict[str, tuple[str, ...]] = {
@@ -7143,6 +7846,76 @@ _ML_EXPORT_SOURCE_ENDPOINTS: dict[str, tuple[str, ...]] = {
     "mwtab": ("mwtab/txt",),
     "untarg_data": ("untarg_data/file", "untarg_data", "untarg_data/txt"),
 }
+
+
+def _ml_export_source_hash(text: str) -> str:
+    return "sha256:" + hashlib.sha256((text or "").encode("utf-8", errors="replace")).hexdigest()
+
+
+def _ml_export_citation_metadata(study_id: str) -> dict[str, Any]:
+    study_id = str(study_id or "").strip().upper()
+    citation_index = _load_citation_index(_default_precomputed_root())
+    citation = citation_index.get(study_id, {}) if isinstance(citation_index, dict) else {}
+    if not isinstance(citation, dict):
+        citation = {}
+    return {
+        "project_id": str(citation.get("project_id") or "") or None,
+        "project_doi": str(citation.get("project_doi") or "") or None,
+        "project_doi_url": str(citation.get("doi_url") or "") or None,
+        "related_publications": citation.get("related_publications") if isinstance(citation.get("related_publications"), list) else [],
+    }
+
+
+def _ml_export_derivation_metadata(
+    *,
+    study_id: str,
+    generated_at: str,
+    source_matrix: str | None = None,
+    analysis_id: str | None = None,
+    rest_url: str | None = None,
+    source_hash: str | None = None,
+    matrix_file: str | None = None,
+    n_exported_samples: int | None = None,
+    n_features: int | None = None,
+) -> dict[str, Any]:
+    study_id = str(study_id or "").strip().upper()
+    citation = _ml_export_citation_metadata(study_id)
+    metadata: dict[str, Any] = {
+        "source_repository": "Metabolomics Workbench",
+        "study_id": study_id,
+        "project_id": citation.get("project_id"),
+        "project_doi": citation.get("project_doi"),
+        "project_doi_url": citation.get("project_doi_url"),
+        "source_url": f"{_WB_STUDY_PAGE_BASE}{study_id}" if study_id else None,
+        "accessed_on": generated_at.split("T", 1)[0],
+        "generated_at_utc": generated_at,
+        "merit_version": MERIT_VERSION,
+        "derivation_note": (
+            "This file was generated by MERIT from public Metabolomics Workbench tabular data "
+            "for ML-readiness assessment. It is a MERIT-derived representation and does not "
+            "replace the original Metabolomics Workbench record."
+        ),
+        "citation_note": (
+            "Users should cite the original Metabolomics Workbench Project ID, Project DOI where available, "
+            "Study ID/accession, and associated publication(s) where applicable."
+        ),
+        "related_publications": citation.get("related_publications") or [],
+    }
+    if source_matrix is not None:
+        metadata["source_matrix"] = source_matrix
+    if analysis_id is not None:
+        metadata["analysis_id"] = analysis_id
+    if rest_url is not None:
+        metadata["rest_url"] = rest_url
+    if source_hash is not None:
+        metadata["source_hash"] = source_hash
+    if matrix_file is not None:
+        metadata["matrix_file"] = matrix_file
+    if n_exported_samples is not None:
+        metadata["n_exported_samples"] = n_exported_samples
+    if n_features is not None:
+        metadata["n_features"] = n_features
+    return metadata
 
 
 def _ml_export_slug(value: Any, fallback: str = "value") -> str:
@@ -7206,7 +7979,7 @@ def _ml_export_untarg_registry_analyses(study_id: str) -> tuple[list[str], list[
     try:
         payload = _ml_export_fetch_json(url)
     except Exception as exc:
-        return [], [f"Could not fetch Workbench untarg_data registry from {url}: {exc}"]
+        return [], [f"Could not fetch Metabolomics Workbench untarg_data registry from {url}: {exc}"]
     analysis_ids = [
         _ml_export_analysis_id(row)
         for row in _ml_export_rows_from_payload(payload)
@@ -7214,9 +7987,9 @@ def _ml_export_untarg_registry_analyses(study_id: str) -> tuple[list[str], list[
     ]
     analysis_ids = sorted({aid for aid in analysis_ids if aid})
     if not analysis_ids:
-        return [], [f"No untarg_data analysis IDs for {study_id} were found in the Workbench untarg_data registry."]
+        return [], [f"No untarg_data analysis IDs for {study_id} were found in the Metabolomics Workbench untarg_data registry."]
     return analysis_ids, [
-        f"Regular study analysis endpoint returned no IDs; recovered {len(analysis_ids)} untarg_data analysis ID(s) from the Workbench untarg_data registry."
+        f"Regular study analysis endpoint returned no IDs; recovered {len(analysis_ids)} untarg_data analysis ID(s) from the Metabolomics Workbench untarg_data registry."
     ]
 
 
@@ -7249,7 +8022,7 @@ def _ml_export_cached_analysis_ids(study_id: str) -> tuple[list[str], list[str]]
     if not analysis_ids:
         return [], []
     return analysis_ids, [
-        "Recovered analysis IDs from the current MERIT assessment metadata; exported matrix values were fetched live from Workbench REST."
+        "Recovered analysis IDs from the current MERIT assessment metadata; exported matrix values were fetched live from Metabolomics Workbench REST."
     ]
 
 
@@ -7262,7 +8035,7 @@ def _ml_export_study_analyses(study_id: str, analysis_ids: Any = None) -> tuple[
     try:
         payload = _ml_export_fetch_json(url)
     except Exception as exc:
-        return [], [f"Could not fetch Workbench analysis list from {url}: {exc}"]
+        return [], [f"Could not fetch Metabolomics Workbench analysis list from {url}: {exc}"]
     analysis_ids = [
         _ml_export_analysis_id(row)
         for row in _ml_export_rows_from_payload(payload)
@@ -7289,7 +8062,7 @@ def _ml_export_factor_labels(study_id: str) -> tuple[dict[str, str], list[dict[s
     try:
         payload = _ml_export_fetch_json(url)
     except Exception as exc:
-        return labels, rows_out, [f"Could not fetch Workbench factor labels from {url}: {exc}"]
+        return labels, rows_out, [f"Could not fetch Metabolomics Workbench factor labels from {url}: {exc}"]
     for row in _ml_export_rows_from_payload(payload):
         sample_id = str(
             row.get("local_sample_id")
@@ -7574,6 +8347,7 @@ def _ml_export_fetch_matrix(study_id: str, analysis_id: str, source_key: str) ->
                     "source_key": source_key,
                     "analysis_id": analysis_id,
                     "url": url,
+                    "source_hash": _ml_export_source_hash(text),
                     "rows": matrix_rows,
                     "features": feature_names,
                     "warnings": warnings,
@@ -7598,6 +8372,7 @@ def _ml_export_fetch_matrix(study_id: str, analysis_id: str, source_key: str) ->
                 "source_key": source_key,
                 "analysis_id": analysis_id,
                 "url": url,
+                "source_hash": _ml_export_source_hash(text),
                 "rows": matrix_rows,
                 "features": feature_names,
                 "warnings": warnings,
@@ -7607,7 +8382,7 @@ def _ml_export_fetch_matrix(study_id: str, analysis_id: str, source_key: str) ->
         "ok": False,
         "source_key": source_key,
         "analysis_id": analysis_id,
-        "errors": errors or ["Source not available from Workbench REST."],
+        "errors": errors or ["Source not available from Metabolomics Workbench REST."],
     }
 
 
@@ -7639,27 +8414,44 @@ def _ml_export_write_tsv(zf: zipfile.ZipFile, path: str, header: list[str], rows
 def _ml_export_build_zip(studies: list[dict[str, Any]], *, bulk: bool = False) -> tuple[bytes, str]:
     generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     manifest: dict[str, Any] = {
+        "export_type": "MERIT-derived ML assessment inputs",
         "generated_at_utc": generated_at,
         "rest_api_base": _WB_REST_BASE,
+        "source_repository": "Metabolomics Workbench",
+        "merit_version": MERIT_VERSION,
+        "derivation_note": (
+            "This ZIP contains MERIT-derived representations of public Metabolomics Workbench tabular data "
+            "for reproducibility of MERIT ML-readiness assessment. It does not replace the original Metabolomics Workbench record."
+        ),
+        "citation_note": (
+            "Users should cite the original Metabolomics Workbench Project ID, Project DOI where available, "
+            "Study ID/accession, and associated publication(s) where applicable."
+        ),
         "policy": {
-            "source": "Workbench REST API only",
+            "source": "Metabolomics Workbench REST API only",
             "storage": "No server-side copy is saved for this export.",
-            "matrix_orientation": "Rows are samples; columns are metabolite features.",
+            "matrix_orientation": "Derived TSV files use rows as samples and columns as metabolite features.",
             "sample_filter": "Only samples marked ML-eligible and carrying usable class labels are exported.",
-            "data_values": "Original downloaded table values are preserved; MERIT does not impute, normalize, or remediate values in this ZIP.",
+            "data_values": "Original matrix values are preserved; MERIT does not impute, normalize, or remediate values in this ZIP.",
+            "citation": "The export is not a Metabolomics Workbench mirror; users must consult and cite the original Metabolomics Workbench record.",
         },
         "studies": [],
     }
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
         readme = (
-            "MERIT ML-ready tabular data export\n"
+            "MERIT-derived ML assessment inputs\n"
             f"Generated UTC: {generated_at}\n\n"
-            "This ZIP was built dynamically from the Metabolomics Workbench REST API.\n"
-            "MERIT does not save a server-side copy of this ZIP.\n\n"
-            "For each available source and analysis, TSV matrices use rows as samples and columns as metabolite features.\n"
-            "The first two columns are Sample ID and Class Label. Class labels reflect the default Workbench factor labels plus any current UI-session matrix edits.\n"
-            "Only ML-eligible samples with usable class labels are included. Original matrix values are preserved; no imputation, scaling, normalization, or feature remediation is applied.\n"
+            "This ZIP was built dynamically from the Metabolomics Workbench REST API and contains MERIT-derived\n"
+            "representations of public Metabolomics Workbench source data for reproducibility of the MERIT assessment.\n"
+            "It does not replace the original Metabolomics Workbench record, and MERIT does not save a server-side copy of this ZIP.\n\n"
+            "For each available source and analysis, MERIT fetches the source-specific tabular dataset from Metabolomics Workbench REST,\n"
+            "then converts it on the fly into an assessment-ready TSV with rows as samples and columns as metabolite features.\n"
+            "The first two columns are Sample ID and Class Label. Class labels are aligned to MERIT sample names and reflect\n"
+            "the default Metabolomics Workbench factor labels plus any current UI-session edits made in Adjust Matrix Properties.\n"
+            "Only ML-eligible samples with usable class labels are included. Original matrix values are preserved; no imputation, scaling, normalization, or feature remediation is applied.\n\n"
+            "Citation responsibility: users must cite the original Metabolomics Workbench Project ID, Project DOI where available,\n"
+            "Study ID/accession, and associated publication(s) where applicable.\n"
         )
         zf.writestr("README.txt", readme)
         for item in studies:
@@ -7668,12 +8460,21 @@ def _ml_export_build_zip(studies: list[dict[str, Any]], *, bulk: bool = False) -
                 continue
             overrides = _bulk_clean_matrix_overrides(item.get("matrix_overrides", {}))
             study_folder = _ml_export_slug(study_id)
+            study_source_metadata = _ml_export_derivation_metadata(
+                study_id=study_id,
+                generated_at=generated_at,
+            )
             study_manifest: dict[str, Any] = {
                 "study_id": study_id,
+                "source_metadata": study_source_metadata,
                 "matrix_override_count": len(overrides),
                 "warnings": [],
                 "analyses": [],
             }
+            zf.writestr(
+                f"{study_folder}/source_metadata.json",
+                json.dumps(study_source_metadata, indent=2, ensure_ascii=False),
+            )
             analysis_ids, analysis_warnings = _ml_export_study_analyses(
                 study_id,
                 item.get("analysis_ids", []),
@@ -7723,7 +8524,19 @@ def _ml_export_build_zip(studies: list[dict[str, Any]], *, bulk: bool = False) -
                     source_dir = f"{study_folder}/{source_key}"
                     source_slug = _ml_export_slug(source_key)
                     analysis_slug = _ml_export_slug(analysis_id)
-                    matrix_path = f"{source_dir}/{analysis_slug}_{source_slug}_ml_ready.tsv"
+                    matrix_path = f"{source_dir}/{analysis_slug}_{source_slug}_merit_derived.tsv"
+                    source_metadata_path = f"{source_dir}/{analysis_slug}_{source_slug}_source_metadata.json"
+                    source_metadata = _ml_export_derivation_metadata(
+                        study_id=study_id,
+                        generated_at=generated_at,
+                        source_matrix=source_key,
+                        analysis_id=analysis_id,
+                        rest_url=str(fetched.get("url", "") or ""),
+                        source_hash=str(fetched.get("source_hash", "") or ""),
+                        matrix_file=matrix_path if feature_names else "",
+                        n_exported_samples=len(exported_rows),
+                        n_features=len(feature_names),
+                    )
                     if feature_names:
                         _ml_export_write_tsv(
                             zf,
@@ -7731,12 +8544,18 @@ def _ml_export_build_zip(studies: list[dict[str, Any]], *, bulk: bool = False) -
                             ["Sample ID", "Class Label"] + feature_names,
                             exported_rows,
                         )
+                        zf.writestr(
+                            source_metadata_path,
+                            json.dumps(source_metadata, indent=2, ensure_ascii=False),
+                        )
                     analysis_entry["sources"].append(
                         {
                             "source": source_key,
                             "available": True,
                             "rest_url": fetched.get("url", ""),
-                            "matrix_file": matrix_path if exported_rows else "",
+                            "source_hash": fetched.get("source_hash", ""),
+                            "matrix_file": matrix_path if feature_names else "",
+                            "source_metadata_file": source_metadata_path if feature_names else "",
                             "n_exported_samples": len(exported_rows),
                             "n_features": len(feature_names),
                             "n_downloaded_samples": len(fetched.get("rows", []) or []),
@@ -7768,10 +8587,10 @@ def _ml_export_build_zip(studies: list[dict[str, Any]], *, bulk: bool = False) -
             manifest["studies"].append(study_manifest)
         zf.writestr("manifest.json", json.dumps(manifest, indent=2, ensure_ascii=False))
     if bulk:
-        filename = f"merit_bulk_ml_ready_tables_{generated_at.replace(':', '').replace('-', '')}.zip"
+        filename = f"merit_bulk_derived_assessment_inputs_{generated_at.replace(':', '').replace('-', '')}.zip"
     else:
         sid = _ml_export_slug(studies[0].get("study_id", "study") if studies else "study")
-        filename = f"{sid}_merit_ml_ready_tables.zip"
+        filename = f"{sid}_merit_derived_assessment_inputs.zip"
     return buffer.getvalue(), filename
 
 
@@ -7782,7 +8601,7 @@ def _ml_ready_data_zip_payload(
 ) -> tuple[bytes, str]:
     sid = str(study_id or "").strip().upper()
     if not (sid.startswith("ST") and len(sid) == 8 and sid[2:].isdigit()):
-        raise ValueError("A valid Workbench study ID is required for tabular data export.")
+        raise ValueError("A valid Metabolomics Workbench study ID is required for the derived assessment-input export.")
     embargo_message = _embargoed_study_message(sid)
     if embargo_message:
         raise ValueError(embargo_message)
@@ -7881,6 +8700,130 @@ def _bulk_rows_to_tsv(rows: list[dict[str, Any]], columns: list[str]) -> str:
     for row in rows:
         lines.append("\t".join(_bulk_text_cell(row.get(col, "")) for col in columns))
     return "\n".join(lines) + "\n"
+
+
+_BULK_EXPORT_PROVENANCE_COLUMNS = [
+    "repository",
+    "study_id",
+    "project_id",
+    "project_doi",
+    "original_study_url",
+    "associated_publication_doi",
+    "associated_publication_pmid",
+    "accessed_on",
+    "source_matrix_type",
+    "source_hash",
+    "MERIT_version",
+    "citation_text",
+]
+
+
+def _bulk_export_columns(columns: list[str]) -> list[str]:
+    merged: list[str] = []
+    for col in [*_BULK_EXPORT_PROVENANCE_COLUMNS, *columns]:
+        if col not in merged:
+            merged.append(col)
+    return merged
+
+
+def _bulk_export_readme_text() -> str:
+    return (
+        "This bulk export contains MERIT-derived assessment metrics for public repository records. "
+        "It does not replace the original repository records. Users must cite the original "
+        "Metabolomics Workbench/NMDR Project ID, Project DOI where available, Study ID/accession, "
+        "and associated publication(s) where applicable."
+    )
+
+
+def _bulk_publication_identifiers(publications: Any) -> tuple[str, str]:
+    dois: list[str] = []
+    pmids: list[str] = []
+    if isinstance(publications, list):
+        for publication in publications:
+            if not isinstance(publication, dict):
+                continue
+            doi = str(publication.get("doi") or "").strip()
+            pmid = str(publication.get("pubmed_id") or publication.get("pmid") or "").strip()
+            if doi and doi not in dois:
+                dois.append(doi)
+            if pmid and pmid not in pmids:
+                pmids.append(pmid)
+    return "; ".join(dois), "; ".join(pmids)
+
+
+def _bulk_citation_text(study_id: str, project_id: str, project_doi: str, publications: Any) -> str:
+    project_display = project_id or "NA"
+    doi_display = project_doi or "NA"
+    pub_doi, pub_pmid = _bulk_publication_identifiers(publications)
+    pub_note = ""
+    if pub_doi or pub_pmid:
+        pub_bits = []
+        if pub_doi:
+            pub_bits.append(f"publication DOI(s): {pub_doi}")
+        if pub_pmid:
+            pub_bits.append(f"PubMed ID(s): {pub_pmid}")
+        pub_note = " Associated publication metadata detected: " + "; ".join(pub_bits) + "."
+    else:
+        pub_note = " No associated publication was detected in the parsed Metabolomics Workbench metadata; users should verify the original Metabolomics Workbench study page before publication."
+    return (
+        "This data is available at the NIH Common Fund's National Metabolomics Data Repository "
+        "(NMDR) website, the Metabolomics Workbench, https://www.metabolomicsworkbench.org "
+        f"where it has been assigned Study ID {study_id or 'NA'} and Project ID {project_display}. "
+        f"The Project DOI parsed by MERIT is {doi_display}. "
+        "Please cite the Metabolomics Workbench as: "
+        "\"The Metabolomics Workbench, https://www.metabolomicsworkbench.org/\"."
+        f"{pub_note}"
+    )
+
+
+def _bulk_provenance_fields(
+    *,
+    study_id: str,
+    source_matrix_type: str = "",
+    accessed_on: Any = "",
+    source_hash: Any = "",
+    precomputed_root: str | Path | None = None,
+) -> dict[str, Any]:
+    sid = str(study_id or "").strip().upper()
+    citation_root = precomputed_root if precomputed_root is not None else _default_precomputed_root()
+    citation_index = _load_citation_index(str(citation_root))
+    citation = citation_index.get(sid, {}) if isinstance(citation_index, dict) else {}
+    if not isinstance(citation, dict):
+        citation = {}
+    publications = citation.get("related_publications") if isinstance(citation.get("related_publications"), list) else []
+    pub_doi, pub_pmid = _bulk_publication_identifiers(publications)
+    project_id = str(citation.get("project_id") or "").strip()
+    project_doi = str(citation.get("project_doi") or "").strip()
+    return {
+        "repository": "Metabolomics Workbench",
+        "study_id": sid,
+        "project_id": project_id,
+        "project_doi": project_doi,
+        "original_study_url": _workbench_study_url(sid) if sid else "",
+        "associated_publication_doi": pub_doi,
+        "associated_publication_pmid": pub_pmid,
+        "accessed_on": accessed_on or "",
+        "source_matrix_type": source_matrix_type or "",
+        "source_hash": source_hash or "",
+        "MERIT_version": MERIT_VERSION,
+        "citation_text": _bulk_citation_text(sid, project_id, project_doi, publications),
+    }
+
+
+def _bulk_export_session_payload(session: dict[str, Any], summary_rows: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+    payload = json.loads(json.dumps(session, default=str))
+    payload["bulk_export_notice"] = _bulk_export_readme_text()
+    payload["provenance_columns_added_to_tsv_exports"] = list(_BULK_EXPORT_PROVENANCE_COLUMNS)
+    payload["citation_responsibility"] = (
+        "Users must cite the original Metabolomics Workbench/NMDR Project ID, Project DOI where "
+        "available, Study ID/accession, and associated publication(s) where applicable."
+    )
+    if summary_rows:
+        payload["study_provenance"] = [
+            {col: row.get(col, "") for col in _BULK_EXPORT_PROVENANCE_COLUMNS}
+            for row in summary_rows
+        ]
+    return payload
 
 
 def _bulk_first_recommendation(metric: Any) -> str:
@@ -8114,48 +9057,64 @@ def _bulk_run_from_session(session: dict[str, Any], precomputed_root: str | Path
                 "recommendation": score_payload.get("recommendation", ""),
                 "_priority_tuple": priority_tuple,
             }
+            row.update(
+                _bulk_provenance_fields(
+                    study_id=sid,
+                    source_matrix_type=selected_source,
+                    accessed_on=summary.get("accessed_date", ""),
+                    source_hash=summary.get("content_hash", ""),
+                    precomputed_root=precomputed_root,
+                )
+            )
             summary_rows.append(row)
             metric_rows.extend(_bulk_metric_long_rows(report, score_payload, row))
         except Exception as exc:
             errors.append(f"{sid}: {exc}")
-            summary_rows.append(
-                {
-                    "study_id": sid,
-                    "title": item.get("title", ""),
-                    "organism": item.get("organism", ""),
-                    "source": item.get("selected_source", ""),
-                    "analysis_type": "",
-                    "n_samples_total": "",
-                    "n_ml_eligible_samples": "",
-                    "n_labeled_samples": "",
-                    "n_classes": "",
-                    "min_class_size": "",
-                    "n_features": "",
-                    "has_refmet_annotations": "",
-                    "n_named_metabolites": "",
-                    "refmet_matched_features": "",
-                    "refmet_coverage_pct": "",
-                    "refmet_summary": "",
-                    "feature_to_sample_ratio": "",
-                    "median_sample_missingness_pct": "",
-                    "core_score_0_100": "",
-                    "final_band": "Error",
-                    "legacy_final_band": "Error",
-                    "gate_summary": "",
-                    "worst_gate": "load_error",
-                    "worst_gate_detail": str(exc),
-                    "lowest_section": "",
-                    "lowest_section_score_0_100": "",
-                    "lowest_metric_section": "",
-                    "lowest_metric": "",
-                    "lowest_metric_score_0_100": "",
-                    "lowest_metric_status": "",
-                    "matrix_override_count": len(matrix_overrides),
-                    "custom_thresholds_applied": "yes" if not _v2_is_default_params(item.get("scoring_params", {})) else "no",
-                    "recommendation": "Check whether this study exists in the selected MERIT assessment set.",
-                    "_priority_tuple": (-1, -1, 0),
-                }
+            error_source = str(item.get("selected_source", "") or "")
+            error_row = {
+                "study_id": sid,
+                "title": item.get("title", ""),
+                "organism": item.get("organism", ""),
+                "source": error_source,
+                "analysis_type": "",
+                "n_samples_total": "",
+                "n_ml_eligible_samples": "",
+                "n_labeled_samples": "",
+                "n_classes": "",
+                "min_class_size": "",
+                "n_features": "",
+                "has_refmet_annotations": "",
+                "n_named_metabolites": "",
+                "refmet_matched_features": "",
+                "refmet_coverage_pct": "",
+                "refmet_summary": "",
+                "feature_to_sample_ratio": "",
+                "median_sample_missingness_pct": "",
+                "core_score_0_100": "",
+                "final_band": "Error",
+                "legacy_final_band": "Error",
+                "gate_summary": "",
+                "worst_gate": "load_error",
+                "worst_gate_detail": str(exc),
+                "lowest_section": "",
+                "lowest_section_score_0_100": "",
+                "lowest_metric_section": "",
+                "lowest_metric": "",
+                "lowest_metric_score_0_100": "",
+                "lowest_metric_status": "",
+                "matrix_override_count": len(matrix_overrides),
+                "custom_thresholds_applied": "yes" if not _v2_is_default_params(item.get("scoring_params", {})) else "no",
+                "recommendation": "Check whether this study exists in the selected MERIT assessment set.",
+                "_priority_tuple": (-1, -1, 0),
+            }
+            error_row.update(
+                _bulk_provenance_fields(
+                    study_id=sid,
+                    source_matrix_type=error_source,
+                    precomputed_root=precomputed_root,
+                )
             )
+            summary_rows.append(error_row)
 
     summary_rows.sort(key=lambda r: r.get("_priority_tuple", (99, 99, 99)))
     for idx, row in enumerate(summary_rows, start=1):
@@ -8191,9 +9150,9 @@ def _bulk_runner_page(session: dict[str, Any], precomputed_root: str | Path) -> 
     """
     _raise_if_embargoed_bulk_session(session)
     header_help = {
-        "priority": "Action order: failed gates first, then warnings, then lower readiness scores.",
+        "priority": "Action order: fail gates first, then warn gates, then lower readiness scores.",
         "study": "Metabolomics Workbench study accession.",
-        "title": "Study title from the parsed Workbench metadata. Long titles are clipped to two lines in this compact table.",
+        "title": "Study title from the parsed Metabolomics Workbench metadata. Long titles are clipped to two lines in this compact table.",
         "organism": "Primary organism parsed from the cached study metadata.",
         "source": "Cached source used for the displayed assessment, usually datatable, mwTab, or untarg_data.",
         "ml_samples": "ML-eligible sample count after excluding QC, blanks, pools, references, standards, and similar non-training samples.",
@@ -8220,6 +9179,8 @@ def _bulk_runner_page(session: dict[str, Any], precomputed_root: str | Path) -> 
         )
 
     session_json = json.dumps(session, ensure_ascii=False, sort_keys=True).replace("</", "<\\/")
+    bulk_readme_json = json.dumps(_bulk_export_readme_text(), ensure_ascii=False).replace("</", "<\\/")
+    provenance_cols_json = json.dumps(_BULK_EXPORT_PROVENANCE_COLUMNS, ensure_ascii=False).replace("</", "<\\/")
     total = len(session.get("studies", []))
     return f"""<!doctype html>
 <html lang='en'>
@@ -8268,6 +9229,7 @@ code{{background:rgba(19,35,39,.08);border-radius:6px;padding:1px 4px}}
       <button id='download-summary' type='button' disabled>Download summary TSV</button>
       <button id='download-metrics' type='button' disabled>Download metrics-long TSV</button>
       <button id='download-session' type='button'>Download session JSON</button>
+      <button id='download-readme' type='button'>Download README</button>
       <span class='pill'>{total} studies selected</span>
     </div>
     <div class='progress-shell'><div id='progress-bar'></div></div>
@@ -8304,13 +9266,15 @@ code{{background:rgba(19,35,39,.08);border-radius:6px;padding:1px 4px}}
         <tbody></tbody>
       </table>
     </div>
-    <p class='sub' style='margin-top:14px'>The summary table is compact. The metrics-long TSV contains every displayed MERIT metric per study/source, sorted within each study by fail/warn/pass and score.</p>
+    <p class='sub' style='margin-top:14px'>The summary table is compact. The metrics-long TSV contains every displayed MERIT metric per study/source, sorted by fail, warn, and pass status followed by score.</p>
   </section>
 </main>
 <script id='bulk-session-json' type='application/json'>{session_json}</script>
 <script>
 (function(){{
   var session = JSON.parse(document.getElementById('bulk-session-json').textContent || '{{}}');
+  var bulkExportReadme = {bulk_readme_json};
+  var provenanceCols = {provenance_cols_json};
   var allStudies = Array.isArray(session.studies) ? session.studies : [];
   var total = allStudies.length;
   var chunkSize = 20;
@@ -8323,18 +9287,26 @@ code{{background:rgba(19,35,39,.08);border-radius:6px;padding:1px 4px}}
   var metricRows = [];
   var errors = [];
   var finalized = false;
-  var summaryCols = [
+  function uniqueCols(cols) {{
+    var seen = Object.create(null);
+    return cols.filter(function(col) {{
+      if (seen[col]) return false;
+      seen[col] = true;
+      return true;
+    }});
+  }}
+  var summaryCols = uniqueCols(provenanceCols.concat([
     'study_priority_rank','study_id','title','organism','source','analysis_type','n_samples_total',
     'n_ml_eligible_samples','n_classes','min_class_size','n_features','has_refmet_annotations',
     'n_named_metabolites','refmet_matched_features','refmet_coverage_pct','feature_to_sample_ratio',
     'median_sample_missingness_pct','core_score_0_100','final_band','gate_summary','worst_gate',
     'worst_gate_detail','lowest_section','lowest_section_score_0_100','lowest_metric',
     'lowest_metric_score_0_100','matrix_override_count','custom_thresholds_applied','recommendation'
-  ];
-  var metricCols = [
+  ]));
+  var metricCols = uniqueCols(provenanceCols.concat([
     'study_priority_rank','study_id','source','final_band','core_score_0_100','section','metric_name',
     'metric_score_0_100','metric_status','metric_recommendation','metric_details_compact'
-  ];
+  ]));
   function esc(text) {{
     return String(text == null ? '' : text)
       .replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
@@ -8524,7 +9496,19 @@ code{{background:rgba(19,35,39,.08);border-radius:6px;padding:1px 4px}}
     download('bulk_merit_metrics_long.tsv', toTsv(metricRows, metricCols), 'text/tab-separated-values');
   }});
   document.getElementById('download-session').addEventListener('click', function() {{
-    download('bulk_merit_session.json', JSON.stringify(session, null, 2), 'application/json');
+    var exportedSession = JSON.parse(JSON.stringify(session || {{}}));
+    exportedSession.bulk_export_notice = bulkExportReadme;
+    exportedSession.provenance_columns_added_to_tsv_exports = provenanceCols;
+    exportedSession.citation_responsibility = 'Users must cite the original Metabolomics Workbench/NMDR Project ID, Project DOI where available, Study ID/accession, and associated publication(s) where applicable.';
+    exportedSession.study_provenance = summaryRows.map(function(row) {{
+      var out = {{}};
+      provenanceCols.forEach(function(col) {{ out[col] = row[col] == null ? '' : row[col]; }});
+      return out;
+    }});
+    download('bulk_merit_session.json', JSON.stringify(exportedSession, null, 2), 'application/json');
+  }});
+  document.getElementById('download-readme').addEventListener('click', function() {{
+    download('bulk_merit_README.txt', bulkExportReadme + '\\n', 'text/plain');
   }});
   document.querySelectorAll('#bulk-table th').forEach(function(th, idx) {{
     th.addEventListener('click', function() {{
@@ -8564,7 +9548,7 @@ def _bulk_results_page(
     errors: list[str] | None = None,
 ) -> str:
     errors = errors or []
-    summary_cols = [
+    summary_cols = _bulk_export_columns([
         "study_priority_rank",
         "study_id",
         "title",
@@ -8594,8 +9578,8 @@ def _bulk_results_page(
         "matrix_override_count",
         "custom_thresholds_applied",
         "recommendation",
-    ]
-    metric_cols = [
+    ])
+    metric_cols = _bulk_export_columns([
         "study_priority_rank",
         "study_id",
         "source",
@@ -8607,22 +9591,24 @@ def _bulk_results_page(
         "metric_status",
         "metric_recommendation",
         "metric_details_compact",
-    ]
+    ])
     summary_tsv = _bulk_rows_to_tsv(summary_rows, summary_cols)
     metric_tsv = _bulk_rows_to_tsv(metric_rows, metric_cols)
-    session_json = json.dumps(session, indent=2, sort_keys=True)
+    bulk_readme = _bulk_export_readme_text()
+    session_json = json.dumps(_bulk_export_session_payload(session, summary_rows), indent=2, sort_keys=True)
     downloads_json = json.dumps(
         {
             "bulk_merit_summary.tsv": summary_tsv,
             "bulk_merit_metrics_long.tsv": metric_tsv,
             "bulk_merit_session.json": session_json,
+            "bulk_merit_README.txt": bulk_readme + "\n",
         }
     ).replace("</", "<\\/")
 
     header_help = {
-        "priority": "Action order: failed gates first, then warnings, then lower readiness scores.",
+        "priority": "Action order: fail gates first, then warn gates, then lower readiness scores.",
         "study": "Metabolomics Workbench study accession.",
-        "title": "Study title from the parsed Workbench metadata. Long titles are clipped to two lines in this compact table.",
+        "title": "Study title from the parsed Metabolomics Workbench metadata. Long titles are clipped to two lines in this compact table.",
         "organism": "Primary organism parsed from the cached study metadata.",
         "source": "Cached source used for the displayed assessment, usually datatable, mwTab, or untarg_data.",
         "ml_samples": "ML-eligible sample count after excluding QC, blanks, pools, references, standards, and similar non-training samples.",
@@ -8738,6 +9724,7 @@ td{{vertical-align:top}}
       <button type='button' onclick="downloadBulk('bulk_merit_summary.tsv')">Download summary TSV</button>
       <button type='button' onclick="downloadBulk('bulk_merit_metrics_long.tsv')">Download metrics-long TSV</button>
       <button type='button' onclick="downloadBulk('bulk_merit_session.json')">Download session JSON</button>
+      <button type='button' onclick="downloadBulk('bulk_merit_README.txt')">Download README</button>
       <span class='pill'>{len(summary_rows)} studies</span>
       <span class='pill'>{len(metric_rows)} metric rows</span>
     </div>
@@ -8767,7 +9754,7 @@ td{{vertical-align:top}}
         <tbody>{table_rows}</tbody>
       </table>
     </div>
-    <p class='sub' style='margin-top:14px'>The summary table is intentionally compact. The metrics-long TSV contains every displayed MERIT metric per study/source, sorted within each study by fail/warn/pass and score.</p>
+    <p class='sub' style='margin-top:14px'>The summary table is intentionally compact. The metrics-long TSV contains every displayed MERIT metric per study/source, sorted by fail, warn, and pass status followed by score.</p>
   </section>
 </main>
 <script>
@@ -8775,7 +9762,8 @@ window.__MERIT_BULK_DOWNLOADS = {downloads_json};
 function downloadBulk(name) {{
   var text = window.__MERIT_BULK_DOWNLOADS[name];
   if (typeof text !== 'string') return;
-  var blob = new Blob([text], {{type: name.endsWith('.json') ? 'application/json' : 'text/tab-separated-values'}});
+  var mime = name.endsWith('.json') ? 'application/json' : (name.endsWith('.txt') ? 'text/plain' : 'text/tab-separated-values');
+  var blob = new Blob([text], {{type: mime}});
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = name;
@@ -8863,11 +9851,11 @@ def _v2_scoring_controls_html(params: dict[str, float]) -> str:
             "Controls the feasibility gates that can cap the final band.",
             [
                 ("g2_sample_pass", "Preferred ML-eligible samples", "Minimum ML-eligible sample count for the sample-size gate to pass. MERIT defaults are for supervised classification / feature-selection reuse; triplicate time-course or isotope-tracing designs may be valid experimentally but remain underpowered for reliable ML validation."),
-                ("g2_sample_fail_below", "Severe sample floor", "ML-eligible sample count below this fails the sample-size gate. This does not judge original-study validity; it flags that very small ML-eligible sample sets cannot support reliable supervised classifier training or feature selection."),
+                ("g2_sample_fail_below", "Sample fail-below threshold", "ML-eligible sample count below this is treated as fail for the sample-size gate. This does not judge original-study validity; it flags that very small ML-eligible sample sets cannot support reliable supervised classifier training or feature selection."),
                 ("g4_class_pass", "Minimum class target", "Smallest class size required for the class-support gate and label-suitability metric to pass; protects cross-validation from under-filled classes."),
-                ("g4_class_warn_min", "Class warning floor", "Smallest class size needed to avoid a hard class-support failure; below this, minority-class learning is treated as infeasible."),
+                ("g4_class_warn_min", "Class warning floor", "Smallest class size needed to avoid a fail class-support gate; below this, minority-class learning is treated as infeasible for supervised ML reuse."),
                 ("g5_missing_pass_pct", "Missingness pass %", "Median sample-level missingness at or below this passes the missingness gate; lower missingness means fewer imputation-driven signals."),
-                ("g5_missing_fail_pct", "Missingness fail %", "Median sample-level missingness above this fails the missingness gate; high missingness can dominate model behavior."),
+                ("g5_missing_fail_pct", "Missingness fail %", "Median sample-level missingness above this is treated as fail for the missingness gate; high missingness can dominate model behavior."),
             ],
         ),
         (
@@ -8896,10 +9884,10 @@ def _v2_scoring_controls_html(params: dict[str, float]) -> str:
             "Controls status thresholds where cached raw distributions support safe v2 recalculation.",
             [
                 ("sample_missingness_score_pass", "Missingness score pass", "Minimum sample-missingness score for pass status; higher cutoffs demand more complete samples before training."),
-                ("class_missingness_gap_warn_pct", "Class gap warn %", "Warns when missingness differs this much between classes; class-specific missingness can leak label information."),
+                ("class_missingness_gap_warn_pct", "Class gap warning %", "Marks a warning signal when missingness differs this much between classes; class-specific missingness can leak label information."),
                 ("sample_outlier_score_pass", "Outlier score pass", "Minimum outlier-burden score for pass status; stricter values flag studies where unusual samples may drive the model."),
                 ("correlation_score_pass", "Correlation score pass", "Minimum redundancy score for pass status; stricter values flag feature blocks that can overweight duplicated signals."),
-                ("feature_missingness_burden_warn_pct", "Feature burden warn %", "Warns when too many features exceed the high-missingness threshold; high feature dropout increases imputation burden."),
+                ("feature_missingness_burden_warn_pct", "Feature burden warning %", "Marks a warning signal when too many features exceed the high-missingness threshold; high feature dropout increases imputation burden."),
             ],
         ),
         (
@@ -8981,6 +9969,28 @@ def _page(state: dict[str, Any] | None = None, error: str | None = None, default
         if has_report
         else ""
     )
+    about_html = (
+        "<button id='merit-about-toggle' class='merit-about-toggle' type='button' "
+        "aria-haspopup='dialog' aria-controls='merit-about-modal' aria-expanded='false'>About</button>"
+        "<div id='merit-about-modal' class='merit-about-modal' role='dialog' aria-modal='true' "
+        "aria-labelledby='merit-about-title' hidden>"
+        "<div class='merit-about-backdrop' data-about-close='1'></div>"
+        "<section class='merit-about-card'>"
+        "<button type='button' class='merit-about-close' data-about-close='1' aria-label='Close About dialog'>&times;</button>"
+        "<div class='merit-about-kicker'>About MERIT-ML</div>"
+        "<h2 id='merit-about-title'>Metabolomics Evaluation of Readiness and Interoperability of Tabular Data for Machine Learning</h2>"
+        "<p>MERIT-ML is a research software framework for assessing the machine-learning readiness of publicly deposited metabolomics tabular data. The current version focuses on studies available through the Metabolomics Workbench and evaluates whether deposited data matrices contain the minimum structural, label, sample-size, missingness, and annotation information needed to attempt supervised classification.</p>"
+        "<p>MERIT-ML was developed as part of an academic research project at the Centre for Digital Health, Indian Institute of Technology Bombay. The work was prepared by Shayantan Banerjee under the supervision of Prof. Pramod P. Wangikar, Department of Chemical Engineering and Centre for Digital Health, IIT Bombay.</p>"
+        "<p>The tool retrieves and summarizes publicly available repository-hosted data and metadata. It does not replace manual review, analytical validation, or biological interpretation of individual studies. A high MERIT-ML readiness score indicates that a deposited tabular matrix satisfies the framework&rsquo;s operational criteria for supervised-classification reuse; it does not guarantee model performance, biomarker validity, or external generalizability.</p>"
+        "<p>MERIT-ML is not affiliated with, endorsed by, or maintained by the Metabolomics Workbench. Users should cite the original deposited studies and the Metabolomics Workbench records when reusing data.</p>"
+        "<div class='merit-about-citation'>"
+        "<strong>Preprint citation</strong>"
+        "<span>Shayantan Banerjee, Pramod P. Wangikar. <em>MERIT-ML: A Machine-Learning-Readiness Framework for Tabular Public Metabolomics Data.</em> ChemRxiv. 10 June 2026.</span>"
+        "<a href='https://doi.org/10.26434/chemrxiv.15004429/v2' target='_blank' rel='noopener noreferrer'>https://doi.org/10.26434/chemrxiv.15004429/v2</a>"
+        "</div>"
+        "</section>"
+        "</div>"
+    )
     if logo_uri:
         sidebar_brand_html = (
             "<div style='display:flex;align-items:flex-start;justify-content:flex-start;margin:0 0 10px'>"
@@ -8997,7 +10007,7 @@ def _page(state: dict[str, Any] | None = None, error: str | None = None, default
 <head>
 <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width,initial-scale=1'>
-<title>MERIT — Workbench Readiness Assessment</title>
+<title>MERIT — Metabolomics Workbench Readiness Assessment</title>
 <script>
 (function(){{
   window.loadPlotlyOnce = function() {{
@@ -9191,6 +10201,30 @@ footer{{margin-top:18px;color:var(--muted);font-size:.82rem}}
   border-radius:999px;background:linear-gradient(135deg,#113e52,#0d6e6e);color:white;
   box-shadow:0 12px 30px rgba(17,62,82,.24);padding:10px 14px;font:inherit;font-size:.82rem;
   font-weight:900;cursor:pointer}}
+.merit-about-toggle{{position:fixed;right:18px;top:18px;z-index:1450;border:1px solid rgba(13,110,110,.28);
+  border-radius:999px;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);color:#0d6e6e;
+  box-shadow:0 10px 28px rgba(17,62,82,.14);padding:8px 13px;font:inherit;font-size:.8rem;
+  font-weight:900;cursor:pointer;letter-spacing:.02em}}
+.merit-about-toggle:hover,.merit-about-toggle:focus-visible{{outline:none;background:#0d6e6e;color:white;
+  transform:translateY(-1px);box-shadow:0 14px 32px rgba(13,110,110,.22)}}
+.merit-about-modal[hidden]{{display:none!important}}
+.merit-about-backdrop{{position:fixed;inset:0;background:rgba(19,35,39,.48);z-index:1490;
+  backdrop-filter:blur(3px)}}
+.merit-about-card{{position:fixed;right:18px;top:58px;z-index:1500;width:min(720px,calc(100vw - 36px));
+  max-height:min(82vh,760px);overflow:auto;background:#fff;border:1px solid rgba(19,35,39,.14);
+  border-radius:24px;box-shadow:0 28px 90px rgba(19,35,39,.28);padding:24px 26px 22px;color:#132327}}
+.merit-about-close{{position:absolute;right:14px;top:12px;border:1px solid rgba(19,35,39,.12);border-radius:999px;
+  width:32px;height:32px;background:rgba(245,241,232,.86);color:#51656a;font:inherit;font-size:1.25rem;
+  line-height:1;cursor:pointer}}
+.merit-about-close:hover,.merit-about-close:focus-visible{{outline:none;background:#0d6e6e;color:white}}
+.merit-about-kicker{{font-size:.73rem;text-transform:uppercase;letter-spacing:.12em;font-weight:900;color:#0d6e6e;margin:0 40px 7px 0}}
+.merit-about-card h2{{font-family:"Iowan Old Style",Georgia,serif;font-size:1.52rem;line-height:1.12;margin:0 40px 15px 0;color:#132327}}
+.merit-about-card p{{margin:0 0 12px;color:#40565b;line-height:1.64;font-size:.92rem}}
+.merit-about-citation{{margin-top:16px;padding:14px;border-radius:16px;background:rgba(13,110,110,.07);
+  border:1px solid rgba(13,110,110,.18);display:flex;flex-direction:column;gap:6px;color:#2e474d;font-size:.88rem;line-height:1.5}}
+.merit-about-citation strong{{color:#0d6e6e;text-transform:uppercase;letter-spacing:.07em;font-size:.72rem}}
+.merit-about-citation a{{color:#0d6e6e;font-weight:800;overflow-wrap:anywhere}}
+@media(max-width:760px){{.merit-about-toggle{{right:12px;top:12px}}.merit-about-card{{right:10px;left:10px;top:52px;width:auto;padding:20px}}}}
 body.report-tools-collapsed .tool-rail-toggle,
 body.report-tools-expanded .tool-rail-toggle{{display:inline-flex;align-items:center;gap:6px}}
 body.report-tools-collapsed .tool-rail-toggle{{animation:meritToolNudge 2.7s ease-in-out infinite}}
@@ -9237,6 +10271,7 @@ body.report-tools-expanded.report-analytical-active .tool-rail-toggle{{bottom:38
 </style>
 </head>
 <body class='{body_class}'>
+{about_html}
 {tool_toggle_html}
 <main class='wrap'>
   <aside class='sidebar sidebar-left'>
@@ -9256,7 +10291,7 @@ body.report-tools-expanded.report-analytical-active .tool-rail-toggle{{bottom:38
       <form id='run-form' method='post' action='/workflow/run'>
         <section class='card'>
           <h3>Repository &amp; Accession</h3>
-          <p>Workbench is active. Paste a study accession ID.</p>
+          <p>Metabolomics Workbench is active. Paste a study accession ID.</p>
           <input type='hidden' name='source' value='workbench'>
           <input type='hidden' name='profile' value='full'>
           <label>Source</label>
@@ -9286,7 +10321,7 @@ body.report-tools-expanded.report-analytical-active .tool-rail-toggle{{bottom:38
     </section>
   </aside>
 </main>
-<footer style='display:flex;justify-content:center;padding:8px 12px 18px'>
+<footer style='display:flex;flex-direction:column;align-items:center;gap:9px;padding:8px 12px 18px'>
   <div style='display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;
     border:1px solid rgba(19,35,39,.14);background:rgba(255,255,255,.72);color:#4e6268;font-size:.81rem'>
     <span>&copy;</span>
@@ -9296,6 +10331,11 @@ body.report-tools-expanded.report-analytical-active .tool-rail-toggle{{bottom:38
     </a>
     <span style='opacity:.7'>&middot;</span>
     <span style='font-weight:600'>IIT Bombay</span>
+  </div>
+  <div style='width:min(980px,calc(100vw - 28px));padding:10px 13px;border-radius:14px;
+    border:1px solid rgba(19,35,39,.10);background:rgba(255,255,255,.62);color:#51656a;
+    font-size:.78rem;line-height:1.5;text-align:center'>
+    {_e(_INDEPENDENCE_NOTE_TEXT)}
   </div>
 </footer>
 <script>
@@ -9355,6 +10395,39 @@ window.addEventListener('afterprint', function() {{
         input.dispatchEvent(new Event('change', {{bubbles:true}}));
       }} catch(e) {{}}
     }});
+  }});
+}})();
+
+// Persistent About dialog.
+(function() {{
+  var btn = document.getElementById('merit-about-toggle');
+  var modal = document.getElementById('merit-about-modal');
+  if (!btn || !modal) return;
+  function setOpen(open) {{
+    if (open) {{
+      modal.hidden = false;
+      btn.setAttribute('aria-expanded', 'true');
+      var closeBtn = modal.querySelector('.merit-about-close');
+      if (closeBtn) setTimeout(function() {{ closeBtn.focus(); }}, 0);
+    }} else {{
+      modal.hidden = true;
+      btn.setAttribute('aria-expanded', 'false');
+      btn.focus();
+    }}
+  }}
+  btn.addEventListener('click', function(ev) {{
+    ev.preventDefault();
+    setOpen(modal.hidden);
+  }});
+  modal.addEventListener('click', function(ev) {{
+    var target = ev.target;
+    if (target && target.getAttribute && target.getAttribute('data-about-close') === '1') {{
+      ev.preventDefault();
+      setOpen(false);
+    }}
+  }});
+  document.addEventListener('keydown', function(ev) {{
+    if (ev.key === 'Escape' && !modal.hidden) setOpen(false);
   }});
 }})();
 
@@ -9873,12 +10946,57 @@ window.addEventListener('afterprint', function() {{
       }}
     }});
   }}
+  function showDerivedDownloadNotice(dlForm) {{
+    var existing = document.getElementById('merit-derived-download-modal');
+    if (existing) existing.remove();
+    var modal = document.createElement('div');
+    modal.id = 'merit-derived-download-modal';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.innerHTML =
+      "<div style='position:fixed;inset:0;background:rgba(19,35,39,.46);z-index:9998'></div>" +
+      "<div style='position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9999;" +
+      "width:min(620px,calc(100vw - 34px));background:#fff;border-radius:22px;border:1px solid rgba(19,35,39,.14);" +
+      "box-shadow:0 28px 80px rgba(19,35,39,.28);padding:22px;color:#132327'>" +
+      "<h3 style='margin:0 0 10px;font-family:Georgia,serif;font-size:1.28rem'>Generate MERIT export ZIP?</h3>" +
+      "<p style='margin:0 0 12px;color:#51656a;line-height:1.6'>" +
+      "This download contains MERIT-derived assessment data generated from public Metabolomics Workbench source records. " +
+      "It does not replace the original Metabolomics Workbench record, and source matrix measurement values are preserved.</p>" +
+      "<p style='margin:0 0 16px;color:#51656a;line-height:1.6'>" +
+      "Please cite the original Metabolomics Workbench/NMDR project and study, including Project ID, Project DOI where available, " +
+      "and associated publication(s), and cite MERIT separately if using the assessment scores.</p>" +
+      "<div style='display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap'>" +
+      "<button type='button' id='merit-derived-download-cancel' style='border:1px solid rgba(19,35,39,.14);border-radius:12px;" +
+      "background:white;color:#51656a;padding:9px 13px;font:inherit;font-weight:800;cursor:pointer'>Cancel</button>" +
+      "<button type='button' id='merit-derived-download-confirm' style='border:0;border-radius:12px;" +
+      "background:#0d6e6e;color:white;padding:9px 13px;font:inherit;font-weight:900;cursor:pointer'>I understand, generate ZIP</button>" +
+      "</div></div>";
+    document.body.appendChild(modal);
+    var cancel = document.getElementById('merit-derived-download-cancel');
+    var confirmBtn = document.getElementById('merit-derived-download-confirm');
+    function closeModal() {{ modal.remove(); }}
+    if (cancel) cancel.addEventListener('click', closeModal);
+    modal.addEventListener('click', function(ev) {{
+      if (ev.target === modal.firstChild) closeModal();
+    }});
+    if (confirmBtn) confirmBtn.addEventListener('click', function() {{
+      closeModal();
+      dlForm.dataset.meritDownloadAcknowledged = '1';
+      dlForm.submit();
+    }});
+  }}
   document.querySelectorAll('.ml-data-download-form').forEach(function(dlForm) {{
-    dlForm.addEventListener('submit', function() {{
+    dlForm.addEventListener('submit', function(ev) {{
       collectOverrides();
       var hidden = dlForm.querySelector('.ml-download-overrides');
       var f = field();
       if (hidden) hidden.value = (f && f.value) ? f.value : '{{}}';
+      if (dlForm.dataset.meritDownloadAcknowledged === '1') {{
+        dlForm.dataset.meritDownloadAcknowledged = '';
+        return;
+      }}
+      ev.preventDefault();
+      showDerivedDownloadNotice(dlForm);
     }});
   }});
 }})();
@@ -10541,7 +11659,7 @@ window.addEventListener('afterprint', function() {{
 		    try {{
 		      if (source && state.source_assessments && state.source_assessments[source]) {{
 		        var item = state.source_assessments[source];
-		        summary = (((item || {{}}).report || {{}}).ingestion_summary || {{}}) || {{}};
+		        summary = ((item || {{}}).summary || {{}}) || {{}};
 		        rs = (item || {{}}).readiness_score || null;
 		      }}
 		      var bySource = ((state.source_availability || {{}}).analyses_by_source || {{}}) || {{}};
@@ -10553,7 +11671,7 @@ window.addEventListener('afterprint', function() {{
 		        }});
 		      }});
 		      if (!summary || !summary.study_id) {{
-		        summary = ((state.final_report || {{}}).ingestion_summary || {{}}) || {{}};
+		        summary = (state.summary || ((state.final_report || {{}}).ingestion_summary || {{}})) || {{}};
 		      }}
 		      if (!analysisIds.length && summary && Array.isArray(summary.per_analysis)) {{
 		        summary.per_analysis.forEach(function(item) {{

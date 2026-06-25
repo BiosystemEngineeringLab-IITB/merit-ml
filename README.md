@@ -16,7 +16,7 @@ This release excludes Workbench records that are currently under embargo from th
 
 ## Quick Start: Run With Docker
 
-Install Docker, then pull the MERIT-ML image from Docker Hub. The current thin-image `v7` and `latest` tags resolve to index digest `sha256:6e1f637846e3eb87760222f24700e0bd46afe2340877148794862d79c41bb5fc`:
+Install Docker, then pull the MERIT-ML image from Docker Hub. The current thin-image `v7` and `latest` tags resolve to index digest `sha256:935bd325d5ff2cda44dcb6170dd1a6faad8ff17980176c34251e152aeb60d716`:
 
 ```bash
 docker pull banerjee28/merit-ml:v7
