@@ -5,6 +5,7 @@ import json
 
 from flask import Flask, Response, request
 
+from merit.visit_stats import get_public_visit_stats
 from merit.ui import (
     _bulk_chunk_payload,
     _bulk_clean_session,
@@ -260,3 +261,13 @@ def bulk_download_data() -> Response:
 @app.get("/healthz")
 def healthz() -> Response:
     return Response("ok", mimetype="text/plain")
+
+
+@app.get("/api/visit-stats")
+def visit_stats() -> Response:
+    payload = get_public_visit_stats()
+    return Response(
+        json.dumps(payload),
+        mimetype="application/json",
+        headers={"Cache-Control": "public, max-age=300"},
+    )

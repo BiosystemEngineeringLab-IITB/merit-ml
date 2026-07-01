@@ -161,6 +161,84 @@ def _merit_analytics_consent_banner() -> str:
 </script>"""
 
 
+def _merit_about_usage_stats_html() -> str:
+    return (
+        "<div class='merit-about-usage' id='merit-about-usage' aria-live='polite'>"
+        "<strong>Site usage</strong>"
+        "<div class='merit-about-usage-grid' id='merit-about-usage-grid'>"
+        "<div class='merit-about-usage-stat'>"
+        "<span class='label'>Unique visitors</span>"
+        "<span class='value' id='merit-visit-count' aria-busy='true'>—</span>"
+        "</div>"
+        "<div class='merit-about-usage-stat'>"
+        "<span class='label'>Page views</span>"
+        "<span class='value' id='merit-pageview-count' aria-busy='true'>—</span>"
+        "</div>"
+        "</div>"
+        "<p class='merit-about-usage-period' id='merit-visit-period'>Loading anonymous totals…</p>"
+        "<p class='merit-about-usage-note' id='merit-visit-note'></p>"
+        "</div>"
+    )
+
+
+def _merit_about_usage_stats_css() -> str:
+    return """
+.merit-about-usage{margin-top:16px;padding:14px;border-radius:16px;background:rgba(19,35,39,.04);
+  border:1px solid rgba(13,110,110,.12)}
+.merit-about-usage strong{color:#0d6e6e;text-transform:uppercase;letter-spacing:.07em;font-size:.72rem}
+.merit-about-usage-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
+.merit-about-usage-stat{padding:12px 14px;border-radius:12px;background:#fff;border:1px solid rgba(19,35,39,.08)}
+.merit-about-usage-stat .label{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;
+  color:#60757b;font-weight:800;margin-bottom:6px}
+.merit-about-usage-stat .value{display:block;font-size:1.55rem;line-height:1;font-weight:900;color:#132327;
+  font-variant-numeric:tabular-nums}
+.merit-about-usage-period,.merit-about-usage-note{margin:12px 0 0;color:#60757b;font-size:.8rem;line-height:1.5}
+.merit-about-usage-note{margin-top:8px}
+@media(max-width:520px){.merit-about-usage-grid{grid-template-columns:1fr}}
+"""
+
+
+def _merit_about_usage_stats_js() -> str:
+    return """
+function meritFormatVisitCount(value) {
+  if (typeof value !== 'number' || isNaN(value)) return '—';
+  try { return value.toLocaleString('en-US'); } catch (e) { return String(value); }
+}
+function meritLoadVisitStats() {
+  if (window.__MERIT_VISIT_STATS_LOADING) return;
+  window.__MERIT_VISIT_STATS_LOADING = true;
+  var visitorsEl = document.getElementById('merit-visit-count');
+  var pageviewsEl = document.getElementById('merit-pageview-count');
+  var periodEl = document.getElementById('merit-visit-period');
+  var noteEl = document.getElementById('merit-visit-note');
+  if (!visitorsEl || !pageviewsEl || !periodEl) return;
+  fetch('/api/visit-stats', {credentials: 'same-origin', headers: {'Accept': 'application/json'}})
+    .then(function(resp) { return resp.ok ? resp.json() : null; })
+    .then(function(data) {
+      if (!data || !data.available) {
+        periodEl.textContent = 'Usage totals are unavailable right now.';
+        return;
+      }
+      visitorsEl.textContent = meritFormatVisitCount(data.visitors);
+      pageviewsEl.textContent = meritFormatVisitCount(data.pageviews);
+      visitorsEl.removeAttribute('aria-busy');
+      pageviewsEl.removeAttribute('aria-busy');
+      var period = data.period_label || 'All time';
+      if (data.mock) period += ' (preview)';
+      periodEl.textContent = period;
+      if (noteEl && data.privacy_note) noteEl.textContent = data.privacy_note;
+    })
+    .catch(function() {
+      periodEl.textContent = 'Usage totals are unavailable right now.';
+    })
+    .finally(function() {
+      window.__MERIT_VISIT_STATS_LOADING = false;
+      window.__MERIT_VISIT_STATS_LOADED = true;
+    });
+}
+"""
+
+
 _V2_DEFAULT_PARAMS: dict[str, float] = {
     # Band cutoffs
     "band_ready_min": 0.85,
@@ -10076,6 +10154,7 @@ def _page(state: dict[str, Any] | None = None, error: str | None = None, default
         "<p>MERIT-ML was developed as part of an academic research project at the Centre for Digital Health, Indian Institute of Technology Bombay. The work was prepared by Shayantan Banerjee under the supervision of Prof. Pramod P. Wangikar, Department of Chemical Engineering and Centre for Digital Health, IIT Bombay.</p>"
         "<p>The tool retrieves and summarizes publicly available repository-hosted data and metadata. It does not replace manual review, analytical validation, or biological interpretation of individual studies. A high MERIT-ML readiness score indicates that a deposited tabular matrix satisfies the framework&rsquo;s operational criteria for supervised-classification reuse; it does not guarantee model performance, biomarker validity, or external generalizability.</p>"
         "<p>MERIT-ML is not affiliated with, endorsed by, or maintained by the Metabolomics Workbench. Users should cite the original deposited studies and the Metabolomics Workbench records when reusing data.</p>"
+        f"{_merit_about_usage_stats_html()}"
         "<div class='merit-about-citation'>"
         "<strong>Preprint citation</strong>"
         "<span>Shayantan Banerjee, Pramod P. Wangikar. <em>MERIT-ML: A Machine-Learning-Readiness Framework for Tabular Public Metabolomics Data.</em> ChemRxiv. 10 June 2026.</span>"
@@ -10318,6 +10397,7 @@ footer{{margin-top:18px;color:var(--muted);font-size:.82rem}}
   border:1px solid rgba(13,110,110,.18);display:flex;flex-direction:column;gap:6px;color:#2e474d;font-size:.88rem;line-height:1.5}}
 .merit-about-citation strong{{color:#0d6e6e;text-transform:uppercase;letter-spacing:.07em;font-size:.72rem}}
 .merit-about-citation a{{color:#0d6e6e;font-weight:800;overflow-wrap:anywhere}}
+{_merit_about_usage_stats_css()}
 @media(max-width:760px){{.merit-about-toggle{{right:12px;top:12px}}.merit-about-card{{right:10px;left:10px;top:52px;width:auto;padding:20px}}}}
 body.report-tools-collapsed .tool-rail-toggle,
 body.report-tools-expanded .tool-rail-toggle{{display:inline-flex;align-items:center;gap:6px}}
@@ -10493,6 +10573,7 @@ window.addEventListener('afterprint', function() {{
   }});
 }})();
 
+{_merit_about_usage_stats_js()}
 // Persistent About dialog.
 (function() {{
   var btn = document.getElementById('merit-about-toggle');
@@ -10502,6 +10583,9 @@ window.addEventListener('afterprint', function() {{
     if (open) {{
       modal.hidden = false;
       btn.setAttribute('aria-expanded', 'true');
+      if (typeof meritLoadVisitStats === 'function' && !window.__MERIT_VISIT_STATS_LOADED) {{
+        meritLoadVisitStats();
+      }}
       var closeBtn = modal.querySelector('.merit-about-close');
       if (closeBtn) setTimeout(function() {{ closeBtn.focus(); }}, 0);
     }} else {{
@@ -12071,6 +12155,11 @@ class MetaboUIHandler(BaseHTTPRequestHandler):
             query = {key: values[-1] for key, values in parse_qs(parsed.query, keep_blank_values=True).items()}
             precomputed_root = query.get("precomputed_root") or _default_precomputed_root()
             self._send_json(_study_browser_data_payload(precomputed_root, query))
+            return
+        if parsed.path == "/api/visit-stats":
+            from merit.visit_stats import get_public_visit_stats
+
+            self._send_json(get_public_visit_stats())
             return
         if parsed.path != "/":
             self._send_html(_page(error="Unknown route."), HTTPStatus.NOT_FOUND)

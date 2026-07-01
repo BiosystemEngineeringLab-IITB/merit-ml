@@ -152,6 +152,11 @@ if [[ "${SKIP_VERCEL_ENV}" -eq 0 ]]; then
   vercel env rm MERIT_CACHE_ONLY "${VERCEL_ENV}" --yes >/dev/null 2>&1 || true
   printf "%s\n" "${MERIT_CACHE_ONLY}" | vercel env add MERIT_CACHE_ONLY "${VERCEL_ENV}" >/dev/null
 
+  if [[ -n "${UMAMI_API_KEY:-}" ]]; then
+    vercel env rm UMAMI_API_KEY "${VERCEL_ENV}" --yes >/dev/null 2>&1 || true
+    printf "%s\n" "${UMAMI_API_KEY}" | vercel env add UMAMI_API_KEY "${VERCEL_ENV}" >/dev/null
+  fi
+
   popd >/dev/null
 else
   echo "[2/3] Skipped Vercel env update."
