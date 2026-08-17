@@ -1,11 +1,25 @@
 from __future__ import annotations
 
 from collections import Counter
+import re
 
 from merit.models import CanonicalStudy, MetricResult
-from merit.utils import sample_is_qc_like
+from merit.utils import sample_is_qc_like, sample_object_is_qc_like
 
 from .base import MetricPlugin
+
+
+_MISSING_SUBJECT_IDS = {"", "-", "na", "n/a", "none", "null", "unknown", "not applicable"}
+_SUBJECT_ID_PATTERN = re.compile(r"\b(patient|subject|donor|participant|volunteer|individual)\b\s*[-_: ]*\w+", re.I)
+_GENERIC_SUBJECT_TERMS = (
+    "quality control",
+    "study sample",
+    "blank",
+    "pool",
+    "nist",
+    "reference",
+    "standard",
+)
 
 
 def _matrix_sample_ids(study: CanonicalStudy) -> list[str]:
@@ -23,6 +37,52 @@ def _matrix_backed_samples(study: CanonicalStudy):
     if not sample_ids:
         return list(study.samples)
     return [s for s in study.samples if str(getattr(s, "sample_id", "")).strip() in sample_ids]
+
+
+def _subject_level_id(sample: object) -> str:
+    attrs = getattr(sample, "attributes", {}) or {}
+    if not isinstance(attrs, dict):
+        return ""
+    subject_id = str(attrs.get("subject_id", "") or "").strip()
+    if subject_id.casefold() in _MISSING_SUBJECT_IDS:
+        return ""
+    folded = subject_id.casefold()
+    if any(term in folded for term in _GENERIC_SUBJECT_TERMS):
+        return ""
+    if not _SUBJECT_ID_PATTERN.search(subject_id):
+        return ""
+    return subject_id
+
+
+def _subject_repeat_summary(samples: list[object]) -> dict[str, object]:
+    subject_to_samples: dict[str, list[str]] = {}
+    for sample in samples:
+        subject_id = _subject_level_id(sample)
+        if not subject_id:
+            continue
+        sample_id = str(getattr(sample, "sample_id", "") or "").strip()
+        subject_to_samples.setdefault(subject_id, []).append(sample_id)
+    repeated = {
+        subject_id: sorted(sample_ids)
+        for subject_id, sample_ids in subject_to_samples.items()
+        if len(sample_ids) > 1
+    }
+    repeated_occurrences = sum(len(sample_ids) - 1 for sample_ids in repeated.values())
+    return {
+        "subject_to_sample_ids": subject_to_samples,
+        "repeated_subject_ids": repeated,
+        "repeated_subject_occurrences": repeated_occurrences,
+        "n_subject_level_ids": sum(len(sample_ids) for sample_ids in subject_to_samples.values()),
+        "n_unique_subject_level_ids": len(subject_to_samples),
+    }
+
+
+def _effective_biological_sample_count(samples: list[object]) -> tuple[int, dict[str, object]]:
+    summary = _subject_repeat_summary(samples)
+    if int(summary["repeated_subject_occurrences"]) <= 0:
+        return len(samples), summary
+    n_missing_subject = len(samples) - int(summary["n_subject_level_ids"])
+    return int(summary["n_unique_subject_level_ids"]) + max(0, n_missing_subject), summary
 
 
 class SchemaIntegrityMetric(MetricPlugin):
@@ -121,6 +181,8 @@ class DuplicateEntityMetric(MetricPlugin):
         source_samples = _matrix_backed_samples(study)
         sample_counts = Counter(sample.sample_id for sample in source_samples)
         duplicate_samples = {key: count for key, count in sample_counts.items() if count > 1}
+        subject_summary = _subject_repeat_summary(source_samples)
+        repeated_subject_occurrences = int(subject_summary["repeated_subject_occurrences"])
         duplicate_features: dict[str, int] = {}
         total_features = 0
         total_duplicate_features = 0
@@ -130,16 +192,33 @@ class DuplicateEntityMetric(MetricPlugin):
             dupes = {key: count for key, count in feature_counts.items() if count > 1}
             duplicate_features.update(dupes)
             total_duplicate_features += sum(count - 1 for count in dupes.values())
-        total_duplicates = sum(count - 1 for count in duplicate_samples.values()) + total_duplicate_features
+        exact_duplicate_occurrences = sum(count - 1 for count in duplicate_samples.values())
+        total_duplicates = exact_duplicate_occurrences + total_duplicate_features + repeated_subject_occurrences
         denominator = max(1, len(source_samples) + total_features)
         score = max(0.0, 1.0 - (total_duplicates / denominator))
+        if repeated_subject_occurrences:
+            summary = (
+                f"Found {exact_duplicate_occurrences + total_duplicate_features} duplicate sample/feature identifiers "
+                f"and {repeated_subject_occurrences} repeated subject-level sample rows."
+            )
+        else:
+            summary = f"Found {total_duplicates} duplicate sample/feature identifiers."
         return MetricResult(
             family=self.family,
             name=self.name,
             score=score,
             status="pass" if total_duplicates == 0 else "warn",
-            summary=f"Found {total_duplicates} duplicate sample/feature identifiers.",
-            details={"duplicate_samples": duplicate_samples, "duplicate_features": duplicate_features},
+            summary=summary,
+            details={
+                "duplicate_samples": duplicate_samples,
+                "duplicate_features": duplicate_features,
+                "duplicate_sample_occurrences": exact_duplicate_occurrences,
+                "duplicate_feature_occurrences": total_duplicate_features,
+                "repeated_subject_ids": subject_summary["repeated_subject_ids"],
+                "repeated_subject_occurrences": repeated_subject_occurrences,
+                "n_subject_level_ids": subject_summary["n_subject_level_ids"],
+                "n_unique_subject_level_ids": subject_summary["n_unique_subject_level_ids"],
+            },
             thresholds={"max_duplicates": 0},
             recommendations=[] if total_duplicates == 0 else ["Deduplicate repeated identifiers before any train/test split."],
         )
@@ -184,42 +263,45 @@ class MinimumSampleThresholdMetric(MetricPlugin):
         }
         matrix_ids = _matrix_sample_ids(study)
         if matrix_ids:
-            sample_triplets = [
-                (
-                    sid,
-                    str(getattr(sample_lookup.get(sid), "label", "") or ""),
-                    str(getattr(sample_lookup.get(sid), "sample_type", "") or ""),
-                )
-                for sid in matrix_ids
-            ]
+            sample_rows = [(sid, sample_lookup.get(sid)) for sid in matrix_ids]
         else:
-            sample_triplets = [
-                (
-                    str(getattr(s, "sample_id", "") or ""),
-                    str(getattr(s, "label", "") or ""),
-                    str(getattr(s, "sample_type", "") or ""),
-                )
-                for s in study.samples
-            ]
-        bio_samples = [
-            triplet for triplet in sample_triplets
-            if not sample_is_qc_like(
-                sample_id=triplet[0],
-                label=triplet[1],
-                sample_type=triplet[2],
-                class_string=triplet[1],
-            )
-        ]
-        n = len(bio_samples)
+            sample_rows = [(str(getattr(s, "sample_id", "") or ""), s) for s in study.samples]
+        bio_samples = []
+        for sid, sample in sample_rows:
+            if sample is not None:
+                if not sample_object_is_qc_like(sample):
+                    bio_samples.append((sid, sample))
+                continue
+            if not sample_is_qc_like(sample_id=sid):
+                bio_samples.append((sid, sample))
+        bio_sample_objects = [sample for _, sample in bio_samples if sample is not None]
+        n_rows = len(bio_samples)
+        n, subject_summary = _effective_biological_sample_count(bio_sample_objects)
         score = min(1.0, n / self.THRESHOLD)
         n_total_samples = len(matrix_ids) if matrix_ids else len(study.samples)
+        if int(subject_summary["repeated_subject_occurrences"]) > 0:
+            summary = (
+                f"{n} independent biological units detected from {n_rows} ML-eligible rows "
+                f"(threshold: {self.THRESHOLD})."
+            )
+        else:
+            summary = f"{n} ML-eligible samples detected (threshold: {self.THRESHOLD})."
         return MetricResult(
             family=self.family,
             name=self.name,
             score=score,
             status="pass" if n >= self.THRESHOLD else "warn",
-            summary=f"{n} ML-eligible samples detected (threshold: {self.THRESHOLD}).",
-            details={"n_biological_samples": n, "n_total_samples": n_total_samples, "threshold": self.THRESHOLD},
+            summary=summary,
+            details={
+                "n_biological_samples": n,
+                "n_biological_sample_rows": n_rows,
+                "n_total_samples": n_total_samples,
+                "threshold": self.THRESHOLD,
+                "repeated_subject_occurrences": subject_summary["repeated_subject_occurrences"],
+                "n_subject_level_ids": subject_summary["n_subject_level_ids"],
+                "n_unique_subject_level_ids": subject_summary["n_unique_subject_level_ids"],
+                "repeated_subject_ids": subject_summary["repeated_subject_ids"],
+            },
             thresholds={"minimum_biological_samples": self.THRESHOLD},
             recommendations=[] if n >= self.THRESHOLD else [
                 f"Fewer than {self.THRESHOLD} ML-eligible samples detected. ML models may be unreliable at this scale."

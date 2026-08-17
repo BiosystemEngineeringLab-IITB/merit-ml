@@ -137,12 +137,109 @@ _QC_BLANK_KEYWORDS: tuple[str, ...] = (
     "equilibration", "conditioning", "wash",
 )
 
+_CONTROL_CONTEXT_KEYS = {
+    "type",
+    "sample_type",
+    "sample_source",
+    "sample_source_type",
+    "source",
+    "class",
+    "classification",
+}
+
+_CONTROL_VALUE_EXPANSIONS = {
+    "blk": "field blank",
+    "blank": "blank",
+    "fieldblank": "field blank",
+    "field_blank": "field blank",
+    "pblk": "process blank",
+    "processblank": "process blank",
+    "process_blank": "process blank",
+    "mblk": "method blank",
+    "methodblank": "method blank",
+    "method_blank": "method blank",
+    "rblk": "reagent blank",
+    "reagentblank": "reagent blank",
+    "reagent_blank": "reagent blank",
+    "sblk": "solvent blank",
+    "solventblank": "solvent blank",
+    "solvent_blank": "solvent blank",
+    "qc": "quality control",
+    "qcs": "quality control",
+    "pooledqc": "pooled qc",
+    "pooled_qc": "pooled qc",
+    "poolqc": "pooled qc",
+    "pool_qc": "pooled qc",
+    "nist": "reference material",
+    "sst": "system suitability",
+    "ltr": "long-term reference",
+}
+
 
 def is_qc_like_text(text: str | None) -> bool:
     haystack = str(text or "").lower()
     if not haystack:
         return False
     return any(kw in haystack for kw in _QC_BLANK_KEYWORDS)
+
+
+def _norm_token(value: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "_", str(value or "").strip().lower()).strip("_")
+
+
+def _compact_token(value: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "", str(value or "").strip().lower())
+
+
+def _control_expansion_for_value(value: str) -> str:
+    normalized = _norm_token(value)
+    compact = _compact_token(value)
+    if normalized in _CONTROL_VALUE_EXPANSIONS:
+        return _CONTROL_VALUE_EXPANSIONS[normalized]
+    if compact in _CONTROL_VALUE_EXPANSIONS:
+        return _CONTROL_VALUE_EXPANSIONS[compact]
+
+    tokens = [t for t in re.split(r"[^a-z0-9]+", str(value or "").lower()) if t]
+    for token in tokens:
+        stripped = re.sub(r"\d+$", "", token)
+        if stripped in _CONTROL_VALUE_EXPANSIONS:
+            return _CONTROL_VALUE_EXPANSIONS[stripped]
+    return ""
+
+
+def _iter_factor_pairs(factor_string: str):
+    for part in str(factor_string or "").split("|"):
+        item = part.strip()
+        if not item:
+            continue
+        if ":" in item:
+            key, value = item.split(":", 1)
+            yield key.strip(), value.strip()
+        else:
+            yield "", item
+
+
+def control_context_expansion(
+    *,
+    sample_id: str = "",
+    label: str = "",
+    sample_type: str = "",
+    class_string: str = "",
+    factor_string: str = "",
+) -> str:
+    """Recognize narrow analytical-control abbreviations in sample context."""
+    for value in (sample_type, class_string, label):
+        expansion = _control_expansion_for_value(value)
+        if expansion:
+            return expansion
+
+    for key, value in _iter_factor_pairs(factor_string):
+        key_norm = _norm_token(key)
+        expansion = _control_expansion_for_value(value)
+        if expansion and (not key_norm or key_norm in _CONTROL_CONTEXT_KEYS):
+            return expansion
+
+    return _control_expansion_for_value(sample_id)
 
 
 def sample_is_qc_like(
@@ -163,6 +260,15 @@ def sample_is_qc_like(
             return True
         if token in {"false", "0", "no"}:
             return False
+
+    if control_context_expansion(
+        sample_id=sample_id,
+        label=label,
+        sample_type=sample_type,
+        class_string=class_string,
+        factor_string=factor_string,
+    ):
+        return True
 
     primary_text = " ".join(
         [

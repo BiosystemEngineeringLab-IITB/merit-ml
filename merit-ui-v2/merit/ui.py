@@ -27,6 +27,7 @@ from merit.readiness_score import compute_readiness_score
 from merit.serialization import assessment_report_from_dict, load_assessment_report, read_json
 from merit.utils import is_usable_class_label, normalize_label, sample_is_qc_like
 from merit.version import __version__ as MERIT_VERSION
+from merit.visit_stats import get_cloudflare_beacon_token
 
 
 # ---------------------------------------------------------------------------
@@ -83,26 +84,37 @@ _INDEPENDENCE_NOTE_TEXT = (
 _MERIT_PARSING_ISSUE_FORM_URL = "https://forms.gle/devGeKVKQTxJRceH7"
 
 _UMAMI_WEBSITE_ID = "e9fa298c-3199-4358-a0ec-8fa401f3eb10"
-_ANALYTICS_CONSENT_STORAGE_KEY = "merit-ml-umami-consent"
+_ANALYTICS_CONSENT_STORAGE_KEY = "merit-ml-analytics-consent"
+
+
+def _cloudflare_beacon_token() -> str:
+    return get_cloudflare_beacon_token()
 
 
 def _merit_analytics_head_script() -> str:
+    beacon_token = _cloudflare_beacon_token()
+    beacon_js_literal = (
+        json.dumps(json.dumps({"token": beacon_token}, separators=(",", ":")))
+        if beacon_token
+        else '""'
+    )
     return f"""<script>
 (function(){{
   var KEY = "{_ANALYTICS_CONSENT_STORAGE_KEY}";
-  var WEBSITE_ID = "{_UMAMI_WEBSITE_ID}";
-  function loadUmami() {{
-    if (document.querySelector('script[data-website-id="' + WEBSITE_ID + '"]')) return;
+  var BEACON = {beacon_js_literal};
+  function loadCloudflareAnalytics() {{
+    if (!BEACON) return;
+    if (document.querySelector('script[src*="cloudflareinsights.com/beacon.min.js"]')) return;
     var s = document.createElement("script");
     s.defer = true;
-    s.src = "https://cloud.umami.is/script.js";
-    s.setAttribute("data-website-id", WEBSITE_ID);
+    s.src = "https://static.cloudflareinsights.com/beacon.min.js";
+    s.setAttribute("data-cf-beacon", BEACON);
     document.head.appendChild(s);
   }}
   window.__meritAnalytics = {{
     accept: function() {{
       try {{ localStorage.setItem(KEY, "accepted"); }} catch (e) {{}}
-      loadUmami();
+      loadCloudflareAnalytics();
       var banner = document.getElementById("merit-analytics-consent");
       if (banner) banner.style.display = "none";
       document.body.classList.remove("merit-analytics-banner-visible");
@@ -117,7 +129,7 @@ def _merit_analytics_head_script() -> str:
       try {{ return localStorage.getItem(KEY); }} catch (e) {{ return null; }}
     }}
   }};
-  if (window.__meritAnalytics.getConsent() === "accepted") loadUmami();
+  if (window.__meritAnalytics.getConsent() === "accepted") loadCloudflareAnalytics();
 }})();
 </script>"""
 
@@ -146,7 +158,7 @@ body.merit-analytics-banner-visible{padding-top:92px}
 def _merit_analytics_consent_banner() -> str:
     return """<div id="merit-analytics-consent" role="dialog" aria-label="Analytics consent">
   <div class="merit-analytics-inner">
-    <p class="merit-analytics-text">This website uses Umami Analytics to collect anonymous usage statistics. The data is processed via Umami Cloud and is not shared with any third parties or external services beyond what is required to operate the analytics service. These statistics are invaluable to us, as they enable us to focus future developments on the features of <strong>MERIT-ML</strong> that are most used, or on the contrary, to pinpoint the features that are of least interest to users.</p>
+    <p class="merit-analytics-text">This website uses <strong>Cloudflare Web Analytics</strong> to collect anonymous, cookieless usage statistics. No personal data is stored in your browser. These statistics help us understand which <strong>MERIT-ML</strong> features are most useful so we can focus future development.</p>
     <div class="merit-analytics-actions">
       <button type="button" class="merit-analytics-accept" onclick="window.__meritAnalytics.accept()">ACCEPT</button>
       <button type="button" class="merit-analytics-decline" onclick="window.__meritAnalytics.decline()">DECLINE</button>
@@ -167,11 +179,11 @@ def _merit_about_usage_stats_html() -> str:
         "<strong>Site usage</strong>"
         "<div class='merit-about-usage-grid' id='merit-about-usage-grid'>"
         "<div class='merit-about-usage-stat'>"
-        "<span class='label'>Unique visitors</span>"
+        "<span class='label' id='merit-visit-label'>Visits</span>"
         "<span class='value' id='merit-visit-count' aria-busy='true'>—</span>"
         "</div>"
         "<div class='merit-about-usage-stat'>"
-        "<span class='label'>Page views</span>"
+        "<span class='label' id='merit-pageview-label'>Page views</span>"
         "<span class='value' id='merit-pageview-count' aria-busy='true'>—</span>"
         "</div>"
         "</div>"
@@ -221,6 +233,10 @@ function meritLoadVisitStats() {
       }
       visitorsEl.textContent = meritFormatVisitCount(data.visitors);
       pageviewsEl.textContent = meritFormatVisitCount(data.pageviews);
+      var visitorLabel = document.getElementById('merit-visit-label');
+      var pageviewLabel = document.getElementById('merit-pageview-label');
+      if (visitorLabel && data.visitor_label) visitorLabel.textContent = data.visitor_label;
+      if (pageviewLabel && data.pageview_label) pageviewLabel.textContent = data.pageview_label;
       visitorsEl.removeAttribute('aria-busy');
       pageviewsEl.removeAttribute('aria-busy');
       var period = data.period_label || 'All time';
@@ -2197,6 +2213,47 @@ def _source_sample_count_notice(study_id: str) -> str:
     )
 
 
+def _repeated_subject_level_notice(report: Any) -> str:
+    """Render a non-scoring Overview note for repeated subject-level sample rows."""
+    dup_metric = _v2_metric_by_name(getattr(report, "schema_validation", []), "duplicate_entities")
+    sample_metric = _v2_metric_by_name(getattr(report, "schema_validation", []), "minimum_sample_count")
+    dup_details = getattr(dup_metric, "details", {}) or {}
+    sample_details = getattr(sample_metric, "details", {}) or {}
+    repeated_ids = dup_details.get("repeated_subject_ids", {})
+    if not isinstance(repeated_ids, dict) or not repeated_ids:
+        return ""
+    repeated_subjects = len(repeated_ids)
+    repeated_rows = int(dup_details.get("repeated_subject_occurrences", 0) or 0)
+    effective_n = sample_details.get("n_biological_samples")
+    row_n = sample_details.get("n_biological_sample_rows")
+    count_text = ""
+    if effective_n not in (None, "") and row_n not in (None, "", effective_n):
+        count_text = f" MERIT-ML uses {effective_n} independent biological units from {row_n} ML-eligible rows for the G2 sample-count gate."
+    examples = []
+    for subject_id, sample_ids in list(repeated_ids.items())[:3]:
+        if isinstance(sample_ids, list):
+            examples.append(f"{subject_id}: {', '.join(str(s) for s in sample_ids[:4])}")
+    example_text = f" Examples: {'; '.join(examples)}." if examples else ""
+    tooltip = (
+        "This is a display-only interpretation note derived from the Structural metrics. "
+        "It is triggered only when explicit patient/subject/donor/participant-like IDs repeat across matrix rows. "
+        "Exact matrix row sample IDs are still checked separately."
+    )
+    return (
+        "<div style='margin:12px 0 0;padding:12px 14px;border-radius:14px;"
+        "background:rgba(246,199,68,.12);border:1px solid rgba(153,91,0,.24);"
+        "color:#132327;line-height:1.45'>"
+        "<div style='display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:5px'>"
+        "<strong style='color:#995b00;font-size:.86rem'>Repeated subject-level rows detected</strong>"
+        f"{_mini_info_icon(tooltip, size=11)}"
+        f"<span style='font-size:.74rem;color:#51656a;font-weight:700'>{repeated_subjects} subject IDs · {repeated_rows} extra rows</span>"
+        "</div>"
+        f"<div style='font-size:.82rem;color:#132327'>Multiple matrix rows map to the same explicit subject-level identifier.{_e(count_text)}"
+        f"{_e(example_text)} Review Structural metrics before treating rows as independent cohort samples.</div>"
+        "</div>"
+    )
+
+
 def _study_header(summary: dict[str, Any]) -> str:
     disease_flag = ""
     study_id = summary.get("study_id")
@@ -3158,8 +3215,8 @@ _METRIC_DESCRIPTORS: dict[str, str] = {
     "schema_integrity": "Checks that the five required top-level study components are present and non-empty.",
     "tabular_data_availability": "Verifies that each assay matrix contains actual sample IDs, feature IDs, and abundance values. At least one populated matrix is required for ML.",
     "required_field_completeness": "Tallies six study-level descriptors (Title, Description, Organism, Disease, Analysis Type, Platform) plus per-sample Label, Sample Type, and Organism.",
-    "duplicate_entities": "Detects repeated Sample IDs across the sample list and repeated Feature IDs within each assay matrix. Duplicates inflate counts and introduce train/test leakage.",
-    "minimum_sample_count": "Counts ML-eligible samples after excluding QC pools, blanks, NIST references, and other non-biological rows. Minimum threshold: 20.",
+    "duplicate_entities": "Detects repeated Sample IDs, repeated Feature IDs, and repeated explicit subject-level identifiers when available. Repeated subject rows can inflate effective sample counts and introduce train/test leakage.",
+    "minimum_sample_count": "Counts ML-eligible samples after excluding QC pools, blanks, NIST references, and other non-biological rows. When explicit repeated subject-level IDs are available, counts independent biological units. Minimum threshold: 20.",
     # Metadata / FAIR
     "fair_study_metadata_compliance": (
         "Displayed score = 100 × passed / 7 binary checks drawn from the study's mwtab metadata. "
@@ -5540,11 +5597,15 @@ def _metric_info_tooltip(
     if m.name == "duplicate_entities":
         dup_s = details.get("duplicate_samples", {})
         dup_f = details.get("duplicate_features", {})
+        repeat_subjects = details.get("repeated_subject_ids", {})
+        repeat_subject_occ = int(details.get("repeated_subject_occurrences", 0) or 0)
         ok_s = len(dup_s) == 0
         ok_f = len(dup_f) == 0
+        ok_subject = repeat_subject_occ == 0
         rows = [
             (ok_s, f"Duplicate sample IDs: {len(dup_s)}"),
             (ok_f, f"Duplicate feature IDs: {len(dup_f)}"),
+            (ok_subject, f"Repeated subject-level IDs: {len(repeat_subjects)} ({repeat_subject_occ} extra rows)"),
         ]
         items = []
         for ok, text in rows:
@@ -5562,15 +5623,22 @@ def _metric_info_tooltip(
     if m.name == "minimum_sample_count":
         n = details.get("n_biological_samples", 0)
         n_total = details.get("n_total_samples", 0)
+        n_rows = details.get("n_biological_sample_rows")
         threshold = details.get("threshold", 20)
         ok = n >= threshold
         color = "#196b4a" if ok else "#995b00"
         mark = "✓" if ok else "⚠"
+        if n_rows not in (None, "", n):
+            primary = f"{n} independent biological units (from {n_rows} ML-eligible rows; min: {threshold})"
+            excluded = max(0, int(n_total or 0) - int(n_rows or 0))
+        else:
+            primary = f"{n} ML-eligible samples (min: {threshold})"
+            excluded = int(n_total or 0) - int(n or 0)
         return (
-            f"<div style='color:{color};font-weight:600'>{mark} {n} ML-eligible samples (min: {threshold})</div>"
+            f"<div style='color:{color};font-weight:600'>{mark} {_e(primary)}</div>"
             f"<div style='color:#51656a;font-size:.79rem;margin-top:4px'>"
             f"Total samples (incl. QC/blank/pool): {n_total}"
-            f"<br>Rows excluded before ML assessment: {n_total - n}</div>"
+            f"<br>Rows excluded before ML assessment: {excluded}</div>"
         )
 
     if m.name == "feature_to_sample_ratio":
@@ -7197,12 +7265,14 @@ def _tabbed_report(report: Any, readiness_score: dict[str, Any],
         size=12,
     )
     study_design_notice = _study_design_context_notice(study_design_context, summary, readiness_score)
+    repeated_subject_notice = _repeated_subject_level_notice(report)
     overview_content = (
         f"<div class='report-overview-grid' style='display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,420px);gap:20px;align-items:start'>"
         # left: study header + source availability + section scores
         f"<div style='min-width:0'>"
         f"{_study_header(summary)}"
         f"{study_design_notice}"
+        f"{repeated_subject_notice}"
         f"{src_avail_html}"
         f"<div style='display:flex;align-items:center;gap:6px;margin:0 0 12px'>"
         f"<h4 style='margin:0;font-size:.95rem;text-transform:uppercase;letter-spacing:.06em'>Section Scores</h4>"

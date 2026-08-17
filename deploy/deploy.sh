@@ -77,9 +77,10 @@ if [[ ! -f "${CRED_FILE}" ]]; then
 fi
 
 # shellcheck source=/dev/null
+set -a
 source "${CONFIG_FILE}"
-# shellcheck source=/dev/null
 source "${CRED_FILE}"
+set +a
 
 PROJECT_ROOT="${PROJECT_ROOT:-${ROOT_DIR}}"
 CACHE_ROOT="${OVERRIDE_CACHE_ROOT:-${CACHE_ROOT:-}}"
@@ -156,6 +157,29 @@ if [[ "${SKIP_VERCEL_ENV}" -eq 0 ]]; then
     vercel env rm UMAMI_API_KEY "${VERCEL_ENV}" --yes >/dev/null 2>&1 || true
     printf "%s\n" "${UMAMI_API_KEY}" | vercel env add UMAMI_API_KEY "${VERCEL_ENV}" >/dev/null
   fi
+
+  if [[ -n "${CLOUDFLARE_API_TOKEN:-}" ]]; then
+    vercel env rm CLOUDFLARE_API_TOKEN "${VERCEL_ENV}" --yes >/dev/null 2>&1 || true
+    printf "%s\n" "${CLOUDFLARE_API_TOKEN}" | vercel env add CLOUDFLARE_API_TOKEN "${VERCEL_ENV}" >/dev/null
+  fi
+  if [[ -n "${CLOUDFLARE_ACCOUNT_ID:-}" ]]; then
+    vercel env rm CLOUDFLARE_ACCOUNT_ID "${VERCEL_ENV}" --yes >/dev/null 2>&1 || true
+    printf "%s\n" "${CLOUDFLARE_ACCOUNT_ID}" | vercel env add CLOUDFLARE_ACCOUNT_ID "${VERCEL_ENV}" >/dev/null
+  fi
+  if [[ -n "${CLOUDFLARE_WEB_ANALYTICS_SITE_TAG:-}" ]]; then
+    vercel env rm CLOUDFLARE_WEB_ANALYTICS_SITE_TAG "${VERCEL_ENV}" --yes >/dev/null 2>&1 || true
+    printf "%s\n" "${CLOUDFLARE_WEB_ANALYTICS_SITE_TAG}" | vercel env add CLOUDFLARE_WEB_ANALYTICS_SITE_TAG "${VERCEL_ENV}" >/dev/null
+  fi
+  if [[ -n "${CLOUDFLARE_WEB_ANALYTICS_SITE_ID:-}" ]]; then
+    vercel env rm CLOUDFLARE_WEB_ANALYTICS_SITE_ID "${VERCEL_ENV}" --yes >/dev/null 2>&1 || true
+    printf "%s\n" "${CLOUDFLARE_WEB_ANALYTICS_SITE_ID}" | vercel env add CLOUDFLARE_WEB_ANALYTICS_SITE_ID "${VERCEL_ENV}" >/dev/null
+  fi
+  if [[ -n "${CLOUDFLARE_WEB_ANALYTICS_DASHBOARD_URL:-}" ]]; then
+    vercel env rm CLOUDFLARE_WEB_ANALYTICS_DASHBOARD_URL "${VERCEL_ENV}" --yes >/dev/null 2>&1 || true
+    printf "%s\n" "${CLOUDFLARE_WEB_ANALYTICS_DASHBOARD_URL}" | vercel env add CLOUDFLARE_WEB_ANALYTICS_DASHBOARD_URL "${VERCEL_ENV}" >/dev/null
+  fi
+  vercel env rm MERIT_VISIT_STATS_PROVIDER "${VERCEL_ENV}" --yes >/dev/null 2>&1 || true
+  printf "%s\n" "${MERIT_VISIT_STATS_PROVIDER:-cloudflare}" | vercel env add MERIT_VISIT_STATS_PROVIDER "${VERCEL_ENV}" >/dev/null
 
   popd >/dev/null
 else

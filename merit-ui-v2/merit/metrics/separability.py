@@ -10,12 +10,14 @@ from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import train_test_split
 
 from merit.models import CanonicalStudy, MetricResult
-from merit.utils import is_usable_class_label, normalize_label, sample_is_qc_like
+from merit.utils import is_usable_class_label, normalize_label, sample_is_qc_like, sample_object_is_qc_like
 
 from .analytical import _is_missing
 from .base import MetricPlugin
 
-def _is_biological_sample(sample_id: str, label: str, sample_type: str) -> bool:
+def _is_biological_sample(sample_id: str, label: str, sample_type: str, sample: Any | None = None) -> bool:
+    if sample is not None:
+        return not sample_object_is_qc_like(sample)
     return not sample_is_qc_like(
         sample_id=sample_id,
         label=label,
@@ -65,7 +67,7 @@ class ClassSeparabilityMetric(MetricPlugin):
                 continue
             sample = sample_lookup.get(sample_id)
             sample_type = str((sample.sample_type if sample is not None else "") or "")
-            if not _is_biological_sample(sample_id, raw_label, sample_type):
+            if not _is_biological_sample(sample_id, raw_label, sample_type, sample):
                 continue
             parsed = [np.nan if _is_missing(value) else float(value) for value in row]
             rows.append(parsed)

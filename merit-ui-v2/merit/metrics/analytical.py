@@ -10,7 +10,7 @@ from typing import Any
 import numpy as np
 
 from merit.models import CanonicalStudy, MetricResult
-from merit.utils import is_usable_class_label, percentile, sample_is_qc_like
+from merit.utils import control_context_expansion, is_usable_class_label, percentile, sample_is_qc_like
 
 from .base import MetricPlugin
 
@@ -304,7 +304,16 @@ def _control_flags_for_sample(sample_id: str, sample: Any | None) -> tuple[bool,
         or bool(factor_string.strip())
     )
 
-    is_blank = any(keyword in primary_text for keyword in _BLANK_CONTROL_KEYWORDS)
+    expansion = control_context_expansion(
+        sample_id=sample_id,
+        label=label,
+        sample_type=sample_type,
+        class_string=class_string,
+        factor_string=factor_string,
+    )
+    is_blank = "blank" in expansion if expansion else False
+    if not is_blank:
+        is_blank = any(keyword in primary_text for keyword in _BLANK_CONTROL_KEYWORDS)
     if not is_blank and not has_class_context:
         is_blank = any(keyword in sample_type_text for keyword in _BLANK_CONTROL_KEYWORDS)
 

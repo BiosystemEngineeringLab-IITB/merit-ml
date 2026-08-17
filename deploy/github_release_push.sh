@@ -128,6 +128,7 @@ copy_deploy_whitelist() {
     ".gitignore"
     "README.md"
     "MERIT_DEPLOYMENT_RUNBOOK.md"
+    "RELEASE_LOG.md"
     "AGENT_RELEASE_AUTOMATION.md"
     "GITHUB_PUSH_AUTOMATION.md"
     "VERCEL_CICD_MERIT.md"

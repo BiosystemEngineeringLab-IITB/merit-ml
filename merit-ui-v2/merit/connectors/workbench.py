@@ -566,6 +566,8 @@ class MetabolomicsWorkbenchConnector(RepositoryConnector):
         summary["analysis_type"] = "; ".join(analysis_types)
         if factors_payload is None:
             factors_payload = self._fallback_factors_payload_from_analysis_payloads(analysis_payloads)
+        else:
+            factors_payload = self._merge_subject_ids_from_analysis_payloads(factors_payload, analysis_payloads)
 
         analyses_payload: dict[str, dict[str, Any]] = {}
         for index, analysis_id in enumerate(sorted(analysis_payloads), start=1):
@@ -687,6 +689,10 @@ class MetabolomicsWorkbenchConnector(RepositoryConnector):
             entry,
             ("mb_sample_id", "Subject ID", "subject_id", "MB Sample ID", "mb_id"),
         )
+        explicit_subject_id = MetabolomicsWorkbenchConnector._first_non_empty(
+            entry,
+            ("Subject ID", "subject_id", "SUBJECT_ID", "Subject_ID"),
+        )
         factors_value = entry.get("factors")
         if factors_value in (None, ""):
             factors_value = entry.get("Factors")
@@ -722,6 +728,7 @@ class MetabolomicsWorkbenchConnector(RepositoryConnector):
             "sample_source": sample_source,
             "factors": factors_text,
             "mb_sample_id": subject_id,
+            "subject_id": explicit_subject_id,
             "raw_data": raw_data,
         }
 
@@ -755,6 +762,49 @@ class MetabolomicsWorkbenchConnector(RepositoryConnector):
                 if isinstance(entry, dict):
                     rows.append(entry)
         return self._factors_payload_from_rows(rows)
+
+    @staticmethod
+    def _valid_subject_level_id(value: str) -> bool:
+        text = str(value or "").strip()
+        if not text:
+            return False
+        folded = text.casefold()
+        return folded not in {"-", "na", "n/a", "none", "null", "unknown", "not applicable"}
+
+    @classmethod
+    def _merge_subject_ids_from_analysis_payloads(
+        cls,
+        factors_payload: dict[str, dict[str, str]],
+        analysis_payloads: dict[str, dict[str, Any]],
+    ) -> dict[str, dict[str, str]]:
+        """Add explicit mwTab Subject ID values without changing matrix sample IDs."""
+        if not factors_payload or not analysis_payloads:
+            return factors_payload
+        subject_by_local: dict[str, str] = {}
+        for payload in analysis_payloads.values():
+            sample_factors = payload.get("SUBJECT_SAMPLE_FACTORS", [])
+            if not isinstance(sample_factors, list):
+                continue
+            for entry in sample_factors:
+                if not isinstance(entry, dict):
+                    continue
+                normalized = cls._normalize_factor_row(entry)
+                local_id = str(normalized.get("local_sample_id", "") or "").strip()
+                subject_id = str(normalized.get("subject_id", "") or "").strip()
+                if local_id and cls._valid_subject_level_id(subject_id):
+                    subject_by_local.setdefault(local_id, subject_id)
+        if not subject_by_local:
+            return factors_payload
+        merged: dict[str, dict[str, str]] = {}
+        for key, row in factors_payload.items():
+            item = dict(row)
+            local_id = str(item.get("local_sample_id", "") or "").strip()
+            if local_id and not str(item.get("subject_id", "") or "").strip():
+                subject_id = subject_by_local.get(local_id, "")
+                if subject_id:
+                    item["subject_id"] = subject_id
+            merged[key] = item
+        return merged
 
     @staticmethod
     def _disease_cache_file(source_root: Path, study_id: str) -> Path:
@@ -2332,11 +2382,16 @@ class MetabolomicsWorkbenchConnector(RepositoryConnector):
                 labels[canonical_id] = label or "unknown"
                 sample_ids.append(canonical_id)
                 class_string = raw_label_text or endpoint_label or tabular_label or ""
-                factor_string = factor_lookup.get(canonical_id, {}).get("factors", "")
+                factor_item = factor_lookup.get(canonical_id, {})
+                factor_string = factor_item.get("factors", "")
                 if canonical_id not in sample_lookup:
                     attrs: dict[str, str] = {"class_string": class_string}
                     if factor_string:
                         attrs["factor_string"] = factor_string
+                    if factor_item.get("mb_sample_id"):
+                        attrs["mb_sample_id"] = factor_item.get("mb_sample_id", "")
+                    if factor_item.get("subject_id"):
+                        attrs["subject_id"] = factor_item.get("subject_id", "")
                     if endpoint_label and endpoint_label != tabular_label:
                         attrs["endpoint_label"] = endpoint_label
                         attrs["endpoint_label_key"] = label_key or ""
@@ -2363,6 +2418,10 @@ class MetabolomicsWorkbenchConnector(RepositoryConnector):
                         attrs["tabular_primary_label"] = tabular_label
                     if factor_string and not str(attrs.get("factor_string", "")).strip():
                         attrs["factor_string"] = factor_string
+                    if factor_item.get("mb_sample_id") and not str(attrs.get("mb_sample_id", "")).strip():
+                        attrs["mb_sample_id"] = factor_item.get("mb_sample_id", "")
+                    if factor_item.get("subject_id") and not str(attrs.get("subject_id", "")).strip():
+                        attrs["subject_id"] = factor_item.get("subject_id", "")
                     if endpoint_label and endpoint_label != tabular_label and not str(attrs.get("endpoint_label", "")).strip():
                         attrs["endpoint_label"] = endpoint_label
                         attrs["endpoint_label_key"] = label_key or ""

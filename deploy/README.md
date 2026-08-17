@@ -25,6 +25,7 @@ Additional focused guides:
 - [VERCEL_CICD_MERIT.md](VERCEL_CICD_MERIT.md) records the MERIT-specific Vercel deployment, promote, rollback, inspect, and CI/CD workflow.
 - [GITHUB_PUSH_AUTOMATION.md](GITHUB_PUSH_AUTOMATION.md) records one-time deploy-key setup and non-interactive GitHub push instructions.
 - [github_release_push.sh](github_release_push.sh) syncs only release-safe files to the public `BiosystemEngineeringLab-IITB/merit-ml` repository.
+- [RELEASE_LOG.md](RELEASE_LOG.md) records targeted release notes, affected files, and verification markers for recent MERIT-ML releases.
 
 The public Docker image is a thin UI/runtime container. It must not include
 `merit-cache-workbench-full-v7/` or local Metabolomics Workbench dump folders.
