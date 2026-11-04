@@ -5,7 +5,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 out=ROOT/'release-artifacts';out.mkdir(exist_ok=True)
 archive=out/'merit-v2-docker-2026-11-05-source.tar.gz'
-allowed=['README.md','LICENSE','SECURITY.md','CODE_OF_CONDUCT.md','.dockerignore','compose.merit-v2.yml',
+allowed=['README.md','.gitignore','.gitattributes','LICENSE','SECURITY.md','CODE_OF_CONDUCT.md','.dockerignore','compose.merit-v2.yml',
          'docker/merit-v2','scripts/sync_merit_v2_runtime.py','scripts/package_merit_v2.py','scripts/test_merit_v2.py','scripts/test_merit_v2_edits.py',
          '.github/workflows/merit-v2-docker.yml','docs/merit-v2-validation.md','docs/legacy-v7-readme.md']
 with tarfile.open(archive,'w:gz') as tar:
