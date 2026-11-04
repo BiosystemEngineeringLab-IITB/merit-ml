@@ -12,7 +12,9 @@ COPY docker/merit-v2/requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -r /tmp/requirements.txt \
     && useradd --uid 10001 --create-home merit
 COPY --chown=merit:merit docker/merit-v2/runtime /app
-RUN python relocate_bundle.py && mkdir -p /app/runs && chown merit:merit /app/runs
+RUN python relocate_bundle.py \
+    && python -c "import numpy, scipy, sklearn, pandas, flask" \
+    && mkdir -p /app/runs && chown merit:merit /app/runs
 USER merit
 VOLUME ["/app/runs"]
 EXPOSE 8791

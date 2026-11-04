@@ -17,3 +17,6 @@ outputs/
 /release-artifacts/
 __pycache__/
 *.pyc
+# Runtime source under historical-looking output folder names is code, not generated results.
+!docker/merit-v2/runtime/source_snapshot/outputs/
+!docker/merit-v2/runtime/source_snapshot/outputs/**
