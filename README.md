@@ -6,7 +6,9 @@ Enter a study ID such as `ST000001`. The application retrieves the study's input
 
 ## Start
 
-With Docker running, use:
+**Registry status:** the image builds, but GHCR publication is currently blocked by the organisation/package `write_package` permission. Until that access is granted, use the source-build command below or load a supplied image archive.
+
+Once publication succeeds, with Docker running, use:
 
 ```sh
 docker run -d --name merit-v2 --init -p 127.0.0.1:8791:8791 -v merit-v2-studies:/app/runs ghcr.io/biosystemengineeringlab-iitb/merit-ml:v2-live-20261105
@@ -19,6 +21,15 @@ To build from source instead, download this repository or the source bundle, ope
 ```sh
 docker compose -f compose.merit-v2.yml up -d --build
 ```
+
+If you have the supplied prebuilt AMD64 image archive, no dependency build is needed:
+
+```sh
+docker load -i merit-v2-docker-2026-11-05-amd64-image.tar.gz
+docker run -d --name merit-v2 --init -p 127.0.0.1:8791:8791 -v merit-v2-studies:/app/runs merit-ml:v2-live-20261105
+```
+
+That archive is for Intel/AMD Linux containers, including Docker on Intel/AMD Windows or macOS. The source build selects your platform automatically; the registry workflow builds both AMD64 and ARM64.
 
 Stop with `docker compose -f compose.merit-v2.yml down`. The named volume retains your downloaded inputs and calculations. `docker compose ... down -v` also deletes that volume. Completed web jobs normally expire after 24 hours; add `--retain` to the container command if you need them kept. Export reports you want to preserve.
 

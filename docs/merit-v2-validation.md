@@ -34,3 +34,11 @@ Use `scripts/test_merit_v2.py --fixture PATH_TO_RAW_LIVE_JOB --expected PATH_TO_
 Run `scripts/test_merit_v2_edits.py --run docker/merit-v2/runtime/runs/v2_validation_clean` for the additional interactive cases. Both scripts must use the release's scientific Python environment. `runtime_capture.json` identifies source inputs and the native integration files; the Docker build verifies path relocation against `source_snapshot_manifest.json`.
 
 The build workflow publishes a separate `v2-live-20261105` tag. This document records local build/test evidence; successful remote workflow publication and package visibility must be checked separately.
+
+## Remote publication status
+
+All 161 required source-snapshot files were verified against the committed Git blobs, and the Docker image was also rebuilt from a clean `git archive` export. The first CI run exposed the legacy ignore rule excluding 23 required source scripts; that packaging error was corrected. The subsequent [GitHub run](https://github.com/BiosystemEngineeringLab-IITB/merit-ml/actions/runs/41908102994) reached registry publication and failed specifically with `permission_denied: write_package`. The image is therefore **not yet available for public GHCR pull**.
+
+A package administrator should grant the repository Write access in the package's **Manage Actions access** settings, or check organisation package-creation policy if the package does not yet exist. Set the package Public for anonymous downloads, then rerun the workflow. See [GitHub package permissions](https://docs.github.com/en/packages/learn-github-packages/about-permissions-for-github-packages). No personal token or password needs to be pasted into a chat.
+
+The dated deployment folder also contains a code-only source archive and a fully built AMD64 Docker image archive, each with SHA-256. The former requires a Docker build; the latter can be installed using `docker load`. Both exclude historical study results and credentials. The existing frozen-input services were left running; only the isolated test container was stopped after its evidence was copied into the release folder.
