@@ -1,0 +1,25 @@
+name: merit-v2
+services:
+  merit:
+    image: ghcr.io/biosystemengineeringlab-iitb/merit-ml:v2-live-20261105
+    build:
+      context: .
+      dockerfile: docker/merit-v2/Dockerfile
+    ports:
+      - "127.0.0.1:8791:8791"
+    volumes:
+      - merit-v2-studies:/app/runs
+    environment:
+      # 0 selects 65% of available memory, respecting Docker's memory allocation.
+      MERIT_WORKER_MEMORY_MB: "0"
+      # Per check, not a limit on the whole study. Set 0 for no time limit.
+      MERIT_CHECK_TIMEOUT_SECONDS: "1800"
+      MERIT_RENDER_TIMEOUT_SECONDS: "3600"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    init: true
+    restart: unless-stopped
+volumes:
+  merit-v2-studies:

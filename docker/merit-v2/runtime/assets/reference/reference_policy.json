@@ -1,0 +1,20 @@
+{
+  "policy": "pinned_8782",
+  "created_at_utc": "2026-11-02T19:08:19+00:00",
+  "scope": "Pinned global chemical reference assets only. Study inputs, reviewed study labels and Pan-ReDU study snapshots are not bundled.",
+  "files": {
+    "refmet_db.csv": {
+      "role": "RefMet super/main/sub class table read by the Annotation tab",
+      "source": "mw-dump-latest-18thSep-2026-version/refmet_db.csv",
+      "sha256": "811a8fa9ed4508970b3dfc236bfdd7ddf1196f1b2fd05f5b87e8475066e37169"
+    },
+    "refmet_all_ids_rest_20260929.json": {
+      "role": "RefMet identifier records used by FAIR evidence",
+      "source": "outputs/refmet_mapping_20260929/refmet_all_ids_rest_20260929.json",
+      "sha256": "d15adf2e78072511cfa4d2ef3f92ea2f4b56c351400fdf37e7196fdd01eac435"
+    },
+    "code_distributed_names_and_flags": {
+      "role": "merit/data/refmet_names_20260927.txt.gz and refmet_external_id_flags_20260929.json.gz, read unchanged from the code snapshot"
+    }
+  }
+}

@@ -1,128 +1,65 @@
-# MERIT
+# MERIT-ML v2 · live Docker application
 
-MERIT (MachinE learning ReadIness for Tabular metabolomics data) is a publication-first framework inspired by AIDRIN, specialized for public metabolomics repositories. It provides:
+**Release: 5 November 2026 — `v2-live-20261105`.** MERIT-ML assesses public Metabolomics Workbench studies in your browser, using your own computer for the calculations. This Docker distribution contains Python, its dependencies, the interface and the metric implementations. Install Docker once; no separate Python installation is needed.
 
-- repository-aware ingestion for MetaboLights and Metabolomics Workbench
-- canonical normalization into a common study schema
-- domain-specific readiness scoring across fixed score families
-- auditable remediations with before/after deltas
-- baseline benchmark execution for ML suitability checks
-- machine-readable reports and Markdown/HTML summaries
+Enter a study ID such as `ST000001`. The application retrieves the study's inputs from Workbench and calculates its metrics locally. It queries **`/datatable/`**, mwTab text/JSON and `untarg_data` independently. It does not read the frozen cohort's v8/v9 study results or require the historical deposit. The fixed R1 alert reference, curated control rules and versioned global chemical reference assets are included; these are declared reference inputs, not downloaded study results. Pan-ReDU evidence is retrieved live. Reviewed historical study-design labels are not bundled: design context is the rule-based reading of the live records.
 
-## Public Docker Distribution
+## Start
 
-The public MERIT-ML Docker image is a thin local UI container. It does not
-bundle the Workbench v7 cache, raw Metabolomics Workbench source dumps, or
-generated export files. At runtime, the container reads hosted MERIT-derived
-assessment artifacts from the configured MERIT/R2 artifact endpoint and fetches
-source-specific tabular details only on demand from Metabolomics Workbench REST
-for MERIT-derived export generation.
+**Registry status:** the image builds, but GHCR publication is currently blocked by the organisation/package `write_package` permission. Until that access is granted, use the source-build command below or load a supplied image archive.
 
-```bash
-docker pull banerjee28/merit-ml:v7
-docker run -d --name merit-ml -p 8780:8773 banerjee28/merit-ml:v7
+Once publication succeeds, with Docker running, use:
+
+```sh
+docker run -d --name merit-v2 --init -p 127.0.0.1:8791:8791 -v merit-v2-studies:/app/runs ghcr.io/biosystemengineeringlab-iitb/merit-ml:v2-live-20261105
 ```
 
-Then open `http://localhost:8780`. See `docker/README.md` for the full Docker
-run, build, verification, and publication workflow.
+Open **http://localhost:8791**. The published image becomes available after this repository's Docker workflow succeeds; see [release validation](docs/merit-v2-validation.md) for the tested build and publication status. Docker selects the matching Linux image for Intel/AMD or ARM systems. Windows and macOS use Docker's Linux container environment.
 
-This repository ships a working v0 foundation designed around the local source data already present in this workspace:
+To build from source instead, download this repository or the source bundle, open a terminal in its top-level folder and run:
 
-- `metabolights_data/mtbls_metadata/MTBLS2262`
-- `mw-dump-latest/ST001814/AN002942/tabular/AN002942_datatable.tsv`
-- `mw-dump/json/ST000356.json`
-- `mw-dump/datatable/ST000356/*.datatable.tsv.gz`
-
-For Metabolomics Workbench, ingestion now defaults to local archives and prefers `mw-dump-latest/` when present, then `mw_dump/`, then `mw-dump/`. The connector supports:
-
-1. Latest nested dump layout: `STUDY/ANALYSIS/json` + `STUDY/ANALYSIS/tabular` with a study `manifest.json`
-2. Managed archive layout (`catalog.sqlite` + `studies/<ST>/manifest.json`)
-3. Legacy dump layout (`json/` + `datatable/`)
-
-Tabular selection priority remains:
-
-1. `*_Results.txt`
-2. `*_datatable.tsv` / `*.datatable.tsv.gz`
-3. `*.mwtab` / `*.mwtab.txt`
-
-For local-first operation during MW downtime, use `--fetch-mode local` and point `--root` at your dump. `merit mw rebuild-index` now merges managed manifests and legacy `json/datatable` entries so one catalog can cover all locally available studies.
-
-The preferred long-term MW storage model is now a managed archive:
-
-- `catalog.sqlite` for lightweight study and asset indexing
-- `studies/<STUDY_ID>/manifest.json` for per-study current state
-- `objects/json/<sha-prefix>/<sha>.json.gz` for compressed JSON payloads
-- `objects/tabular/<sha-prefix>/<sha>...` for compressed tabular assets
-
-This keeps the Python package small while preserving the full JSON and raw tabular payloads outside the git-tracked source tree.
-
-## Readiness Scoring Overview
-
-MERIT reports two top-level scores:
-
-- **Core ML readiness score**: unweighted mean of Structural, Analytical QC, Annotation, Cohort/Bias, and ML Readiness section scores.
-- **Reusability score**: Metadata / FAIR section score (reported separately from core ML readiness).
-
-Annotation is intentionally part of the core score: in metabolomics, weak annotation does not always prevent model training, but it directly limits interpretability and biological usability of model outputs.
-
-MERIT also applies feasibility gates (tabular data availability, biological sample count, group count, minimum per-group support, and non-catastrophic missingness). Gates do not change the numeric score; they can cap the final readiness band.
-
-## Install
-
-```bash
-python3 -m pip install -e .
+```sh
+docker compose -f compose.merit-v2.yml up -d --build
 ```
 
-## Quick Start
+If you have the supplied prebuilt AMD64 image archive, no dependency build is needed:
 
-```bash
-merit ingest --source metabolights --study-id MTBLS2262 --fetch-mode auto --output outputs/mtbls2262_bundle.json
-merit assess --bundle outputs/mtbls2262_bundle.json --profile full --output outputs/mtbls2262_assessment.json
-merit ingest --source workbench --study-id ST000356 --fetch-mode auto --output outputs/st000356_bundle.json
-merit assess --bundle outputs/st000356_bundle.json --profile full --output outputs/st000356_assessment.json
-merit report --assessment outputs/st000356_assessment.json --format md --output outputs/st000356_report.md
-merit mw sync --root ~/.cache/merit/mw --limit 10
-merit mw pull ST004241 --root ~/.cache/merit/mw
-merit mw rebuild-index --root ~/.cache/merit/mw
-merit mw snapshot-create --root ~/.cache/merit/mw --output outputs/mw_snapshot.tar.gz
-merit mw snapshot-install --root ~/.cache/merit/mw --snapshot outputs/mw_snapshot.tar.gz
-merit mw full-run --dump-root /path/to/mw-dump-latest --output-root /path/to/merit-full-run-mw --profile full
-merit ui --port 8765
+```sh
+docker load -i merit-v2-docker-2026-11-05-amd64-image.tar.gz
+docker run -d --name merit-v2 --init -p 127.0.0.1:8791:8791 -v merit-v2-studies:/app/runs merit-ml:v2-live-20261105
 ```
 
-## CLI Commands
+That archive is for Intel/AMD Linux containers, including Docker on Intel/AMD Windows or macOS. The source build selects your platform automatically; the registry workflow builds both AMD64 and ARM64.
 
-- `merit ingest`
-- `merit normalize`
-- `merit assess`
-- `merit remediate`
-- `merit benchmark`
-- `merit report`
-- `merit ui`
-- `merit mw sync`
-- `merit mw pull`
-- `merit mw rebuild-index`
-- `merit mw snapshot-create`
-- `merit mw snapshot-install`
-- `merit mw full-run`
+Stop with `docker compose -f compose.merit-v2.yml down`. The named volume retains your downloaded inputs and calculations. `docker compose ... down -v` also deletes that volume. Completed web jobs normally expire after 24 hours; add `--retain` to the container command if you need them kept. Export reports you want to preserve.
 
-`merit mw full-run` creates a centralized JSON cache (`<output-root>/json/*_workflow_state.json`) plus logs (`<output-root>/logs/`) so the UI can replay reports from cached JSON without touching raw dump files.
+## What the profile means
 
-## Scope of This Version
+The application reports matrix properties, analytical alerts against fixed R1 and sample-count support under your selected classes and folds. It does not combine them into a universal readiness score or certify predictive performance. Each analysis × data endpoint is assessed separately. You can change classes, folds, allowed check settings, sample eligibility, labels and subject information in the interface.
 
-This implementation delivers the initial end-to-end scientific core:
+This native v2 build retains the arrays needed for exact recalculation when resources permit, rather than imposing the browser version's matrix-size ceiling. Storage and processing time therefore grow with the study. A fresh fetch can differ from the manuscript's frozen deposit if Workbench has changed its inputs. The live rule-based design context and live external evidence also need not equal historical reviewed evidence.
 
-- canonical data model
-- dual-source local connectors
-- metrics across all planned score families
-- JSON assessment reports with reproducible content hashes
-- safe remediations (label normalization, duplicate feature collapse, missingness filtering)
-- baseline within-study and leave-one-study-out benchmarking
-- tests for parsers, metrics, and benchmark orchestration
-- remote accession fetchers with local cache materialization
-- JSON-first incremental Metabolomics Workbench archive sync
-- `catalog.sqlite` index plus content-addressed compressed object storage for MW
-- portable MW snapshot create/install commands for lightweight distribution
-- local testing UI with a directed workflow and experimental MetaboScore panel
+## A large matrix must not discard the other results
 
-It does not yet ship a production web application.
+Every initial check and interactive calculation runs behind a **matrix-specific process boundary**. Successful results are retained. A worker that runs out of its memory budget, exceeds its time limit or raises an error is reported as **not assessed**, with its reason. Its result is not replaced with zero or a passing score. Other matrices and independent checks continue. Shared metadata or input-fetch failures are identified separately. Exceptionally large report/export lists are checked against available memory before loading; the underlying calculation is retained if only its report cannot fit.
+
+The server reserves memory headroom using the available host/container memory. There is no fixed cell-count exclusion. Resources are finite: an OS-level failure or forced container shutdown can still interrupt the service. Checkpoints preserve calculations already saved; they do not make unlimited matrices executable on insufficient hardware.
+
+Optional controls for `docker run` (place before the image name):
+
+| Setting | Default | Effect |
+|---|---:|---|
+| `-e MERIT_WORKER_MEMORY_MB=4096` | automatic: 65% of available memory | Per-worker memory budget in MiB; 0 selects automatic |
+| `-e MERIT_CHECK_TIMEOUT_SECONDS=3600` | 1800 | Maximum duration per calculation/check; 0 disables this timeout |
+| `-e MERIT_RENDER_TIMEOUT_SECONDS=7200` | 3600 | Maximum wait for a rendered report/export |
+| `--memory=8g` | Docker's allocation | Optional overall container limit; leave headroom for the server |
+
+Execution details are saved to each job's `matrix_execution.json`, with logs, elapsed time, measured peak RSS and the budget. A running service also exposes `/api/v2/execution/<job-id>`. Downloads, working arrays and reports are stored only in the local Docker volume. Size depends on the studies assessed; the application does not download the entire cohort at startup. MW and external evidence services require internet access.
+
+This is a personal local application. The command binds its port to localhost. Do not expose it publicly without a separate authenticated service deployment and capacity controls.
+
+## Update and reproduce a release
+
+The source capture is [docker/merit-v2/runtime](docker/merit-v2/runtime); [runtime_capture.json](docker/merit-v2/runtime/runtime_capture.json) records its provenance. Native supervision files are separate from the captured metric implementation. [Build/update instructions](docker/merit-v2/README.md) explain synchronization, rebuilding, validation and packaging. The original cache-based v7 distribution is documented in [the archived README](docs/legacy-v7-readme.md); this release does not replace its old image tag.
+
+No credentials, private keys, deployment configuration or cohort caches belong in the image or source bundle. Commits use the maintainer's existing Git identity, without agent co-author trailers. Existing repository history is preserved.

@@ -1,0 +1,5 @@
+# Preserve versioned reference bytes and source-snapshot hashes exactly.
+docker/merit-v2/runtime/assets/reference/*.csv -text -diff
+docker/merit-v2/runtime/assets/reference/*.json -text
+docker/merit-v2/runtime/assets/home.html -whitespace
+docker/merit-v2/runtime/source_snapshot/** -whitespace

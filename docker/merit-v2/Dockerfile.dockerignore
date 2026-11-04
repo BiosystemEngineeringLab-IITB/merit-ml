@@ -1,0 +1,8 @@
+*
+!docker/
+docker/*
+!docker/merit-v2/
+!docker/merit-v2/**
+docker/merit-v2/runtime/runs/
+**/__pycache__/
+**/*.pyc
