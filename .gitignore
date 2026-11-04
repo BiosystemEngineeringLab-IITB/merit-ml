@@ -11,3 +11,9 @@ outputs/
 *.tar
 *.tar.gz
 *.zip
+
+# v2 live downloads, generated calculations and private release reports
+/docker/merit-v2/runtime/runs/
+/release-artifacts/
+__pycache__/
+*.pyc

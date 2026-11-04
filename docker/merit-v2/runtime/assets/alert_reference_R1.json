@@ -1,0 +1,58 @@
+{
+  "reference_version": "R1",
+  "reference_cohort": "all 11,749 valid matrices assessed when R1 was made (default settings); fixed: studies added later do not change it",
+  "reference_matrices": 11749,
+  "reference_cohort_sha256": "ece9a3ab1909c549dc36046574cd0b87406bf18981e74656ffc60a1f27614696",
+  "comparison": "strictly below the cut-off",
+  "created_at": "2026-10-25T17:10:43+05:30",
+  "n_matrices_with_a_value": {
+    "missingness": 11717,
+    "low_information": 11518,
+    "redundancy": 10367,
+    "outliers": 11591
+  },
+  "sensitivity": {
+    "2.5": {
+      "cutoffs": {
+        "missingness": 30.30461259891674,
+        "low_information": 68.90625,
+        "redundancy": 21.380162809018273,
+        "outliers": 80.0
+      },
+      "matrices": 11749,
+      "matrices_with_an_alert": 966
+    },
+    "5": {
+      "cutoffs": {
+        "missingness": 42.220303193441815,
+        "low_information": 87.5,
+        "redundancy": 28.57142857142857,
+        "outliers": 83.33333333333334
+      },
+      "matrices": 11749,
+      "matrices_with_an_alert": 1797
+    },
+    "7.5": {
+      "cutoffs": {
+        "missingness": 50.0,
+        "low_information": 93.6036046511628,
+        "redundancy": 34.189022556390974,
+        "outliers": 86.66666666666667
+      },
+      "matrices": 11749,
+      "matrices_with_an_alert": 2770
+    },
+    "10": {
+      "cutoffs": {
+        "missingness": 57.00757575757576,
+        "low_information": 96.96969696969697,
+        "redundancy": 40.0,
+        "outliers": 88.23529411764706
+      },
+      "matrices": 11749,
+      "matrices_with_an_alert": 3590
+    }
+  },
+  "asset_role": "fixed scoring configuration; no individual study results",
+  "source_reference_sha256": "ab67a022cb835a086fdebb990f979f2163d8252daee2d0496637faaeabba0a86"
+}

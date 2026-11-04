@@ -1,0 +1,39 @@
+"""Bulk wrapper using the current profile; no retired study score or band."""
+import html
+import json
+import re
+from pathlib import Path
+
+
+def page(session,source):
+    # Preserve the existing bulk workspace's styling. Its old score/band table
+    # cannot be populated from v9 profiles without inventing an aggregation.
+    text=Path(source).read_text()
+    start=text.index('def _bulk_runner_page(')
+    css=text[text.index('<style>',start)+7:text.index('</style>',start)]
+    css=css.replace('{{','{').replace('}}','}').replace('{_merit_analytics_consent_css()}','')
+    value=json.dumps(session,ensure_ascii=False).replace('</','<\\/')
+    return '''<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bulk MERIT-ML</title><style>'''+css+'''</style></head><body><main><section class="panel">
+<h1>Bulk MERIT-ML</h1><p class="sub">Every analysis and data file is reported separately, with the classes, settings and sample edits selected for each study.</p>
+<div class="actions"><a class="btn" href="/">Back to MERIT-ML UI</a><button id="summary" disabled>Download summary TSV</button>
+<button id="metrics" disabled>Download metrics-long TSV</button><button id="session">Download session JSON</button></div>
+<div class="progress-shell"><div id="progress-bar"></div></div><p id="status">Starting…</p>
+<div style="overflow:auto"><table><thead><tr><th>Study</th><th>Analysis</th><th>Data file</th><th>Summary</th><th>Smallest class</th><th>Samples</th><th>Features</th></tr></thead><tbody id="rows"></tbody></table></div>
+<p class="sub">No study-level score, band or endpoint priority is assigned.</p></section></main><script>
+    const session='''+value+r''';let summaries=[],metrics=[];
+const enc=x=>String(x??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
+function download(name,data,type='application/json'){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);}
+function tsv(rows){if(!rows.length)return '';let keys=Object.keys(rows[0]);return keys.join('\t')+'\n'+rows.map(r=>keys.map(k=>String(r[k]??'').replace(/[\t\r\n]/g,' ')).join('\t')).join('\n');}
+document.getElementById('session').onclick=()=>download('merit_bulk_session.json',JSON.stringify(session,null,2));
+document.getElementById('summary').onclick=()=>download('merit_bulk_summary.tsv',tsv(summaries),'text/tab-separated-values');
+document.getElementById('metrics').onclick=()=>download('merit_bulk_metrics.tsv',tsv(metrics),'text/tab-separated-values');
+async function run(){for(let i=0;i<session.studies.length;i++){let one={...session,studies:[session.studies[i]]};
+while(true){let form=new URLSearchParams({bulk_session:JSON.stringify(one)});let r=await fetch('/bulk/chunk',{method:'POST',body:form});let x=await r.json();
+if(r.status===202){document.getElementById('status').textContent=(i+1)+' / '+session.studies.length+' · '+x.pending.map(j=>j.state).join(', ');await new Promise(r=>setTimeout(r,2000));continue;}
+if(!r.ok||!x.ok){document.getElementById('status').textContent=x.error||'Bulk assessment failed';return;}
+summaries.push(...x.summary_rows);metrics.push(...x.metric_rows);break;}
+document.getElementById('rows').innerHTML=summaries.map(r=>'<tr>'+['study_id','analysis_id','endpoint','summary','smallest_class','ml_eligible_sample_ids','features'].map(k=>'<td>'+enc(r[k])+'</td>').join('')+'</tr>').join('');
+document.getElementById('progress-bar').style.width=((i+1)/session.studies.length*100)+'%';}
+document.getElementById('status').textContent='Complete · '+summaries.length+' matrices';document.getElementById('summary').disabled=false;document.getElementById('metrics').disabled=false;}run();
+</script></body></html>'''
