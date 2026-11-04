@@ -6,15 +6,15 @@ Enter a study ID such as `ST000001`. The application retrieves the study's input
 
 ## Start
 
-**Registry status:** the image builds, but GHCR publication is currently blocked by the organisation/package `write_package` permission. Until that access is granted, use the source-build command below or load a supplied image archive.
+**Registry status:** published publicly on GHCR for Linux AMD64 and ARM64. No GitHub login is required to download the image.
 
-Once publication succeeds, with Docker running, use:
+With Docker running, use:
 
 ```sh
 docker run -d --name merit-v2 --init -p 127.0.0.1:8791:8791 -v merit-v2-studies:/app/runs ghcr.io/biosystemengineeringlab-iitb/merit-ml:v2-live-20261105
 ```
 
-Open **http://localhost:8791**. The published image becomes available after this repository's Docker workflow succeeds; see [release validation](docs/merit-v2-validation.md) for the tested build and publication status. Docker selects the matching Linux image for Intel/AMD or ARM systems. Windows and macOS use Docker's Linux container environment.
+Open **http://localhost:8791**. The [Docker publication workflow](https://github.com/BiosystemEngineeringLab-IITB/merit-ml/actions/runs/41908102994) passed; see [release validation](docs/merit-v2-validation.md) for the test evidence. Docker selects the matching Linux image for Intel/AMD or ARM systems. Windows and macOS use Docker's Linux container environment.
 
 To build from source instead, download this repository or the source bundle, open a terminal in its top-level folder and run:
 
