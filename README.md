@@ -14,7 +14,7 @@ With Docker running, use:
 docker run -d --name merit-v2 --init -p 127.0.0.1:8791:8791 -v merit-v2-studies:/app/runs ghcr.io/biosystemengineeringlab-iitb/merit-ml:v2-live-20261105-r2
 ```
 
-Open **http://localhost:8791**. The [Docker publication workflow](https://github.com/BiosystemEngineeringLab-IITB/merit-ml/actions/runs/41908102994) passed; see [release validation](docs/merit-v2-validation.md) for the test evidence. Docker selects the matching Linux image for Intel/AMD or ARM systems. Windows and macOS use Docker's Linux container environment.
+Open **http://localhost:8791**. The [Docker publication workflow](https://github.com/BiosystemEngineeringLab-IITB/merit-ml/actions/workflows/merit-v2-docker.yml) passed; see [release validation](docs/merit-v2-validation.md) for the test evidence. Docker selects the matching Linux image for Intel/AMD or ARM systems. Windows and macOS use Docker's Linux container environment.
 
 To build from source instead, download this repository or the source bundle, open a terminal in its top-level folder and run:
 

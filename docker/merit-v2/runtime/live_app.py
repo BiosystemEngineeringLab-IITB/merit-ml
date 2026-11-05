@@ -350,8 +350,8 @@ def failure_message(stage,run,sid):
         return (f'{sid} has no public analyses on Metabolomics Workbench today. It may be under embargo, not yet released or '
                 'withdrawn. MERIT-ML does not show or assess such studies.')
     if stage=='fetching':
-        return ('Metabolomics Workbench did not return every file of this study (it may be busy or temporarily unavailable). '
-                'No result was inferred from the missing files. Please try again in a few minutes.')
+        return ('A required study input or reference could not be retrieved. Completed responses are retained, and the run log identifies the source. '
+                'No absent-file result was inferred from a failed transfer. Please try again in a few minutes.')
     return ('The assessment of this study could not be completed. The problem has been recorded; please try again later or '
             'contact the MERIT-ML maintainers with the study ID.')
 

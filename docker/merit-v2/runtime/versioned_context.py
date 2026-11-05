@@ -19,7 +19,8 @@ def ensure(root,sid):
         if expected is None:continue
         p=root/rel
         if not p.is_file() or hashlib.sha256(p.read_bytes()).hexdigest()!=expected['sha256']:
-            with urllib.request.urlopen(BASE+rel,timeout=120) as response:raw=response.read(expected['bytes']+1)
+            request=urllib.request.Request(BASE+rel,headers={'User-Agent':'MERIT-ML-online-parity-pilot/1.0'})
+            with urllib.request.urlopen(request,timeout=120) as response:raw=response.read(expected['bytes']+1)
             if len(raw)!=expected['bytes'] or hashlib.sha256(raw).hexdigest()!=expected['sha256']:raise ValueError('Context reference checksum mismatch: '+rel)
             p.parent.mkdir(parents=True,exist_ok=True);temp=p.with_name(p.name+f'.{os.getpid()}.tmp');temp.write_bytes(raw);temp.replace(p)
         records.append({'file':rel,'sha256':expected['sha256'],'bytes':expected['bytes'],'url':BASE+rel,'role':'versioned context reference input; not a matrix result'})
