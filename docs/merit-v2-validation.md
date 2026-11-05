@@ -86,4 +86,4 @@ The historical r2 validation record above is retained as release history.
 
 ## Full-screen report and original logo, r6
 
-The browser report occupies the full viewport below the 58 px navigation bar. The inner report no longer has a 1,320/1,800 px width cap, in either tools mode. A New study control returns to the search page. The unchanged original PNG from `merit-ui-v8/static/merit-logo-sidebar.png` is used on the search page and in the browser build. These are presentation changes; all calculation implementations and controls are retained. Browser release: `20261105-r10`; native/Docker release: `v2-live-20261105-r6`.
+The browser report occupies the full viewport below the 58 px navigation bar. The inner report no longer has a 1,320/1,800 px width cap, in either tools mode. A New study control returns to the search page. The unchanged original PNG from `merit-ui-v8/static/merit-logo-sidebar.png` is used on the search page and in the browser build. These are presentation changes; all calculation implementations and controls are retained. Browser release: `20261105-r11`; native/Docker release: `v2-live-20261105-r6`.
