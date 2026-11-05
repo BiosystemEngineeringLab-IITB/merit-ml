@@ -47,7 +47,7 @@ def enhance_page(page,study_id=''):
 const current=__STUDY__;
 const run=document.getElementById('run-form');if(run){let origin=run.elements.namedItem('live_origin_study_id');
 if(!origin){origin=document.createElement('input');origin.type='hidden';origin.name='live_origin_study_id';run.appendChild(origin);}origin.value=current;}
-function show(form){if(!form||form.id!=='run-form'||!form.checkValidity())return;
+function show(form){if(!form||!['run-form','start'].includes(form.id)||!form.checkValidity())return;
 const input=form.elements.namedItem('study_id');if(!input)return;const id=input.value.trim().toUpperCase();
 if(!/^ST\d{6}$/.test(id))return;input.value=id;
 if(id!==current){['live_job_id','label_classes','subjects_confirmed','matrix_overrides'].forEach(n=>{const x=form.elements.namedItem(n);if(x)x.value='';});}

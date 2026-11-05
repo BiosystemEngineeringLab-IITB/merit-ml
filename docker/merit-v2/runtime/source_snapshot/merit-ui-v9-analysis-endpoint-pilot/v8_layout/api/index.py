@@ -5,6 +5,7 @@ import json
 import csv
 import io
 import re
+from pathlib import Path
 
 from flask import Flask, Response, request
 
@@ -53,6 +54,31 @@ def _default_precomputed_root() -> str:
 app = Flask(__name__)
 
 
+@app.after_request
+def _persist_theme(response: Response) -> Response:
+    if response.mimetype != "text/html":
+        return response
+    page = response.get_data(as_text=True)
+    if "id=\"theme-toggle\"" in page or "id='theme-toggle'" in page or "id=\"merit-theme-toggle\"" in page:
+        return response
+    css = """<style id="merit-theme-css">
+html[data-theme="dark"]{--ink:#e8eaed;--muted:#b4c0c3;--bg:#111518;--panel:#1b2226}
+html[data-theme="dark"] [style*="background:rgba(255,255,255"],html[data-theme="dark"] [style*="background:#fff"],html[data-theme="dark"] [style*="background:white"]{background:#1b2226!important;color:#e8eaed!important}
+html[data-theme="dark"] [style*="color:#132327"],html[data-theme="dark"] [style*="color:#51656a"],html[data-theme="dark"] h2,html[data-theme="dark"] h3,html[data-theme="dark"] h4{color:#dce6e9!important}
+html[data-theme="dark"] body{background:#111518!important;color:#e8eaed!important}
+html[data-theme="dark"] .panel,html[data-theme="dark"] .card,html[data-theme="dark"] .about-card,html[data-theme="dark"] .v2-tune,html[data-theme="dark"] .tab-panel,html[data-theme="dark"] .tablewrap,html[data-theme="dark"] details{background:#1b2226!important;color:#e8eaed!important;border-color:#394247!important}
+html[data-theme="dark"] input,html[data-theme="dark"] select,html[data-theme="dark"] textarea{background:#20282d!important;color:#e8eaed!important;border-color:#465158!important}
+html[data-theme="dark"] p,html[data-theme="dark"] li,html[data-theme="dark"] td,html[data-theme="dark"] th,html[data-theme="dark"] label,html[data-theme="dark"] summary{color:#c5ced1}
+#merit-theme-toggle{position:fixed;right:16px;top:14px;z-index:99999;width:38px;height:38px;border:1px solid #c7d0d2;border-radius:50%;background:#fff;color:#263238;font:18px Arial;cursor:pointer;box-shadow:0 2px 8px #0002}
+html[data-theme="dark"] #merit-theme-toggle{background:#20282d;color:#f3f5f6;border-color:#536168}
+</style>"""
+    control = """<button id="merit-theme-toggle" type="button" aria-label="Switch to dark theme" title="Switch color theme">◐</button>
+<script>(function(){var r=document.documentElement,k='merit-ml-theme';try{r.dataset.theme=localStorage.getItem(k)||'light'}catch(e){r.dataset.theme='light'}var b=document.getElementById('merit-theme-toggle');function paint(){var d=r.dataset.theme==='dark';b.textContent=d?'☼':'◐';b.setAttribute('aria-label',d?'Switch to light theme':'Switch to dark theme')}paint();b.addEventListener('click',function(){r.dataset.theme=r.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem(k,r.dataset.theme)}catch(e){}paint()})})();</script>"""
+    page = page.replace("</head>", css + "</head>", 1).replace("</body>", control + "</body>", 1)
+    response.set_data(page)
+    return response
+
+
 @app.get("/download/acquisition-evidence")
 def download_acquisition_evidence() -> Response:
     """Download reviewed evidence for the displayed study, without scoring it."""
@@ -90,6 +116,11 @@ def home() -> Response:
         "precomputed_root": _default_precomputed_root(),
         "study_id": study_id,
     }
+    if not study_id:
+        landing = next((root / "online-tool/assets/landing.html" for root in Path(__file__).resolve().parents if (root / "online-tool/assets/landing.html").is_file()), Path("/missing-landing.html"))
+        if landing.exists():
+            page = landing.read_text(encoding="utf-8").replace("__MERIT_MODE__", "cache").replace("__MERIT_APP_SCRIPT__", "")
+            return Response(page, mimetype="text/html", headers={"Cache-Control": "no-store"})
     if study_id:
         try:
             cached_state = _load_precomputed_state(
@@ -109,6 +140,17 @@ def home() -> Response:
             )
         except Exception as exc:
             return Response(_page(error=str(exc), defaults=defaults), status=400, mimetype="text/html")
+    return Response(_page(defaults=defaults), mimetype="text/html")
+
+
+@app.get("/workspace")
+def workspace() -> Response:
+    defaults = {
+        "source": "workbench",
+        "profile": (request.args.get("profile") or "full").strip() or "full",
+        "precomputed_root": _default_precomputed_root(),
+        "study_id": "",
+    }
     return Response(_page(defaults=defaults), mimetype="text/html")
 
 

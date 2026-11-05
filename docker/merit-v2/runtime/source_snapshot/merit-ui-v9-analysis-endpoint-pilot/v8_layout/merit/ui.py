@@ -8863,8 +8863,7 @@ def _result_panel(
         f"<div>"
         f"<h2 style='margin:0;font-family:\"Iowan Old Style\",Georgia,serif;font-size:1.5rem'>"
         f"MERIT-ML Assessment Report — {_e(summary.get('study_id',''))}</h2>"
-        f"<p style='margin:4px 0 0;color:#51656a;font-size:.88rem'>"
-        f"{_e(summary.get('title','')[:100])} &bull; {_e(_repository_display_label(summary.get('source')))}</p>"
+        "<a href='/' style='display:inline-block;margin:6px 0 12px;font-size:.8rem'>Search another study</a>"
         f"</div>"
         f"<div style='display:flex;gap:8px;align-items:center'>"
         f"<button onclick='downloadRenderedState()' style='border:1px solid rgba(13,110,110,.35);border-radius:12px;"
@@ -8885,9 +8884,6 @@ def _result_panel(
 
     return (
         f"<div style='margin-top:26px'>"
-        f"<div style='margin:0 0 10px;color:#51656a;font-size:.86rem'>"
-        f"Please download and keep this MERIT-ML Assessment JSON for reproducibility. It holds the Structural and Metadata results shown on this page, "
-        f"per analysis and endpoint, with the parameters and sample edits in force.</div>"
         f"{pdf_header}"
         f"{scope_note_html}"
         f"{parsing_issue_html}"
@@ -11473,6 +11469,7 @@ body.report-tools-collapsed .wrap{{width:min(1320px,calc(100vw - 28px));
   grid-template-columns:minmax(0,1fr);grid-template-areas:"content"}}
 body.report-tools-collapsed .sidebar{{display:none}}
 body.report-tools-collapsed .content .panel{{overflow:visible}}
+body:not(.home-mode) .assessment-launch{{display:none}}
 body.report-tools-expanded .tool-rail-toggle{{background:linear-gradient(135deg,#8f4f0a,#d27d2d)}}
 .analytical-scroll-shell{{width:100%;max-width:100%;min-width:0;overflow:hidden}}
 .analytical-scroll-body{{width:100%;max-width:100%;min-width:0;overflow-x:auto;overflow-y:visible;padding-bottom:4px}}
@@ -11518,12 +11515,12 @@ body.report-tools-expanded.report-analytical-active .tool-rail-toggle{{bottom:38
   </aside>
   <section class='content'>
     <section class='panel'>
-      <h2 style='margin:0 0 4px;font-family:"Iowan Old Style",Georgia,serif;font-size:clamp(1.6rem,2.5vw,2.6rem);line-height:1'>Run a MERIT-ML Assessment</h2>
-      <p style='margin:0 0 22px;color:var(--muted);max-width:66ch;line-height:1.55'>Evaluate the machine-learning readiness of tabular metabolomics datasets from Metabolomics Workbench.</p>
+      <h2 class='assessment-launch' style='margin:0 0 4px;font-family:"Iowan Old Style",Georgia,serif;font-size:clamp(1.6rem,2.5vw,2.6rem);line-height:1'>Run a MERIT-ML Assessment</h2>
+      <p class='assessment-launch' style='margin:0 0 22px;color:var(--muted);max-width:66ch;line-height:1.55'>Evaluate the machine-learning readiness of tabular metabolomics datasets from Metabolomics Workbench.</p>
       {error_html}
       <form id='run-form' method='post' action='/workflow/run'>
-        <section class='card'>
-          <h3>Repository &amp; Accession</h3>
+        <section class='card assessment-launch'>
+          <h3>Study ID</h3>
           <p>Metabolomics Workbench is active. Paste a study accession ID.</p>
           <input type='hidden' name='source' value='workbench'>
           <input type='hidden' name='profile' value='full'>
@@ -11533,15 +11530,14 @@ body.report-tools-expanded.report-analytical-active .tool-rail-toggle{{bottom:38
           <input id='study-id-input' name='study_id' value='{_e(defaults.get("study_id",""))}' placeholder='e.g. ST000356' list='study-id-suggestions' autocomplete='off' required>
           <datalist id='study-id-suggestions'></datalist>
           <div class='example-studies' aria-label='Representative study examples'>
-            <span class='example-studies-label'>Try examples:</span>
+            <span class='example-studies-label'>Examples:</span>
             <button type='button' class='example-study-chip' data-study-id='ST000043' title='Small demo study'>ST000043 <small>small demo</small></button>
             <button type='button' class='example-study-chip' data-study-id='ST000496' title='Study with rich annotation summary'>ST000496 <small>annotation</small></button>
             <button type='button' class='example-study-chip' data-study-id='ST001518' title='Small labelled study: sample counts not met under the deposited labels'>ST001518 <small>counts not met</small></button>
             <button type='button' class='example-study-chip' data-study-id='ST003741' title='The datatable and mwTab files of one analysis give different results'>ST003741 <small>endpoints differ</small></button>
           </div>
         </section>
-        <div class='actions'>
-          <p class='caption'>MERIT-ML pipeline: <strong>acquire → normalize → assess each matrix → readiness profile</strong>. Results are written to the run output directory and shown below.</p>
+        <div class='actions assessment-launch'>
           <button class='btn' type='submit'>Run Assessment</button>
         </div>
       </form>

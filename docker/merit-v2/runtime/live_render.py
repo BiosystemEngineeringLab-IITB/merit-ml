@@ -18,6 +18,23 @@ import traceback
 import zipfile
 from pathlib import Path
 
+_THEME_CSS = """<style id="merit-theme-css">
+html[data-theme="dark"]{--ink:#e8eaed;--muted:#b4c0c3;--bg:#111518;--panel:#1b2226}
+html[data-theme="dark"] [style*="background:rgba(255,255,255"],html[data-theme="dark"] [style*="background:#fff"],html[data-theme="dark"] [style*="background:white"]{background:#1b2226!important;color:#e8eaed!important}
+html[data-theme="dark"] [style*="color:#132327"],html[data-theme="dark"] [style*="color:#51656a"],html[data-theme="dark"] h2,html[data-theme="dark"] h3,html[data-theme="dark"] h4{color:#dce6e9!important}
+html[data-theme="dark"] body{background:#111518!important;color:#e8eaed!important}
+html[data-theme="dark"] .panel,html[data-theme="dark"] .card,html[data-theme="dark"] .about-card,
+html[data-theme="dark"] .v2-tune,html[data-theme="dark"] .tab-panel,html[data-theme="dark"] .tablewrap,
+html[data-theme="dark"] details,html[data-theme="dark"] .study-card{background:#1b2226!important;color:#e8eaed!important;border-color:#394247!important}
+html[data-theme="dark"] input,html[data-theme="dark"] select,html[data-theme="dark"] textarea{background:#20282d!important;color:#e8eaed!important;border-color:#465158!important}
+html[data-theme="dark"] p,html[data-theme="dark"] li,html[data-theme="dark"] td,html[data-theme="dark"] th,
+html[data-theme="dark"] label,html[data-theme="dark"] summary{color:#c5ced1}
+#merit-theme-toggle{position:fixed;right:16px;top:14px;z-index:99999;width:38px;height:38px;border:1px solid #c7d0d2;border-radius:50%;background:#fff;color:#263238;font:18px Arial;cursor:pointer;box-shadow:0 2px 8px #0002}
+html[data-theme="dark"] #merit-theme-toggle{background:#20282d;color:#f3f5f6;border-color:#536168}
+</style>"""
+_THEME_HTML = """<button id="merit-theme-toggle" type="button" aria-label="Switch color theme" title="Switch color theme">◐</button>
+<script>(function(){var r=document.documentElement,k='merit-ml-theme';try{r.dataset.theme=localStorage.getItem(k)||'light'}catch(e){r.dataset.theme='light'}var b=document.getElementById('merit-theme-toggle');function paint(){var d=r.dataset.theme==='dark';b.textContent=d?'☼':'◐';b.setAttribute('aria-label',d?'Switch to light theme':'Switch to dark theme')}paint();b.addEventListener('click',function(){r.dataset.theme=r.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem(k,r.dataset.theme)}catch(e){}paint()})})();</script>"""
+
 import online_assess as oa
 
 
@@ -197,7 +214,7 @@ def respond(payload):
                 try:when_text=_dt.datetime.fromisoformat(when).strftime('%d %b %Y, %H:%M UTC')
                 except ValueError:when_text=when
             strip=("<div id='online-provenance' style='padding:8px 18px;background:#eaf4f3;color:#22494b;font:13px sans-serif'>"
-                   "Live assessment · data retrieved from Metabolomics Workbench"+(f" on {when_text}" if when_text else '')+" · "
+                   "Assessment input: Metabolomics Workbench"+(f" · retrieved {when_text}" if when_text else '')+" · "
                    f"<a href='/?study_id={sid}&amp;refresh=1'>Retrieve again</a> · "
                    f"<a href='/api/provenance/{sid}?live_job_id={job_id}' target='_blank'>Input provenance</a></div>")
             result=result.replace('<body', '<body',1)
@@ -223,6 +240,10 @@ document.querySelectorAll('a[href*="/download/acquisition-evidence"]').forEach(a
 if(window.__MERIT_STATE_JSON)window.__MERIT_STATE_JSON.online_assessment={job_id:job,study_id:study,source:'fresh MW responses',historical_results_used:false};
 })();</script>'''.replace('__JOB__',json.dumps(job_id)).replace('__STUDY__',json.dumps(sid))
             result=result.replace('</body>',script+'</body>')
+        if '</head>' in result and 'merit-theme-css' not in result:
+            result=result.replace('</head>',_THEME_CSS+'</head>',1)
+        if '</body>' in result and 'merit-theme-toggle' not in result:
+            result=result.replace('</body>',_THEME_HTML+'</body>',1)
         from live_progress import enhance_page
         result=enhance_page(result,sid)
         data=result.encode();mime='text/html';filename=None

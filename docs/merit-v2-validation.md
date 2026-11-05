@@ -2,7 +2,17 @@
 
 This is the native Docker release at `deploy/merit-v2-docker-2026-11-05`, separate from both running development services. No 8782/8791 code, historical cache or frozen study dump was changed.
 
-## Scope and evidence
+## Interface release r5 — 5 November 2026
+
+The r5 release adds the shared MERIT-ML search landing page, recent Workbench releases, About/publication/GitHub links, a persistent light/dark theme, and a compact assessment report entry. The original complete workspace remains at `/workspace`; its forms, bulk tools and downloads are retained. The browser memory notice applies only to the browser edition. The scientific implementations and fixed R1 are unchanged.
+
+Desktop and phone-width browser checks passed for the new page, themes, navigation, recent-study selection, queued selection during engine startup, and report controls. The complete embedded ST000096 assessment state from 8782 was identical before and after the presentation change. The native Docker image built and served its landing page, workspace and health route on a separate smoke-test port. Evidence is retained in the development workspace at `outputs/landing_redesign_20261105/`.
+
+Public browser build: `20261105-r7`; Docker/native build: `v2-live-20261105-r5`. Both use the same captured assessment UI source. No new R2 reference prefix was uploaded; the existing verified `20261104` assets are retained. The current source upload archive is produced by `scripts/package_merit_v2.py`; source and image archives remain separate artifacts.
+
+The earlier numerical and failure-isolation validation below remains historical evidence; it was not repeated across the full cohort for this presentation update.
+
+## Earlier numerical scope and evidence
 
 The 161-file pinned metric/UI source bundle and the native live bridge were captured from the current online tool. Only code, control rules, R1 and two global RefMet assets are distributed. No study matrices, cohort assessment results, historical reviewed study-design labels or Pan-ReDU study snapshots are included.
 

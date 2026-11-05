@@ -371,8 +371,9 @@ def create_app(jobs,catalog=None,inventory=None):
         if not check['ok']:raise Unavailable(check)
         return check['study_id']
     def home_html():
-        home=HOME/'assets/home.html'
-        return home.read_text() if home.exists() else '<!doctype html><html><head></head><body><h1>MERIT-ML</h1></body></html>'
+        home=HOME/'assets/landing.html'
+        if home.exists():return home.read_text().replace('__MERIT_MODE__','native').replace('__MERIT_APP_SCRIPT__','')
+        return '<!doctype html><html><head></head><body><h1>MERIT-ML</h1></body></html>'
     @app.errorhandler(Unavailable)
     def unavailable(exc):
         check=exc.check;status={'not_a_workbench_id':400,'workbench_unreachable':503}.get(check.get('reason'),404)
@@ -449,14 +450,20 @@ document.getElementById('status').textContent=all.filter(j=>j.state==='complete'
         if not request.args.get('study_id'):
             # A landing-page visit never loads or renders a previous study.
             from live_progress import enhance_page
-            home=HOME/'assets/home.html'
-            if home.exists():return Response(enhance_page(home.read_text()),mimetype='text/html',headers={'Cache-Control':'no-store'})
-            return '<form method="get"><h1>MERIT-ML live pilot</h1><label>Study ID <input name="study_id" pattern="ST[0-9]{6}" required></label><button>Assess study</button></form>'
+            home=HOME/'assets/landing.html'
+            if home.exists():return Response(enhance_page(home_html()),mimetype='text/html',headers={'Cache-Control':'no-store'})
+            return '<form method="get"><h1>MERIT-ML</h1><label>Study ID <input name="study_id" pattern="ST[0-9]{6}" required></label><button>Search</button></form>'
         args=request.args.to_dict();refresh=args.pop('refresh','')=='1'
         sid,form=study_form(args)
         job=jobs.start(sid,job_id=None if refresh else form.get('live_job_id'),refresh=refresh)
         if refresh:form.pop('live_job_id',None)
         return rendered(job,sid,form=form) if job['state']=='complete' else wait_page(job,sid,form)
+    @app.get('/workspace')
+    def workspace():
+        home=HOME/'assets/home.html'
+        if not home.exists():return Response('Workspace unavailable.',status=404,mimetype='text/plain')
+        from live_progress import enhance_page
+        return Response(enhance_page(home.read_text()),mimetype='text/html',headers={'Cache-Control':'no-store'})
     @app.post('/workflow/run')
     def workflow():
         sid,form=study_form(request.form.to_dict())

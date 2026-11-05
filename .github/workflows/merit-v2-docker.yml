@@ -31,6 +31,6 @@ jobs:
           file: docker/merit-v2/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ghcr.io/biosystemengineeringlab-iitb/merit-ml:v2-live-20261105-r4
+          tags: ghcr.io/biosystemengineeringlab-iitb/merit-ml:v2-live-20261105-r5
           cache-from: type=gha
           cache-to: type=gha,mode=max
