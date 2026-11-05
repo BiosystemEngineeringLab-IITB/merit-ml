@@ -288,27 +288,8 @@ if(window.__MERIT_STATE_JSON)window.__MERIT_STATE_JSON.online_assessment={job_id
         data=ui._bulk_runner_page(ui._bulk_clean_session(form.get('bulk_session','')),str(out)).encode();mime='text/html';filename=None
     elif action=='bulk-records':
         value=pilot.public(pilot.export_overview_block(sid,params,overrides));summaries=[];metrics=[]
-        for a in value['analyses']:
-            if not any(e.get('availability')=='valid' for e in a['endpoints'].values()):
-                summaries.append({'study_id':sid,'analysis_id':a['analysis_id'],'endpoint':'',
-                    'summary':'No valid quantitative matrix available','class_counts':'not assessable',
-                    'smallest_class':None,'classes':None,'ml_eligible_sample_ids':None,'features':None,
-                    'analytical_alerts':'not assessable','checks_assessed':0,'class_support':None,
-                    'separability':None,'chance':None})
-                continue
-            for src,e in a['endpoints'].items():
-                if e.get('availability')!='valid':continue
-                rd=e.get('readiness') or {};task=rd.get('task') or {};d=rd.get('data') or {};p=e.get('profile') or {}
-                row={'study_id':sid,'analysis_id':a['analysis_id'],'endpoint':src,'summary':rd.get('summary'),
-                     'class_counts':task.get('result'),'smallest_class':task.get('smallest'),'classes':task.get('n_classes'),
-                     'ml_eligible_sample_ids':p.get('eligible_sample_ids'),'features':p.get('features'),
-                     'analytical_alerts':d.get('result'),'checks_assessed':d.get('assessed'),'class_support':task.get('class_support'),
-                     'separability':task.get('separability'),'chance':task.get('chance')}
-                summaries.append(row)
-                for metric,item in e.get('items',{}).items():
-                    metrics.append({'study_id':sid,'analysis_id':a['analysis_id'],'endpoint':src,'metric':metric,
-                                    'value':item.get('value'),'detail':item.get('detail')})
-        data=json.dumps({'summary_rows':summaries,'metric_rows':metrics,'settings':value['readiness_settings']},ensure_ascii=False).encode()
+        from merit.bulk_profile_ui import rows
+        data=json.dumps(rows(value,sid),ensure_ascii=False).encode()
         mime='application/json';filename=None
     else:raise ValueError('Unknown action')
     return {'ok':True,'mime':mime,'filename':filename,'data_b64':base64.b64encode(data).decode(),

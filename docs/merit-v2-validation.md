@@ -87,3 +87,7 @@ The historical r2 validation record above is retained as release history.
 ## Full-screen report and original logo, r6
 
 The browser report occupies the full viewport below the 58 px navigation bar. The inner report no longer has a 1,320/1,800 px width cap, in either tools mode. A New study control returns to the search page. The unchanged original PNG from `merit-ui-v8/static/merit-logo-sidebar.png` is used on the search page and in the browser build. These are presentation changes; all calculation implementations and controls are retained. Browser release: `20261105-r11`; native/Docker release: `v2-live-20261105-r6`.
+
+## Progress and bulk-entry release r7
+
+The landing progress region is directly below search and the recent-study/bulk sections are hidden while assessing. Generating report is a separate visible UI step, including while the rendering request is pending. Legacy bulk and Find Similar Studies panels are removed from study reports; the legacy workspace URL redirects to the landing page. Native/cache bulk entry checks up to 500 distinct IDs and runs available entries using default settings and deposited labels, retaining per-analysis × endpoint profiles. Unknown network outcomes are not labelled invalid or embargoed. Browser bulk controls are disabled and blurred with a Docker link. Native and cached actual ST000001 bulk paths each returned two current per-matrix profiles; six UI checks passed, including a deliberately delayed renderer. Source/archive scans remain required. Browser build r12; native/Docker r7.

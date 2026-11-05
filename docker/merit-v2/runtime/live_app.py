@@ -439,6 +439,20 @@ document.getElementById('status').textContent=all.filter(j=>j.state==='complete'
         message=str(exc) if isinstance(exc,(ValueError,RuntimeError)) else 'The request could not be completed. Please try again.'
         return Response(unavailable_page(home_html(),{'reason':'error','title':'Request not completed','message':message,'latest':None}),
                         mimetype='text/html',status=400,headers={'Cache-Control':'no-store'})
+    @app.post('/api/bulk/validate')
+    def bulk_validate():
+        from bulk_entry import validate
+        def classify(sid):
+            if inventory is None:return dict(status='unknown',message='Public inventory is not ready; try again')
+            with inventory.lock:listed=sid in inventory.studies
+            if listed:return dict(status='available',message='Public study available')
+            release=inventory.embargo.get(sid)
+            if release and release>dt.date.today().isoformat():return dict(status='embargoed',message='Embargoed until '+release)
+            public=inventory._public_now(sid)
+            if public is None:return dict(status='unknown',message='Could not verify with Workbench; try again')
+            return dict(status='available' if public else 'unavailable',message='Public study available' if public else 'Not publicly available; release/embargo status is not confirmed')
+        try:return jsonify(validate((request.get_json(silent=True) or {}).get('text'),classify,parallel=True))
+        except ValueError as exc:return jsonify(ok=False,error=str(exc)),400
     @app.get('/api/public-studies')
     def public_studies():
         return jsonify(inventory.status() if inventory else {'error':'not initialised'})
@@ -460,10 +474,7 @@ document.getElementById('status').textContent=all.filter(j=>j.state==='complete'
         return rendered(job,sid,form=form) if job['state']=='complete' else wait_page(job,sid,form)
     @app.get('/workspace')
     def workspace():
-        home=HOME/'assets/home.html'
-        if not home.exists():return Response('Workspace unavailable.',status=404,mimetype='text/plain')
-        from live_progress import enhance_page
-        return Response(enhance_page(home.read_text()),mimetype='text/html',headers={'Cache-Control':'no-store'})
+        return Response(status=302,headers={'Location':'/'})
     @app.post('/workflow/run')
     def workflow():
         sid,form=study_form(request.form.to_dict())

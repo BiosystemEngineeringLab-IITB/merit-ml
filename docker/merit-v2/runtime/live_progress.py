@@ -84,7 +84,7 @@ document.getElementById('live-phase').textContent=p.label||j.state;document.getE
 const track=document.getElementById('live-progress');const fill=track.firstElementChild;const n=p.percent;
 if(typeof n==='number'){track.classList.remove('indeterminate');track.setAttribute('aria-valuenow',n);fill.style.width=n+'%';}
 else{track.classList.add('indeterminate');track.removeAttribute('aria-valuenow');}
-if(j.state==='complete'){document.getElementById('resume').submit();return;}if(j.state==='failed'){track.classList.remove('indeterminate');return;}
+if(j.state==='complete'){document.getElementById('live-phase').textContent='Generating report';document.getElementById('live-detail').textContent='All calculation steps are complete. Preparing your report…';track.classList.add('indeterminate');requestAnimationFrame(()=>setTimeout(()=>document.getElementById('resume').submit(),50));return;}if(j.state==='failed'){track.classList.remove('indeterminate');return;}
 }catch(e){document.getElementById('live-detail').textContent='Reconnecting to the assessment…';}setTimeout(poll,1500);}poll();
 </script></body></html>'''
     return page.replace('__TARGET__',json.dumps('/api/jobs/'+job['id']))

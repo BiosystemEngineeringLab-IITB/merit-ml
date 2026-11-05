@@ -145,13 +145,7 @@ def home() -> Response:
 
 @app.get("/workspace")
 def workspace() -> Response:
-    defaults = {
-        "source": "workbench",
-        "profile": (request.args.get("profile") or "full").strip() or "full",
-        "precomputed_root": _default_precomputed_root(),
-        "study_id": "",
-    }
-    return Response(_page(defaults=defaults), mimetype="text/html")
+    return Response(status=302,headers={"Location":"/"})
 
 
 @app.get("/study-browser-data")
@@ -243,6 +237,21 @@ def workflow_run() -> Response:
         return Response(_page(error=str(exc), defaults=defaults), status=400, mimetype="text/html")
 
 
+@app.post("/api/bulk/validate")
+def bulk_validate():
+    import sys
+    home=next(root / "online-tool" for root in Path(__file__).resolve().parents if (root / "online-tool/bulk_entry.py").exists())
+    if str(home) not in sys.path:sys.path.append(str(home))
+    from bulk_entry import validate
+    index=json.loads((Path(_default_precomputed_root()) / "index.json").read_text()).get("studies",{})
+    def classify(sid):
+        embargo=_embargoed_study_message(sid)
+        if embargo:return dict(status="embargoed",message=embargo)
+        return dict(status="available" if sid in index else "unavailable",message="Available in the frozen reference cohort" if sid in index else "Not available in the frozen reference cohort")
+    try:return Response(json.dumps(validate((request.get_json(silent=True) or {}).get("text"),classify)),mimetype="application/json")
+    except ValueError as exc:return Response(json.dumps(dict(ok=False,error=str(exc))),status=400,mimetype="application/json")
+
+
 @app.post("/bulk/run")
 def bulk_run() -> Response:
     form = request.form.to_dict(flat=True)
@@ -256,7 +265,7 @@ def bulk_run() -> Response:
     try:
         session = _bulk_clean_session(form.get("bulk_session", ""))
         return Response(
-            _bulk_runner_page(session, precomputed_root),
+            __import__("merit.bulk_profile_ui",fromlist=["page"]).page({**session,"input_review":json.loads(form.get("bulk_session","{} ")).get("input_review",[])}, Path(__file__).resolve().parents[1]/"merit/ui.py"),
             mimetype="text/html",
         )
     except Exception as exc:
@@ -272,7 +281,16 @@ def bulk_chunk() -> Response:
         or _default_precomputed_root()
     )
     try:
-        payload = _bulk_chunk_payload(form.get("bulk_session", ""), precomputed_root)
+        from merit import pilot_analysis_endpoint as pilot, ui
+        from merit.bulk_profile_ui import rows
+        session=_bulk_clean_session(form.get("bulk_session", ""))
+        summaries=[];metrics=[]
+        for item in session['studies']:
+            sid=item['study_id']
+            if _embargoed_study_message(sid):raise ValueError(_embargoed_study_message(sid))
+            value=pilot.public(pilot.export_overview_block(sid,ui._coerce_v2_scoring_params(item.get('scoring_params') or {}),item.get('matrix_overrides') or {}))
+            block=rows(value,sid);summaries.extend(block['summary_rows']);metrics.extend(block['metric_rows'])
+        payload=dict(ok=True,summary_rows=summaries,metric_rows=metrics,n_used=len(session['studies']),errors=[])
         payload["chunk_start"] = int(form.get("chunk_start", 0) or 0)
         payload["chunk_size"] = int(form.get("chunk_size", payload.get("n_used", 0)) or 0)
         return Response(

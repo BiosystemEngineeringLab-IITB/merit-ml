@@ -11165,8 +11165,8 @@ def _page(state: dict[str, Any] | None = None, error: str | None = None, default
         precomputed_root=precomputed_root,
     )
     source = "workbench"
-    leaderboard_html = _study_browser_html(precomputed_root, limit=500)
-    bulk_workspace_html = _bulk_workspace_html(precomputed_root)
+    leaderboard_html = ""
+    bulk_workspace_html = ""
     scoring_controls_html = _v2_scoring_controls_html(scoring_params)
     v2_defaults_js = json.dumps({
         key: _v2_param_display_value(key, value)
@@ -11255,8 +11255,8 @@ body{{margin:0;color:var(--ink);font-family:"IBM Plex Sans","Avenir Next","Segoe
   radial-gradient(circle at 15% 20%,rgba(210,125,45,.18),transparent 28%),
   linear-gradient(180deg,#f7f3ea 0%,#e9efe9 52%,#eaf0f1 100%)}}
 .wrap{{width:calc(100vw - 28px);margin:18px auto 36px;
-  display:grid;grid-template-columns:minmax(320px,360px) minmax(560px,1fr) minmax(320px,360px);
-  grid-template-areas:"left content right";gap:22px;align-items:start}}
+  display:grid;grid-template-columns:minmax(320px,360px) minmax(560px,1fr);
+  grid-template-areas:"left content";gap:22px;align-items:start}}
 .panel{{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
   box-shadow:var(--shadow);backdrop-filter:blur(14px);min-width:0}}
 .sidebar,.content{{min-width:0}}
@@ -11544,11 +11544,7 @@ body.report-tools-expanded.report-analytical-active .tool-rail-toggle{{bottom:38
       {result_html}
     </section>
   </section>
-  <aside class='sidebar sidebar-right'>
-    <section class='panel'>
-      {leaderboard_html}
-    </section>
-  </aside>
+
 </main>
 <footer style='display:flex;flex-direction:column;align-items:center;gap:9px;padding:8px 12px 18px'>
   <div style='display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;

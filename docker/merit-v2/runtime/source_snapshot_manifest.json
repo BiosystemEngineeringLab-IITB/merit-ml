@@ -264,8 +264,8 @@
     {
       "source": "/home/shayantan/metabolomics/ML-ready/merit-ui-v9-analysis-endpoint-pilot/v8_layout/api/index.py",
       "bundled": "source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/api/index.py",
-      "source_sha256": "c551680899c5da7f16775d6703bf2b85865a8fa4aa531376c14e346bfbb01eac",
-      "bundled_sha256": "0d2f0085bbc21543d3f4691d67fc4cb88b6e04b77dce7eae723f00ba06f3b898",
+      "source_sha256": "de713bef037b73ec65f0b9302cc7fba71387fc0c25ad0304acd1ea642e0e9e12",
+      "bundled_sha256": "7d7d31c580ea2358de47c975ad79fb7e1a4be949b420632d53cc7ac1f898d776",
       "absolute_path_relocations": 1
     },
     {
@@ -315,6 +315,13 @@
       "bundled": "source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/assessment.py",
       "source_sha256": "a0d9809c4e71f16a7b539daef9361b42afa1da281a42a2611a994651876870ab",
       "bundled_sha256": "a0d9809c4e71f16a7b539daef9361b42afa1da281a42a2611a994651876870ab",
+      "absolute_path_relocations": 0
+    },
+    {
+      "source": "/home/shayantan/metabolomics/ML-ready/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/bulk_profile_ui.py",
+      "bundled": "source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/bulk_profile_ui.py",
+      "source_sha256": "8e82e75cc214940d72e4bab2385924a4ec3907f8ef43cb598aec694e56bd205b",
+      "bundled_sha256": "8e82e75cc214940d72e4bab2385924a4ec3907f8ef43cb598aec694e56bd205b",
       "absolute_path_relocations": 0
     },
     {
@@ -929,8 +936,8 @@
     {
       "source": "/home/shayantan/metabolomics/ML-ready/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/ui.py",
       "bundled": "source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/ui.py",
-      "source_sha256": "d8363a2f031ea370f1c56b8f8358c9ea5b1cb14a095adf7e013ffa9fd4514f28",
-      "bundled_sha256": "b37d49fb2549f497f3f1da089779030dd46f8c8c15764df4b0b54cf46b3aac44",
+      "source_sha256": "d0ea58d9675d993d5bf1b9aa6b02fe3490bccc1eab99da26ef5638bb6c4736be",
+      "bundled_sha256": "749411a2cbedb46d10886eb6e74e65740b24fc7063c33bbc18d7015e7f8a3a15",
       "absolute_path_relocations": 4
     },
     {
