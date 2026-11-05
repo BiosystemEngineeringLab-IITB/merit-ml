@@ -1,6 +1,6 @@
 {
   "source": "online-tool/browser_app",
-  "release": "v2-live-20261105-r2",
+  "release": "v2-live-20261105-r3",
   "files": {
     "app.js": "075748466dd32bea1e626675f9882d091a1c6b6d4da34bac780fd97019ee8bc3",
     "worker.js": "8661d1fd96dbfee91e4cfe66815a4144aa6dc791e19d9b6af18240794132e0c7",

@@ -45,7 +45,7 @@ Anonymous access was checked using a newly created empty Docker configuration, i
 
 The dated deployment folder also contains a code-only source archive and a fully built AMD64 Docker image archive, each with SHA-256. The former requires a Docker build; the latter can be installed using `docker load`. Both exclude historical study results and credentials. The existing frozen-input services were left running; only the isolated test container was stopped after its evidence was copied into the release folder.
 
-## 5 November reliability revision (`v2-live-20261105-r2`)
+## 5 November reliability revision (`v2-live-20261105-r3`)
 
 The native and browser entry points now share the checkpoint merge rules and partial-input handling. Failed transfers are not interpreted as missing deposits. Native context references follow the browser/8791 versioned policy, checked against a bundled checksum index and retrieved on demand. Quantitative matrices and metric results are not distributed in the image.
 

@@ -25,7 +25,7 @@ def main():
     for sid in registry:
         context=ensure(HOME/'assets/reference',sid)
         atomic(run/f'{sid}_context_references.json',context)
-    report={'version':'v2-live-20261105-r2','checks':[],'scope':'per analysis x endpoint; shared metadata identified separately'}
+    report={'version':'v2-live-20261105-r3','checks':[],'scope':'per analysis x endpoint; shared metadata identified separately'}
     # Fetch errors are not silently interpreted as missing deposits.
     manifest=json.loads((run/'inputs/fetch_manifest.json').read_text())
 
