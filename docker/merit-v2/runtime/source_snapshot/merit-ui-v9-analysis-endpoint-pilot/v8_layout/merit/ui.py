@@ -11254,7 +11254,7 @@ body{{margin:0;color:var(--ink);font-family:"IBM Plex Sans","Avenir Next","Segoe
   background:radial-gradient(circle at top right,rgba(13,110,110,.18),transparent 36%),
   radial-gradient(circle at 15% 20%,rgba(210,125,45,.18),transparent 28%),
   linear-gradient(180deg,#f7f3ea 0%,#e9efe9 52%,#eaf0f1 100%)}}
-.wrap{{width:min(1800px,calc(100vw - 28px));margin:18px auto 36px;
+.wrap{{width:calc(100vw - 28px);margin:18px auto 36px;
   display:grid;grid-template-columns:minmax(320px,360px) minmax(560px,1fr) minmax(320px,360px);
   grid-template-areas:"left content right";gap:22px;align-items:start}}
 .panel{{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
@@ -11465,7 +11465,7 @@ body.report-tools-collapsed .tool-rail-toggle:focus-visible{{animation:none;tran
   86%{{transform:translateY(-3px) scale(1.025) rotate(-.6deg)}}
   92%{{transform:translateY(0) scale(1) rotate(0deg)}}
 }}
-body.report-tools-collapsed .wrap{{width:min(1320px,calc(100vw - 28px));
+body.report-tools-collapsed .wrap{{width:calc(100vw - 28px);max-width:none;
   grid-template-columns:minmax(0,1fr);grid-template-areas:"content"}}
 body.report-tools-collapsed .sidebar{{display:none}}
 body.report-tools-collapsed .content .panel{{overflow:visible}}
