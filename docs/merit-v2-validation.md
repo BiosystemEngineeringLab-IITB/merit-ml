@@ -8,7 +8,7 @@ The r5 release adds the shared MERIT-ML search landing page, recent Workbench re
 
 Desktop and phone-width browser checks passed for the new page, themes, navigation, recent-study selection, queued selection during engine startup, and report controls. The complete embedded ST000096 assessment state from 8782 was identical before and after the presentation change. The native Docker image built and served its landing page, workspace and health route on a separate smoke-test port. Evidence is retained in the development workspace at `outputs/landing_redesign_20261105/`.
 
-Public browser build: `20261105-r8`; Docker/native build: `v2-live-20261105-r5`. Both use the same captured assessment UI source. No new R2 reference prefix was uploaded; the existing verified `20261104` assets are retained. The current source upload archive is produced by `scripts/package_merit_v2.py`; source and image archives remain separate artifacts.
+Public browser build: `20261105-r9`; Docker/native build: `v2-live-20261105-r5`. Both use the same captured assessment UI source. No new R2 reference prefix was uploaded; the existing verified `20261104` assets are retained. The current source upload archive is produced by `scripts/package_merit_v2.py`; source and image archives remain separate artifacts.
 
 The earlier numerical and failure-isolation validation below remains historical evidence; it was not repeated across the full cohort for this presentation update.
 
