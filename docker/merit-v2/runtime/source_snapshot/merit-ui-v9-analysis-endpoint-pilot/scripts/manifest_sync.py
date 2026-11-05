@@ -21,7 +21,7 @@ import numpy as np
 from multiprocessing import Pool
 from pathlib import Path
 HERE = Path(__file__).resolve().parent
-DEFAULT_V9 = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/merit-cache-workbench-full-v9')
+DEFAULT_V9 = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/merit-cache-workbench-full-v9')
 
 
 def _opt(name):
@@ -31,7 +31,7 @@ def _opt(name):
 V9 = Path(_opt('--root')).resolve() if _opt('--root') else DEFAULT_V9           # never the default cache when another root is given
 sys.path.insert(0, str(HERE.parent / 'v8_layout'))
 SRC = ('datatable', 'mwtab', 'untarg_data')
-DEFAULT_REDUNDANCY_TSV = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/outputs/redundant_features_v9_claude_20261018/per_matrix.tsv')
+DEFAULT_REDUNDANCY_TSV = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/outputs/redundant_features_v9_claude_20261018/per_matrix.tsv')
 REDUNDANCY_TSV = Path(_opt('--redundancy-tsv')) if _opt('--redundancy-tsv') else (DEFAULT_REDUNDANCY_TSV if V9 == DEFAULT_V9 else None)
 
 

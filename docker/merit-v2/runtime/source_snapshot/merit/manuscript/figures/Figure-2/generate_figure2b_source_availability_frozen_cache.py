@@ -38,7 +38,7 @@ matplotlib.use("Agg")
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 
-CACHE = Path("/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/mw-dump-latest-18thSep-2026-version")
+CACHE = Path("/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/mw-dump-latest-18thSep-2026-version")
 OUT = Path(__file__).resolve().parent / "Used-in-manuscript"
 EXPECTED_FILES = 42559
 

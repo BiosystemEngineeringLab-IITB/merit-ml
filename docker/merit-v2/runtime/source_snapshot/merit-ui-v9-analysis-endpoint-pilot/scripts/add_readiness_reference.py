@@ -23,7 +23,7 @@ ARGS = [a for a in sys.argv[1:]]
 NEW = None
 if '--new-version' in ARGS:
     i = ARGS.index('--new-version'); NEW = ARGS[i + 1]; del ARGS[i:i + 2]
-V9 = Path(ARGS[0]) if ARGS else Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/merit-cache-workbench-full-v9')
+V9 = Path(ARGS[0]) if ARGS else Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/merit-cache-workbench-full-v9')
 REF = V9 / 'readiness_reference'
 KEYS = ('missingness', 'low_information', 'redundancy', 'outliers')
 PERCENTILES = (2.5, 5.0, 7.5, 10.0)

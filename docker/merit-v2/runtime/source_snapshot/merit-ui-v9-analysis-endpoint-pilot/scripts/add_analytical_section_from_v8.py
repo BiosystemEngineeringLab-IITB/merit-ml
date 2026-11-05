@@ -31,7 +31,7 @@ usage: add_analytical_section_from_v8.py [v9 root]
 import json, re, sys, datetime, collections
 from pathlib import Path
 from multiprocessing import Pool
-B = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot')
+B = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot')
 V8 = B / 'merit-cache-workbench-full-v8'
 V9 = Path(sys.argv[1]) if len(sys.argv) > 1 else B / 'merit-cache-workbench-full-v9'
 # every field the nine kept columns of the table read

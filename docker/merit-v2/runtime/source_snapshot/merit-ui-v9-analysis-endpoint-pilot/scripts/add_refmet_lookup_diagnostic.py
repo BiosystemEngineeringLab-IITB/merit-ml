@@ -9,7 +9,7 @@ Reads the frozen dump only. usage: add_refmet_lookup_diagnostic.py [v9 root]
 import sys, json, collections
 from pathlib import Path
 from multiprocessing import Pool
-B = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot')
+B = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot')
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'v8_layout'))
 from merit.manuscript_matrix_readers import _lines, _mwtab_layout
 from merit import manuscript_feature_labels as ml

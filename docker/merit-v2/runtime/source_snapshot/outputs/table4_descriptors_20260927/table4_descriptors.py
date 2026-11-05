@@ -40,7 +40,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-ROOT = Path("/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot")
+ROOT = Path("/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot")
 CACHE = ROOT / "mw-dump-latest-18thSep-2026-version"
 VALIDITY = ROOT / "merit/manuscript/figures/Figure-2/Used-in-manuscript/figure2b_source_availability_per_analysis.tsv"
 OUT = Path(__file__).resolve().parent

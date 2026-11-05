@@ -15,7 +15,7 @@ matplotlib.rc("font", family="DejaVu Sans")
 matplotlib.rcParams["pdf.fonttype"] = 42
 matplotlib.rcParams["ps.fonttype"]  = 42
 
-OUT_DIR  = Path("/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/merit/manuscript/figures/Figure-3")
+OUT_DIR  = Path("/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/merit/manuscript/figures/Figure-3")
 DATA_FILE = Path("/tmp/sample_counts.json")
 
 # ── colours ───────────────────────────────────────────────────────────────────

@@ -12,7 +12,7 @@ from multiprocessing import Pool
 from pathlib import Path
 HERE = Path(__file__).resolve().parent
 DRY = '--dry-run' in sys.argv; args = [a for a in sys.argv[1:] if a != '--dry-run']
-V9 = Path(args[0]) if args else Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/merit-cache-workbench-full-v9')
+V9 = Path(args[0]) if args else Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/merit-cache-workbench-full-v9')
 WORKERS = int(args[1]) if len(args) > 1 else 32
 sys.path.insert(0, os.environ.get('MERIT_CODE', str(HERE.parent / 'v8_layout')))
 from merit import separability_v9 as sp

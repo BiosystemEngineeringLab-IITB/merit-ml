@@ -7,11 +7,11 @@ import json, os, re, sys
 from pathlib import Path
 import pandas as pd
 
-sys.path.insert(0, '/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot')
+sys.path.insert(0, '/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot')
 from merit.feature_names import classify_feature_name
 
-DUMP = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/mw-dump-latest-confirmation-latest-version')
-SRC  = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/outputs/diagnostics/mw_6696_source_presence.tsv')
+DUMP = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/mw-dump-latest-confirmation-latest-version')
+SRC  = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/outputs/diagnostics/mw_6696_source_presence.tsv')
 OUT  = Path('/tmp/feature_type_counts.json')
 
 BLOCK_START = re.compile(

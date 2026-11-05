@@ -22,7 +22,7 @@ from multiprocessing import Pool
 from pathlib import Path
 import numpy as np
 HERE = Path(__file__).resolve().parent
-B = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot')
+B = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot')
 V9 = Path(sys.argv[1]) if len(sys.argv) > 1 else B / 'merit-cache-workbench-full-v9'
 WORKERS = int(sys.argv[2]) if len(sys.argv) > 2 else 48
 RUNNING = V9 / 'separability_running'           # one small file per busy process: the matrix it is computing

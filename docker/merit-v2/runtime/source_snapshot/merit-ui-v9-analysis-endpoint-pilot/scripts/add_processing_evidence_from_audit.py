@@ -12,7 +12,7 @@ usage: add_processing_evidence_from_audit.py [v9 root]
 """
 import collections, csv, datetime, json, re, sys
 from pathlib import Path
-B = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot')
+B = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot')
 V9 = Path(sys.argv[1]) if len(sys.argv) > 1 else B / 'merit-cache-workbench-full-v9'
 A = B / 'merit/manuscript/manuscript-original-reviews/reviewer-1/comment5_preprocessing_parameters_and_software_evidence'
 csv.field_size_limit(10 ** 9)

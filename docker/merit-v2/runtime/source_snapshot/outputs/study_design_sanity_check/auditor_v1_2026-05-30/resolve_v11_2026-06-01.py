@@ -43,7 +43,7 @@ import re
 import pandas as pd
 from pathlib import Path
 
-BASE = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/outputs/study_design_sanity_check')
+BASE = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/outputs/study_design_sanity_check')
 V9_XLSX  = BASE / 'mw_study_design_type_review_sheet_v9_2026-05-27.xlsx'
 V11_TSV  = BASE / 'auditor_v1_2026-05-30' / 'programmatic_design_audit_v11_2026-06-01.tsv'
 MWTAB    = BASE / 'auditor_v1_2026-05-30' / 'study_mwtab_features_2026-06-01.tsv'

@@ -7,8 +7,8 @@ Output: /tmp/intensity_scale.json
 import csv, json, random
 from pathlib import Path
 
-DUMP    = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/mw-dump-latest-confirmation-latest-version')
-SRC     = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/outputs/diagnostics/mw_6696_source_presence.tsv')
+DUMP    = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/mw-dump-latest-confirmation-latest-version')
+SRC     = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/outputs/diagnostics/mw_6696_source_presence.tsv')
 
 _MISSING_TOKENS = {
     '', 'na', 'n/a', 'nan', 'null', 'none', 'nd', 'bdl', 'bql',

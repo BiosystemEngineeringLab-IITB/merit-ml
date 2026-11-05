@@ -10,7 +10,7 @@ import json, sys
 from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-V9 = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/merit-cache-workbench-full-v9')
+V9 = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/merit-cache-workbench-full-v9')
 studies = [a.upper() for a in sys.argv[1:] if a.startswith('ST')]
 files = [V9 / 'json' / f'{s.lower()}_v9.json' for s in studies]
 assert all(f.is_file() for f in files), files

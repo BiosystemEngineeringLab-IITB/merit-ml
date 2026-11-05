@@ -24,7 +24,7 @@ import pandas as pd
 from scipy.stats import gaussian_kde, norm
 from sklearn.mixture import GaussianMixture
 
-SRC = Path("/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/outputs/table4_descriptors_20260927/table4_per_analysis.tsv")
+SRC = Path("/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/outputs/table4_descriptors_20260927/table4_per_analysis.tsv")
 OUT = Path(__file__).resolve().parent
 B = 1000
 SEED = 20260930

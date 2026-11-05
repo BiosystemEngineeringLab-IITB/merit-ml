@@ -14,7 +14,7 @@ sys.path.insert(0, str(HERE.parent / 'v8_layout')); sys.path.insert(0, str(HERE)
 from merit import qc_blank_v9 as qb, structural_v9 as sv
 from build_v9_cache import DEPENDS_ON_QC_FLAG
 from apply_sample_table_rule import curated_list
-V9 = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/merit-cache-workbench-full-v9')
+V9 = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/merit-cache-workbench-full-v9')
 WRITE = '--write' in sys.argv
 studies = [a.upper() for a in sys.argv[1:] if a.upper().startswith('ST')]
 for st in studies:

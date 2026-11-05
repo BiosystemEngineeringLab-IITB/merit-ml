@@ -15,7 +15,7 @@ import json
 import re
 from pathlib import Path
 
-BASE = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot')
+BASE = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot')
 DEFAULT_DUMP = BASE / 'mw-dump-latest-18thSep-2026-version'
 DEFAULT_OUT = Path(__file__).resolve().parent
 

@@ -13,12 +13,12 @@ import csv, sys, json, collections
 from pathlib import Path
 from multiprocessing import Pool
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE)); sys.path.insert(0, '/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/merit-ui-v8')
+sys.path.insert(0, str(HERE)); sys.path.insert(0, '/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/merit-ui-v8')
 from value_cell_classes import klass, TEXT_CLASSES
 from matrix_paths import matrix_path
 from merit.manuscript_sample_rules import is_qc_or_blank, tier1_alignment
 from merit.manuscript_matrix_readers import sample_rows_of_sample_by_feature, sample_rows_of_mwtab, _lines, _mwtab_layout
-B = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot'); ROOT = B / 'mw-dump-latest-18thSep-2026-version'; OUT = HERE.parent
+B = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot'); ROOT = B / 'mw-dump-latest-18thSep-2026-version'; OUT = HERE.parent
 VALID = B / 'merit/manuscript/figures/Figure-2/Used-in-manuscript/figure2b_source_availability_per_analysis.tsv'
 OLD = B / 'outputs/structural_candidates_claude_20261011'
 BLANK = {'', '-', 'na', 'n/a', 'nan', 'null', 'none'}

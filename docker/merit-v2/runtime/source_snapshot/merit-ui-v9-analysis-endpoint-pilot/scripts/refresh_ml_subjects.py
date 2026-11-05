@@ -4,7 +4,7 @@ import json, sys
 from multiprocessing import Pool
 from pathlib import Path
 HERE = Path(__file__).resolve().parent
-V9 = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/merit-cache-workbench-full-v9')
+V9 = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/merit-cache-workbench-full-v9')
 sys.path.insert(0, str(HERE.parent / 'v8_layout'))
 from merit import separability_v9 as sp, labels_v9 as lb
 KEYS = ('subjects', 'sample_ids_with_subject', 'subjects_with_several_samples', 'subjects_in_several_classes', 'most_shared_subject')

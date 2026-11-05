@@ -14,7 +14,7 @@ usage: add_metadata_section_from_v8.py [v9 root]
 import json, sys, datetime, collections
 from pathlib import Path
 from multiprocessing import Pool
-B = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot')
+B = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot')
 V8 = B / 'merit-cache-workbench-full-v8'
 V9 = Path(sys.argv[1]) if len(sys.argv) > 1 else B / 'merit-cache-workbench-full-v9'
 ORDER = ('fair_study_metadata_compliance', 'fair_metabolite_identifier_resolvability', 'external_cross_references_via_refmet',

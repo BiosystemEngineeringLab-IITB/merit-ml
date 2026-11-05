@@ -40,7 +40,7 @@ from openpyxl.styles import Alignment, Font
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import scan_mode_evidence as SM  # noqa: E402  (block I: reported scan-mode evidence)
 
-ROOT = Path("/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot")
+ROOT = Path("/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot")
 CACHE = ROOT / "mw-dump-latest-18thSep-2026-version"
 VALIDITY = ROOT / "merit/manuscript/figures/Figure-2/Used-in-manuscript/figure2b_source_availability_per_analysis.tsv"
 LABELS = ROOT / "outputs/annotation_coverage_20260928/class_counts_per_analysis.tsv"

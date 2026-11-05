@@ -48,13 +48,13 @@ from typing import Any
 import pandas as pd
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
-REVIEW_XLSX = Path("/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/outputs/study_design_sanity_check/"
+REVIEW_XLSX = Path("/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/outputs/study_design_sanity_check/"
                    "mw_study_design_type_review_sheet_v9_2026-05-27.xlsx")
 LOCAL_RAW   = Path("/home/shayantan/metabolomics/metabolomics_pipeline/"
                    "manuscript/data_used_for_harmony/MW_raw_data_rest")
-MWTAB_FEATS = Path("/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/outputs/study_design_sanity_check/"
+MWTAB_FEATS = Path("/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/outputs/study_design_sanity_check/"
                    "auditor_v1_2026-05-30/study_mwtab_features_2026-06-01.tsv")
-OUT_DIR     = Path("/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/outputs/study_design_sanity_check/"
+OUT_DIR     = Path("/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/outputs/study_design_sanity_check/"
                    "auditor_v1_2026-05-30")
 OUT_TSV     = OUT_DIR / "programmatic_design_audit_v11_2026-06-01.tsv"
 OUT_JSON    = OUT_DIR / "programmatic_design_audit_v11_summary_2026-06-01.json"

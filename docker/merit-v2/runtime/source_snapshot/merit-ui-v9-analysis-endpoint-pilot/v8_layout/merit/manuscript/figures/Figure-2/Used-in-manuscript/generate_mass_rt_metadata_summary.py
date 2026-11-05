@@ -21,7 +21,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 
-ROOT = Path("/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot")
+ROOT = Path("/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot")
 CACHE_JSON = ROOT / "merit-cache-workbench-full-v7" / "json"
 OUT = ROOT / "merit" / "manuscript" / "figures" / "Figure-2" / "Used-in-manuscript"
 TOTAL_STUDIES = 4121

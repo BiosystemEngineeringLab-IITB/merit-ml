@@ -21,7 +21,7 @@ from multiprocessing import Pool
 from pathlib import Path
 import numpy as np
 HERE = Path(__file__).resolve().parent
-B = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot')
+B = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot')
 args = [a for a in sys.argv[1:] if not a.startswith('--')]
 V9 = Path(args[0]) if args else B / 'merit-cache-workbench-full-v9'
 WORKERS = int(args[1]) if len(args) > 1 else 40

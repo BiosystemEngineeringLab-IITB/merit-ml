@@ -23,7 +23,7 @@ plt.rcParams['font.family'] = 'DejaVu Sans'
 plt.rcParams['pdf.fonttype'] = 42
 plt.rcParams['ps.fonttype']  = 42
 
-OUT = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/merit/manuscript/figures/Figure-2/mwtab-datatable-difference')
+OUT = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/merit/manuscript/figures/Figure-2/mwtab-datatable-difference')
 
 df = pd.read_csv('/tmp/dt_mw_metrics.tsv', sep='\t')
 n_total = len(df)

@@ -14,7 +14,7 @@ def annotation_evidence(v):
     for analysis in v['analyses']:
         for endpoint in analysis['endpoints'].values():
             if 'roster' not in endpoint:continue
-            if not endpoint.get('sections',{}).get('annotation'): continue
+            if not endpoint.get('sections',{}).get('annotation'):continue
             result=endpoint['sections']['annotation']
             # This historical compatibility block used Table S1's lower-bound
             # mapping rule, before v9 added Text S10 spelling normalization.

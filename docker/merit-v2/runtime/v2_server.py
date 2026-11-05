@@ -9,6 +9,7 @@ import time
 from pathlib import Path
 import live_app as app
 import live_catalog
+os.environ['MERIT_NATIVE_SUPERVISION']='1'
 
 _Catalog=live_catalog.Catalog
 class NativeCatalog(_Catalog):
@@ -64,7 +65,7 @@ def create(jobs,catalog=None,inventory=None):
     service=old_create(jobs,catalog,inventory)
     @service.after_request
     def add_version(response):
-        response.headers['X-MERIT-Version']='v2-live-20261105'
+        response.headers['X-MERIT-Version']='v2-live-20261105-r2'
         return response
     @service.get('/api/v2/execution/<key>')
     def execution(key):

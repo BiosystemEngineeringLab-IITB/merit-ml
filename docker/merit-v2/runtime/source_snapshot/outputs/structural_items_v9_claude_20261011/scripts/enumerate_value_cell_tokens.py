@@ -8,10 +8,10 @@ Output: value_cell_tokens_per_matrix.jsonl (counts per matrix) and value_cell_to
 import csv, sys, re, json, collections
 from pathlib import Path
 from multiprocessing import Pool
-sys.path.insert(0, '/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/merit-ui-v8'); sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, '/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/merit-ui-v8'); sys.path.insert(0, str(Path(__file__).resolve().parent))
 from matrix_paths import matrix_path
 from merit.manuscript_matrix_readers import _lines, _mwtab_layout
-B = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot'); ROOT = B / 'mw-dump-latest-18thSep-2026-version'
+B = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot'); ROOT = B / 'mw-dump-latest-18thSep-2026-version'
 VALID = B / 'merit/manuscript/figures/Figure-2/Used-in-manuscript/figure2b_source_availability_per_analysis.tsv'
 OUT = B / 'outputs/structural_items_v9_claude_20261011'
 N = r'[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?'

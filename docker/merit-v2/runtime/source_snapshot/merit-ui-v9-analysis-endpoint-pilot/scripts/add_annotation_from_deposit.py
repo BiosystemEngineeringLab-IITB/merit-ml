@@ -9,7 +9,7 @@ import collections, datetime, gzip, json, sys
 from multiprocessing import Pool
 from pathlib import Path
 HERE = Path(__file__).resolve().parent
-B = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot')
+B = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot')
 V9 = Path(sys.argv[1]) if len(sys.argv) > 1 else B / 'merit-cache-workbench-full-v9'
 WORKERS = int(sys.argv[2]) if len(sys.argv) > 2 else 60
 sys.path.insert(0, str(HERE.parent / 'v8_layout'))

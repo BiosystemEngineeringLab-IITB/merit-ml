@@ -1,6 +1,6 @@
 import re, pandas as pd
 S='/tmp/claude-1004/-home-shayantan-metabolomics/fa6f75df-9cb2-4557-b4f2-aa6e5e67c504/scratchpad/'
-m=pd.read_pickle(S+'m.pkl'); nf=pd.read_csv('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/outputs/measurement_scale_20260930/audit_declared_vs_values_20260930/number_format_corruption_mwtab.tsv',sep='\t')
+m=pd.read_pickle(S+'m.pkl'); nf=pd.read_csv('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/outputs/measurement_scale_20260930/audit_declared_vs_values_20260930/number_format_corruption_mwtab.tsv',sep='\t')
 c=m[m.units_category=='concentration'].copy()
 P={'':1,'m':1e-3,'u':1e-6,'µ':1e-6,'μ':1e-6,'n':1e-9,'p':1e-12,'f':1e-15}
 WORDP={'milli':'m','micro':'u','nano':'n','pico':'p','femto':'f'}
@@ -35,4 +35,4 @@ print(o.flag.value_counts())
 pd.set_option('display.width',250); pd.set_option('display.max_rows',200)
 print(o[o.flag=='implausible'].sort_values('median_converted',ascending=False).to_string())
 print(o[o.flag.str.startswith('not')].units_raw.value_counts().head(25))
-o.to_csv('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/outputs/measurement_scale_20260930/audit_declared_vs_values_20260930/concentration_plausibility.tsv',sep='\t',index=False)
+o.to_csv('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/outputs/measurement_scale_20260930/audit_declared_vs_values_20260930/concentration_plausibility.tsv',sep='\t',index=False)

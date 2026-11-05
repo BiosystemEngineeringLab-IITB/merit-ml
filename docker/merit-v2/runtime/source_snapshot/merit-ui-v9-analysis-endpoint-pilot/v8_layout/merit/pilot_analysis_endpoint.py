@@ -37,7 +37,7 @@ from merit import labels_v9 as lb
 from merit import manuscript_feature_labels as mfl
 from merit import readiness_v9 as rd
 
-V9_ROOT = Path(os.environ.get("MERIT_V9_CACHE_ROOT", "/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/merit-cache-workbench-full-v9"))
+V9_ROOT = Path(os.environ.get("MERIT_V9_CACHE_ROOT", "/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/merit-cache-workbench-full-v9"))
 SOURCES = (("datatable", "datatable"), ("mwtab", "mwTab"), ("untarg_data", "untarg_data"))
 # (key, name, one-line definition)
 ITEMS = (
@@ -1856,7 +1856,7 @@ def _additional_by_sample(study_id: str, analysis_id: str) -> dict:
     """Additional sample data of every sample-table line of one analysis (mwTab text file, else JSON), raw-file fields left out
     (they are shown in the FAIR raw-data check)."""
     from merit import additional_sample_data as asd
-    root = Path(os.environ.get("MERIT_MW_DUMP_ROOT", "/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/mw-dump-latest-18thSep-2026-version"))
+    root = Path(os.environ.get("MERIT_MW_DUMP_ROOT", "/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/mw-dump-latest-18thSep-2026-version"))
     try:
         _, recs = asd.read(root / study_id / analysis_id / "mwtab", analysis_id)
     except Exception:

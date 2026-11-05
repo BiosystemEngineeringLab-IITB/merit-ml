@@ -14,8 +14,8 @@ matplotlib.rcParams["pdf.fonttype"] = 42
 matplotlib.rcParams["ps.fonttype"]  = 42
 matplotlib.rcParams["font.size"]    = 16
 
-SRC_TSV = Path("/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/outputs/diagnostics/mw_6696_source_presence.tsv")
-OUT_DIR = Path("/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/merit/manuscript/figures/Figure-2")
+SRC_TSV = Path("/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/outputs/diagnostics/mw_6696_source_presence.tsv")
+OUT_DIR = Path("/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/merit/manuscript/figures/Figure-2")
 
 # Bit order for intersection keys: mwtab, datatable, untarg_data.
 KEY_ORDER = ["110", "001", "111", "100", "101", "010", "011", "000"]

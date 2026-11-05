@@ -22,8 +22,8 @@ import csv
 import re
 from pathlib import Path
 
-CACHE = Path("/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/mw-dump-latest-18thSep-2026-version")
-VALIDITY = Path("/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/merit/manuscript/figures/Figure-2/Used-in-manuscript/"
+CACHE = Path("/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/mw-dump-latest-18thSep-2026-version")
+VALIDITY = Path("/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/merit/manuscript/figures/Figure-2/Used-in-manuscript/"
                 "figure2b_source_availability_per_analysis.tsv")
 OUT = Path(__file__).resolve().parent
 NOT_DECLARED = {"", "-", "--", "na", "n/a", "none", "not applicable", "not available", "unknown", "unspecified", "."}

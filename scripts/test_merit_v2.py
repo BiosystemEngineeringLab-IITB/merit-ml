@@ -14,6 +14,7 @@ import subprocess
 import sys
 import time
 
+os.environ.setdefault('MERIT_NATIVE_SUPERVISION','1')
 ROOT=Path(__file__).resolve().parents[1];RUNTIME=ROOT/'docker/merit-v2/runtime'
 p=argparse.ArgumentParser();p.add_argument('--fixture',type=Path,required=True);p.add_argument('--expected',type=Path,required=True)
 p.add_argument('--output',type=Path,default=ROOT/'release-artifacts/validation.json');p.add_argument('--skip-build',action='store_true')

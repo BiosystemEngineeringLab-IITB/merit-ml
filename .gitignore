@@ -20,3 +20,15 @@ __pycache__/
 # Runtime source under historical-looking output folder names is code, not generated results.
 !docker/merit-v2/runtime/source_snapshot/outputs/
 !docker/merit-v2/runtime/source_snapshot/outputs/**
+
+# Never publish server authentication artifacts.
+**/.env
+**/credentials.env*
+**/config.env
+**/server_only_*/
+**/yes
+**/yes.pub
+**/id_rsa*
+**/id_ed25519*
+**/*.pem
+**/*.key

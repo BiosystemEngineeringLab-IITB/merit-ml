@@ -32,10 +32,10 @@ from pathlib import Path
 
 import pandas as pd
 
-DUMP_ROOT = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/mw-dump-latest-confirmation-latest-version')
-OUT_TSV   = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/outputs/study_design_sanity_check/'
+DUMP_ROOT = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/mw-dump-latest-confirmation-latest-version')
+OUT_TSV   = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/outputs/study_design_sanity_check/'
                  'auditor_v1_2026-05-30/study_mwtab_features_2026-06-01.tsv')
-V10_TSV   = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/outputs/study_design_sanity_check/'
+V10_TSV   = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/outputs/study_design_sanity_check/'
                  'mw_study_design_type_review_sheet_v10_resolved_2026-06-01.tsv')
 
 

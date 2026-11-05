@@ -16,7 +16,7 @@ import collections, csv, datetime, json, sys
 from multiprocessing import Pool
 from pathlib import Path
 HERE = Path(__file__).resolve().parent
-B = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot')
+B = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot')
 V9 = Path(sys.argv[1]) if len(sys.argv) > 1 else B / 'merit-cache-workbench-full-v9'
 ZO = B / 'outputs/table4_descriptors_20260927/zero_origin_per_analysis.tsv'
 PROV = B / 'merit/manuscript/supplementary/sample_missingness_scoring/datatable_zero_provenance_per_sample.tsv.gz'

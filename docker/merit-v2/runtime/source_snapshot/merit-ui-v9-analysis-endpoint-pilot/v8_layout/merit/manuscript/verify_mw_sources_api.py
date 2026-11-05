@@ -59,13 +59,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--input-tsv",
         type=Path,
-        default=Path("/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/merit/manuscript/mw_6696_source_presence.tsv"),
+        default=Path("/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/merit/manuscript/mw_6696_source_presence.tsv"),
         help="Input TSV with study_id and analysis_id columns.",
     )
     parser.add_argument(
         "--output-tsv",
         type=Path,
-        default=Path("/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/outputs/diagnostics/mw_6696_source_presence_api_verified.tsv"),
+        default=Path("/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/outputs/diagnostics/mw_6696_source_presence_api_verified.tsv"),
         help="Where to write verification results TSV.",
     )
     parser.add_argument("--workers", type=int, default=24, help="Number of concurrent worker threads.")

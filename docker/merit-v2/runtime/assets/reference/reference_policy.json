@@ -1,20 +1,47 @@
 {
-  "policy": "pinned_8782",
-  "created_at_utc": "2026-11-02T19:08:19+00:00",
-  "scope": "Pinned global chemical reference assets only. Study inputs, reviewed study labels and Pan-ReDU study snapshots are not bundled.",
-  "files": {
-    "refmet_db.csv": {
-      "role": "RefMet super/main/sub class table read by the Annotation tab",
-      "source": "mw-dump-latest-18thSep-2026-version/refmet_db.csv",
-      "sha256": "811a8fa9ed4508970b3dfc236bfdd7ddf1196f1b2fd05f5b87e8475066e37169"
-    },
-    "refmet_all_ids_rest_20260929.json": {
-      "role": "RefMet identifier records used by FAIR evidence",
-      "source": "outputs/refmet_mapping_20260929/refmet_all_ids_rest_20260929.json",
-      "sha256": "d15adf2e78072511cfa4d2ef3f92ea2f4b56c351400fdf37e7196fdd01eac435"
-    },
-    "code_distributed_names_and_flags": {
-      "role": "merit/data/refmet_names_20260927.txt.gz and refmet_external_id_flags_20260929.json.gz, read unchanged from the code snapshot"
-    }
+ "policy": "pinned_8782",
+ "created_at_utc": "2026-11-02T19:08:19+00:00",
+ "scope": "Global reference data only (chemical names, identifiers, classes, Pan-ReDU snapshot). No study result is stored here.",
+ "files": {
+  "refmet_db.csv": {
+   "role": "RefMet super/main/sub class table read by the Annotation tab",
+   "source": "mw-dump-latest-18thSep-2026-version/refmet_db.csv",
+   "sha256": "811a8fa9ed4508970b3dfc236bfdd7ddf1196f1b2fd05f5b87e8475066e37169"
+  },
+  "refmet_all_ids_rest_20260929.json": {
+   "role": "RefMet identifier records used by FAIR evidence",
+   "source": "outputs/refmet_mapping_20260929/refmet_all_ids_rest_20260929.json",
+   "sha256": "d15adf2e78072511cfa4d2ef3f92ea2f4b56c351400fdf37e7196fdd01eac435"
+  },
+  "code_distributed_names_and_flags": {
+   "role": "merit/data/refmet_names_20260927.txt.gz and refmet_external_id_flags_20260929.json.gz, read unchanged from the code snapshot"
+  },
+  "panredu_20261004/<study>.tsv": {
+   "role": "Pan-ReDU rows (7 columns) per Workbench study, exactly as build_analysis_evidence.py reads them",
+   "source": "all_sampleinformation.tsv (4 Oct 2026)",
+   "source_sha256": "71ce5cab3722858dab38299aa6c6d9bf5733c10188b877166f5764c8e3bf6613",
+   "studies": 2241,
+   "rows": 416635,
+   "rows_in_source": 1055121
+  },
+  "original_cohort_4121_study_ids.txt": {
+   "role": "Studies for which the Pan-ReDU snapshot is authoritative (the 9 March cohort); other studies query Pan-ReDU live"
+  },
+  "design_context_v11_20260601/<study>.json": {
+   "role": "Reviewed study-design labels (language-model reading + rules, frozen 1 June 2026) used by 8782 for the 4,121 cohort studies; other studies get the live rule-based reading",
+   "source": "merit-cache-workbench-full-v9/design_context (written by add_design_context_from_v11.py from the frozen v11 review sheet)",
+   "studies": 4121,
+   "folder_sha256": "8c18f982f7d8d0d20f41916b0ecda04834207f1084d47c258efd130d543ea76d"
+  },
+  "panredu_dump_20261104/<study>.tsv": {
+   "role": "Pan-ReDU rows (7 columns) per Workbench study outside the original 4,121-study cohort, from the frozen Pan-ReDU dump; a study absent from the dump has no rows. Cohort studies keep the 4 Oct 2026 snapshot (8782).",
+   "source": "https://redu.gnps2.org/dump",
+   "source_last_modified": "Tue, 03 Nov 2026 06:17:53 GMT",
+   "downloaded_utc": "2026-11-03T19:15:16.259175+00:00",
+   "source_sha256": "31becfd304c7a4a19e4b174881cdaa7b5c644649ab379cfc412c205a6e520297",
+   "source_bytes": 1600107050,
+   "studies": 2952,
+   "rows": 491926
   }
+ }
 }

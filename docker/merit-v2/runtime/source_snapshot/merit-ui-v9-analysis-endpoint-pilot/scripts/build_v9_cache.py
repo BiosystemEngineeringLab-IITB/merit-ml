@@ -12,7 +12,7 @@ usage: build_v9_cache.py [output root]
 import csv, sys, re, json, collections, datetime
 from pathlib import Path
 from multiprocessing import Pool
-B = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot')
+B = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot')
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent / 'v8_layout')); sys.path.insert(0, str(B / 'outputs/structural_items_v9_claude_20261011/scripts'))
 from merit import structural_v9 as sv

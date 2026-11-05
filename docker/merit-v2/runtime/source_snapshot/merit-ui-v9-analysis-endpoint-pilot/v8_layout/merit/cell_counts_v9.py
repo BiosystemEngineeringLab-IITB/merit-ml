@@ -17,7 +17,7 @@ from pathlib import Path
 
 from merit.manuscript_matrix_readers import _lines, _mwtab_layout
 
-sys.path.insert(0, "/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/outputs/table4_descriptors_20260927")
+sys.path.insert(0, "/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/outputs/table4_descriptors_20260927")
 from missing_token_scan import ORDER, klass  # noqa: E402  (Table S2C classes, in the manuscript's order)
 
 N = r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?"

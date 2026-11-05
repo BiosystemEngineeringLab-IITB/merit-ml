@@ -37,7 +37,7 @@ plt.rcParams['font.family']  = 'DejaVu Sans'
 plt.rcParams['pdf.fonttype'] = 42
 plt.rcParams['ps.fonttype']  = 42
 
-OUT = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/merit/manuscript/figures/Figure-4/used-in-manuscript')
+OUT = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/merit/manuscript/figures/Figure-4/used-in-manuscript')
 OUT.mkdir(exist_ok=True)
 
 # ── palette (consistent across all panels) ───────────────────────────────────

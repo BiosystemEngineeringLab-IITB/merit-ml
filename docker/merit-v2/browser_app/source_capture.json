@@ -1,0 +1,18 @@
+{
+  "source": "online-tool/browser_app",
+  "release": "v2-live-20261105-r2",
+  "files": {
+    "app.js": "075748466dd32bea1e626675f9882d091a1c6b6d4da34bac780fd97019ee8bc3",
+    "worker.js": "8661d1fd96dbfee91e4cfe66815a4144aa6dc791e19d9b6af18240794132e0c7",
+    "checkpoints.js": "20821307f9533ee4a4354da056c73504413c1dc248f41c55de5c73dbce79a8b0",
+    "downloads.js": "177d209f2fc8080927e5232bf0dd4369e70103bec1613b14b35a9b6e2ae4f2a8",
+    "index.html": "5db8ab3bf14dd1a1df85e884f60816ef4bb46b5fde3daaeaac766ef0e157ccfb",
+    "browser_runtime.py": "c521fe327db0e6713c98034f638bc50b22a1325c4825b881fcc49926065bccc3",
+    "browser_tasks.py": "e48941aa62b33a6ac50b2e9ec7fc9dc4a012be93c0166db9eafd588595e3dff4",
+    "browser_outputs.py": "30eaa4371d927c6cc776702f43368199c7fa13954127906f8605ccea5179a8bf",
+    "browser_interactive.py": "ba3733eb6945793c2d5a9b804cae0b94373c3caaae84a80fe82266863a11ba4d",
+    "build.py": "2d5bcb177574dcf44eb4f743c0f89e873f17f06a24bc54d91f56ab9a386aa264",
+    "estimate_calibration.json": "95c05be6813879dbab74c2ca9633020507554fa85edafbf0b08b7dac5078d0fa",
+    "RESOURCE_GUARD.md": "70dfedb41387f4c93988fa2a58d41485a5493347ed339a893b0cf1a08da417c2"
+  }
+}

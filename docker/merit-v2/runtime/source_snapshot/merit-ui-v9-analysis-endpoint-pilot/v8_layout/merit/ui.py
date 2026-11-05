@@ -347,7 +347,7 @@ _V2_HIDDEN_LEGACY_METRICS = {
     "age_biological_sex_metadata",
 }
 
-_V2_DEFAULT_MW_DUMP_ROOT = "/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/mw-dump-latest-18thSep-2026-version"
+_V2_DEFAULT_MW_DUMP_ROOT = "/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/mw-dump-latest-18thSep-2026-version"
 _WB_STUDY_PAGE_BASE = "https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID="
 _WB_REST_BASE = "https://www.metabolomicsworkbench.org/rest"
 
@@ -697,7 +697,7 @@ def _logo_asset_path() -> Path | None:
         Path(__file__).resolve().parents[1] / "static" / "merit-logo-sidebar.png",
         Path(__file__).resolve().parents[1] / "Logo.png",
         Path.cwd() / "Logo.png",
-        Path("/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/Logo.png"),
+        Path("/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/Logo.png"),
     ]
     for path in candidates:
         try:
@@ -927,7 +927,7 @@ def _default_precomputed_root() -> str:
     for candidate in (
         Path.cwd() / "merit-cache-workbench-full-v8",
         Path.cwd().parent / "merit-cache-workbench-full-v8",
-        Path("/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/merit-cache-workbench-full-v8"),
+        Path("/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/merit-cache-workbench-full-v8"),
     ):
         try:
             if candidate.exists():
@@ -13233,7 +13233,7 @@ class MetaboUIHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(payload)
 
-    _DEFAULT_ROOT = "/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/mw-dump-latest-18thSep-2026-version"
+    _DEFAULT_ROOT = "/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/mw-dump-latest-18thSep-2026-version"
 
     def do_GET(self) -> None:  # noqa: N802
         parsed = urlparse(self.path)

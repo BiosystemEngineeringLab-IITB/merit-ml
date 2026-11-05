@@ -35,7 +35,7 @@ from pathlib import Path
 from merit import manuscript_feature_labels as fl
 from merit import manuscript_refmet as mr
 
-DUMP = Path("/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/mw-dump-latest-18thSep-2026-version")
+DUMP = Path("/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/mw-dump-latest-18thSep-2026-version")
 NAMED, WITHOUT, EXCLUDED = fl.NAMED, fl.WITHOUT, fl.EXCLUDED
 DUP_SUFFIX = re.compile(fl.DUP_SUFFIX)
 EXAMPLES = 5

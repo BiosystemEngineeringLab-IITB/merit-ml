@@ -39,7 +39,7 @@ from typing import Any
 from merit import additional_sample_data as asd
 from merit import structural_v9 as sv
 
-DUMP = Path(os.environ.get("MERIT_MW_DUMP_ROOT", "/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/mw-dump-latest-18thSep-2026-version"))
+DUMP = Path(os.environ.get("MERIT_MW_DUMP_ROOT", "/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/mw-dump-latest-18thSep-2026-version"))
 MISSING = {"", "-"}
 MIN_COVERAGE, MAX_DISTINCT = 0.6, 0.9
 BATCH_KINDS = ("batch", "plate", "run day or run", "mixed")

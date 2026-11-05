@@ -7,10 +7,9 @@ import sys
 from pathlib import Path
 
 
-def main():
-    p=argparse.ArgumentParser();p.add_argument('--run-root',type=Path,required=True)
-    p.add_argument('--study',required=True);p.add_argument('--analysis');p.add_argument('--endpoint');p.add_argument('--stage',required=True)
-    args=p.parse_args();run=args.run_root.resolve()
+def execute(args):
+    """The same calculation entry point in a native child or a browser worker."""
+    run=Path(args.run_root).resolve()
     import online_assess as oa
     from native_resources import atomic,constrain_child
     oa.dump=atomic
@@ -21,12 +20,13 @@ def main():
     live=run/'materialized';out=run/'assessment';out.mkdir(exist_ok=True)
     if args.stage=='materialize':oa.materialize(run);return
     for key,value in {'MERIT_MW_DUMP_ROOT':live,'MERIT_V9_CACHE_ROOT':out}.items():os.environ[key]=str(value)
-    for folder in (oa.BASE/'outputs/measurement_scale_20260930',oa.T4,oa.STRUCT,oa.CODE):sys.path.insert(0,str(folder))
+    for folder in (oa.BASE/'outputs/measurement_scale_20260930',oa.T4,oa.STRUCT,oa.CODE):
+        if str(folder) not in sys.path:sys.path.insert(0,str(folder))
     stage,_=oa.configure(live,out,run)
     from merit import low_information_v9 as li,separability_v9 as sp
     # Native version retains exact editable arrays for every matrix that can be calculated.
     li.STORE_ALL_CELLS=sys.maxsize;sp.FULL_LIMIT=sys.maxsize
-    constrain_child()
+    if sys.platform != 'emscripten':constrain_child()
     if os.environ.get('MERIT_TEST_MODE')=='1':
         selected=':'.join((args.study,args.analysis or '',args.endpoint or '',args.stage))
         if selected==os.environ.get('MERIT_TEST_FAIL'):
@@ -37,7 +37,8 @@ def main():
     if args.stage=='bootstrap':
         builder=stage('build_v9_cache');original=builder.matrix_path
         builder.matrix_path=lambda sid,aid,src:original(sid,aid,src) if src==args.endpoint else (None,None)
-        oa.bootstrap(args.study,[args.analysis],live,out,stage)
+        try:oa.bootstrap(args.study,[args.analysis],live,out,stage)
+        finally:builder.matrix_path=original
     elif args.stage=='cross_endpoint':
         items=oa.load('structural_items',oa.STRUCT/'build_structural_items.py',out);items.ROOT=live
         value=json.loads(path.read_text())
@@ -73,6 +74,12 @@ def main():
         if isinstance(result,tuple) and isinstance(result[-1],list) and result[-1]:raise RuntimeError(result[-1])
     atomic(run/'last_worker_audit.json',{'historical_result_or_deposit_reads_forbidden':True,'denied_attempts':oa.DENIED,
                                        'files_read':sorted(oa.READS)})
+
+
+def main():
+    p=argparse.ArgumentParser();p.add_argument('--run-root',type=Path,required=True)
+    p.add_argument('--study',required=True);p.add_argument('--analysis');p.add_argument('--endpoint');p.add_argument('--stage',required=True)
+    execute(p.parse_args())
 
 
 if __name__=='__main__':main()

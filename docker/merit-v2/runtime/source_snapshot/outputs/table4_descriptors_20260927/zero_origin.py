@@ -21,7 +21,7 @@ import os
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
-ROOT = Path("/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot")
+ROOT = Path("/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot")
 HERE = Path(__file__).resolve().parent
 _sp = importlib.util.spec_from_file_location(
     "dvm", ROOT / "outputs/datatable_vs_mwtab_values_20260925/datatable_vs_mwtab_values.py")

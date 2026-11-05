@@ -17,7 +17,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-ROOT = Path("/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot")
+ROOT = Path("/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot")
 DUMP_ROOT = ROOT / "mw-dump-latest-confirmation-latest-version"
 CACHE_JSON = ROOT / "merit-cache-workbench-full-v7" / "json"
 OUT_DIR = ROOT / "merit" / "manuscript" / "figures" / "Figure-5" / "latest" / "readiness_band_stacked_bar_v7_analysis_level"

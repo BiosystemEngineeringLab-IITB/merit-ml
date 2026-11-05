@@ -4,7 +4,7 @@ Run with the interface stopped."""
 import json, sys
 from multiprocessing import Pool
 from pathlib import Path
-V9 = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/merit-cache-workbench-full-v9')
+V9 = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/merit-cache-workbench-full-v9')
 
 
 def one(path):

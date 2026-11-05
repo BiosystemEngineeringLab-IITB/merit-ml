@@ -8,6 +8,7 @@ import os
 import sys
 from pathlib import Path
 from native_resources import atomic,run_isolated
+from execution_state import input_block,shared_metadata_block,empty_study,scoped,merge,unavailable,dependency_reason
 
 HOME=Path(__file__).resolve().parent
 SOURCES=('datatable','mwtab','untarg_data')
@@ -20,11 +21,13 @@ def main():
     args=p.parse_args();run=args.run_root.resolve()
     if not run.is_relative_to(HOME/'runs'):raise ValueError('Assessment must be inside runtime/runs')
     registry=json.loads((run/'live_registry.json').read_text());out=run/'assessment';out.mkdir(exist_ok=True)
-    report={'version':'v2-live-20261105','checks':[],'scope':'per analysis x endpoint; shared metadata identified separately'}
+    from versioned_context import ensure
+    for sid in registry:
+        context=ensure(HOME/'assets/reference',sid)
+        atomic(run/f'{sid}_context_references.json',context)
+    report={'version':'v2-live-20261105-r2','checks':[],'scope':'per analysis x endpoint; shared metadata identified separately'}
     # Fetch errors are not silently interpreted as missing deposits.
     manifest=json.loads((run/'inputs/fetch_manifest.json').read_text())
-    failed=[x for x in manifest['requests'] if x.get('error')]
-    if failed:raise RuntimeError('Input fetch failures must be resolved before assessment: '+str([(x.get('url'),x.get('error')) for x in failed]))
 
     def call(sid,name,aid='',src='',blocked=None):
         cmd=[sys.executable,str(HOME/'matrix_worker.py'),'--run-root',str(run),'--study',sid,'--stage',name]
@@ -46,42 +49,37 @@ def main():
     if call(next(iter(registry)),'materialize')['state']!='complete':raise RuntimeError('Could not prepare downloaded inputs; see matrix_execution.json')
     for sid,aids in registry.items():
         path=out/'json'/f'{sid.lower()}_v9.json'
-        full={'schema':'merit.cache.v9.study','study_id':sid,'analyses':[{'analysis_id':aid,'endpoints':{src:{'availability':'no_file'} for src in SOURCES}} for aid in aids]}
+        full=empty_study(sid,aids)
         def checkpoint():
             atomic(path,full);atomic(out/'checkpoints'/path.name,full)
         for analysis in full['analyses']:
             aid=analysis['analysis_id']
             for src in SOURCES:
-                result=call(sid,'bootstrap',aid,src)
+                block=input_block(run,sid,aid,src)
+                result=call(sid,'bootstrap',aid,src,blocked=block['reason'] if block else None)
                 if result['state']=='complete':
                     value=json.loads(path.read_text());full['roster_fields']=value.get('roster_fields',[])
                     analysis['endpoints'][src]=value['analyses'][0]['endpoints'][src]
                 else:
-                    analysis['endpoints'][src]={'availability':'not_assessed','execution_failure':result}
+                    analysis['endpoints'][src]={**unavailable(result['reason']),'execution_failure':result}
                 checkpoint()
         for shared in ('cross_endpoint','metadata'):
-            result=call(sid,shared)
+            result=call(sid,shared,blocked=shared_metadata_block(run,sid) if shared=='metadata' else None)
             if result['state']=='complete':full=json.loads(path.read_text())
             checkpoint()
         targets=[(a['analysis_id'],src) for a in full['analyses'] for src,ep in a['endpoints'].items() if 'roster' in ep]
         for aid,src in targets:
             for name in STAGES:
-                scoped=copy.deepcopy(full)
-                for a in scoped['analyses']:
-                    for s,ep in a['endpoints'].items():
-                        keep=(a['analysis_id'],s)==(aid,src)
-                        if name in ('missingness','scale') and src=='datatable' and (a['analysis_id'],s)==(aid,'mwtab'):keep=True
-                        if not keep:ep.pop('roster',None)
-                atomic(path,scoped)
+                atomic(path,scoped(full,aid,src,name))
                 paired=next(a for a in full['analyses'] if a['analysis_id']==aid)['endpoints'].get('mwtab',{})
                 blocked=('Paired mwTab matrix could not be assessed; datatable zero provenance cannot be assumed unpaired'
                          if src=='datatable' and name=='missingness' and paired.get('execution_failure') else None)
+                blocked=blocked or dependency_reason(full,aid,src,name)
                 result=call(sid,name,aid,src,blocked=blocked)
                 target=next(a for a in full['analyses'] if a['analysis_id']==aid)['endpoints'][src]
                 if result['state']=='complete':
                     value=json.loads(path.read_text())
-                    replacement=next(a for a in value['analyses'] if a['analysis_id']==aid)['endpoints'][src]
-                    target.clear();target.update(replacement)
+                    full=merge(full,value,aid,src)
                 else:target.setdefault('execution_failures',{})[name]=result
                 checkpoint()
         # Shared informational evidence must not erase successful individual metrics.

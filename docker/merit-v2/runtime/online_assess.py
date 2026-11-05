@@ -35,6 +35,7 @@ POST_BUILD_FROM = '2026-10-21'   # curated rows from this day reached the 8782 r
 READS = set()
 DENIED = []
 MODULES = {}
+_GUARD_INSTALLED = False
 
 
 def dump(path, value):
@@ -44,6 +45,8 @@ def dump(path, value):
 
 
 def install_guard():
+    global _GUARD_INSTALLED
+    if _GUARD_INSTALLED:return
     def audit(event, args):
         if event != 'open' or not isinstance(args[0], (str, bytes, os.PathLike)):
             return
@@ -67,6 +70,7 @@ def install_guard():
         if not writing and p.is_relative_to(PROJECT_GUARD):
             READS.add(str(p))
     sys.addaudithook(audit)
+    _GUARD_INSTALLED = True
 
 
 def load(name, path, output):
@@ -115,10 +119,14 @@ def materialize(run):
     raw, live = run / 'inputs', run / 'materialized'
     registry = json.loads((run / 'live_registry.json').read_text())
     requests=json.loads((raw/'fetch_manifest.json').read_text())['requests']
+    failed_files={x['file'] for x in requests if (x.get('error') or x.get('resource_refusal')) and not x.get('metadata_only_view')}
     changes = []
     for sid, aids in registry.items():
         for source in (raw / sid).rglob('*'):
             if not source.is_file():
+                continue
+            if str(source.relative_to(raw)) in failed_files:
+                changes.append({'input':str(source.relative_to(run)),'operation':'failed input retained as provenance, not used as deposited data'})
                 continue
             dest = live / source.relative_to(raw)
             if source.stat().st_size == 0 and len(source.relative_to(raw / sid).parts) > 1:
@@ -721,7 +729,7 @@ def extra_evidence(path, live, out, stage, run, reuse_native=False):
         pe = {'dedicated': dedicated, 'software': sorted(tools), 'steps': sorted(steps), 'minfrac': minfrac,
               'header_status': header_identity_status(sid, aid, txt, js, proc),
               'files': 'none' if not txt.is_file() and not js.is_file() else ('mwTab JSON only' if not txt.is_file() else 'mwTab text and JSON')}
-        section=a['sections']['analytical'];section['processing_evidence']=pe
+        section=a.setdefault('sections',{}).setdefault('analytical',{});section['processing_evidence']=pe
         parsed=acq.read_mwtab(txt)
         # Initialize only the published schema, never values from old analyses.
         rec={k:(None if 'redu' in k.lower() else '') for group in ax.FIELD_GROUPS.values() for k in group}
@@ -796,7 +804,7 @@ def extra_evidence(path, live, out, stage, run, reuse_native=False):
                 sec=ep['sections'];an=sec.get('analytical',{})
                 vals={'missingness':an.get('sample_missingness',{}).get('score'),**{k:an.get(k,{}).get('default',{}).get('score') for k in ('low_information','redundancy','outliers')}}
                 items={k:{'value':x} for k,x in vals.items()};u=an.get('measurement_scale',{});items['units']={'value':u.get('score'),'flag':u.get('units',{}).get('declared')}
-                data=rd.data_result(items);task=rd.task_result(sec.get('labels',{}),sec.get('ml',{}).get('default',{}),5)
+                data=rd.data_result(items);task=rd.task_result(sec.get('labels'),sec.get('ml',{}).get('default'),5)
                 profiles[a['analysis_id']][src]={'summary':rd.summary(data,task),'summary_parts':rd.summary_parts(data,task),'data':data,'task':task}
         dump(out/'readiness'/f'{sid.lower()}.json',profiles)
 

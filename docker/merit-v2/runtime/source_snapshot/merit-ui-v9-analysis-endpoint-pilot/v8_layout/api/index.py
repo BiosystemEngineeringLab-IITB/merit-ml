@@ -42,7 +42,7 @@ def _default_precomputed_root() -> str:
     candidates = [
         os.path.join(os.getcwd(), "merit-cache-workbench-full-v8"),
         os.path.join(os.path.dirname(os.getcwd()), "merit-cache-workbench-full-v8"),
-        "/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/merit-cache-workbench-full-v8",
+        "/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/merit-cache-workbench-full-v8",
     ]
     for candidate in candidates:
         if os.path.exists(candidate):

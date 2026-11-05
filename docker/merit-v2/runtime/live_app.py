@@ -42,8 +42,8 @@ def code_version():
     """Digest of everything that defines a calculation besides the study inputs: code snapshot, service code, references, R1."""
     h=hashlib.sha256()
     calculation=('fetch_online.py','online_assess.py','fast_correlation.py','online_evidence.py','mwtab_input.py','live_references.py','live_validity.py',
-                 'live_indexes.py','live_design_context.py','live_study_summary.py')
-    for p in [HOME/'source_snapshot_manifest.json',HOME/'assets/reference/reference_policy.json',HOME/'assets/alert_reference_R1.json',
+                 'live_indexes.py','live_design_context.py','live_study_summary.py','execution_state.py','versioned_context.py')
+    for p in [HOME/'source_snapshot_manifest.json',HOME/'assets/reference/reference_policy.json',HOME/'assets/reference/study_reference_manifest.json',HOME/'assets/alert_reference_R1.json',
               *(HOME/n for n in calculation)]:
         if p.is_file():h.update(p.name.encode()+b'\0'+hashlib.sha256(p.read_bytes()).digest())
     return h.hexdigest()
@@ -234,7 +234,7 @@ class Jobs:
                 env.pop('MERIT_EXISTING_PROJECT_ROOT',None)
                 fetch_extra=['--shared-reference-inputs',str(refs)]
             for name,cmd in (
-                ('fetching',[sys.executable,str(runtime/'fetch_online.py'),'--run-root',str(run),'--studies',sid,'--with-panredu',*fetch_extra]),
+                ('fetching',[sys.executable,str(runtime/'fetch_online.py'),'--run-root',str(run),'--studies',sid,'--with-panredu','--allow-partial',*fetch_extra]),
                 ('computing',[sys.executable,str(runtime/'online_assess.py'),'--run-root',str(run)])):
                 if name=='computing':
                     self.update(key,fetched_at=time.time())

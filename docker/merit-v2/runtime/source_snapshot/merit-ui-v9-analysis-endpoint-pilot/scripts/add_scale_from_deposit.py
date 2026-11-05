@@ -17,7 +17,7 @@ from multiprocessing import Pool
 from pathlib import Path
 import numpy as np
 HERE = Path(__file__).resolve().parent
-B = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot')
+B = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot')
 V9 = Path(sys.argv[1]) if len(sys.argv) > 1 else B / 'merit-cache-workbench-full-v9'
 MS = B / 'outputs/measurement_scale_20260930'
 ZO = B / 'outputs/table4_descriptors_20260927/zero_origin_per_analysis.tsv'

@@ -497,12 +497,12 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--cache-root",
-        default="/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/merit-cache-workbench-full-v6",
+        default="/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/merit-cache-workbench-full-v6",
         help="Path to merit-cache-workbench-full-v6 directory.",
     )
     parser.add_argument(
         "--out-dir",
-        default="/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/merit/manuscript/supplementary/readinessscore_distribution",
+        default="/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/merit/manuscript/supplementary/readinessscore_distribution",
         help="Output directory for TSV + markdown outputs.",
     )
     args = parser.parse_args()

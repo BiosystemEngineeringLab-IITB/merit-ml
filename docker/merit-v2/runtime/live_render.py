@@ -62,9 +62,10 @@ def setup(run):
         return re.sub(r"<p style='margin:10px 0 0;.*?</p>",lambda m:note,text,flags=re.S)
     ui._source_availability_panel=live_sources
     from merit import acquisition_context_ui as context_ui
-    context_ui.DESIGN_TIP=('The original MERIT programmatic classifier is executed on this assessment\'s fresh MW metadata and sample structure. '
-        'This is the rule-based reading only. The independent language-model reading and reviewed historical consensus are not loaded or claimed. '
-        'The reported confidence is the classifier\'s heuristic category, not an independently validated probability. Nothing here enters a score or alert.')
+    context_ui.DESIGN_TIP=('Provenance is recorded for each study: original-cohort reviewed design labels come from the versioned context reference; '
+        'other studies use the original MERIT programmatic classifier on fresh MW metadata and sample structure. '
+        'No new language-model reading is performed. A programmatic confidence label is a heuristic category, not a validated probability. '
+        'Nothing here enters a score or alert.')
     original_design_line=context_ui._design_line
     def live_design_line(design):
         text=original_design_line(design)
@@ -76,8 +77,9 @@ def setup(run):
                    "<details style='font-size:.77rem;margin-top:4px'><summary>Rule evidence</summary>"+escape(evidence)+"</details>")
         return text
     context_ui._design_line=live_design_line
-    from native_guard import install
-    install(ui,pilot,run,live,out)
+    if sys.platform!='emscripten' and os.environ.get('MERIT_NATIVE_SUPERVISION')=='1':
+        from native_guard import install
+        install(ui,pilot,run,live,out)
     return ui,pilot,live,out
 
 
@@ -85,7 +87,8 @@ def state_for(sid,live,out):
     from merit.models import AssessmentReport
     from fetch_online import records
     raw=json.loads((out/'json'/f'{sid.lower()}_v9.json').read_text())
-    rows=records(json.loads((live/sid/'summary.json').read_text()))
+    try:rows=records(json.loads((live/sid/'summary.json').read_text()))
+    except (OSError,ValueError):rows=[]
     meta=rows[0] if rows else {}
     summary={**meta,'study_id':sid,'source':'workbench',
              'title':meta.get('study_title') or meta.get('title') or sid,

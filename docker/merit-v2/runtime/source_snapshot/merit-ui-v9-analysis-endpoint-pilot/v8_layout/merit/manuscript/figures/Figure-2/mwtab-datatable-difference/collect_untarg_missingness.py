@@ -6,8 +6,8 @@ Output: /tmp/untarg_missingness.tsv
 import csv
 from pathlib import Path
 
-DUMP = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/mw-dump-latest-confirmation-latest-version')
-SRC  = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/outputs/diagnostics/mw_6696_source_presence.tsv')
+DUMP = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/mw-dump-latest-confirmation-latest-version')
+SRC  = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/outputs/diagnostics/mw_6696_source_presence.tsv')
 
 # Same missing token set as collect_metrics.py
 _MISSING_TOKENS = {

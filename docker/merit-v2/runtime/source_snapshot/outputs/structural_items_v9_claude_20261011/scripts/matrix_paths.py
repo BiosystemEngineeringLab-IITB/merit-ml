@@ -5,7 +5,7 @@ when the manuscript's validity table says the matrix is valid and the study's ow
 of the same analysis ID under the other study folder is used, and that folder is reported.
 """
 from pathlib import Path
-ROOT = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/mw-dump-latest-18thSep-2026-version')
+ROOT = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/mw-dump-latest-18thSep-2026-version')
 NAMES = {'datatable': 'tabular/{a}_datatable_slash.txt', 'mwtab': 'mwtab/{a}_mwtab.txt', 'untarg_data': 'tabular/{a}_untarg_data.tsv'}
 
 def matrix_path(study_id, analysis_id, source):

@@ -17,7 +17,7 @@ from pathlib import Path
 
 import pandas as pd
 
-B = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot')
+B = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot')
 ROOT = Path(sys.argv[sys.argv.index('--root') + 1]) if '--root' in sys.argv[:-1] else B / 'merit-cache-workbench-full-v9'
 AUDIT = B / 'outputs/study_design_sanity_check'
 SHEET = AUDIT / 'mw_study_design_type_review_sheet_v11_resolved_2026-06-01.tsv'

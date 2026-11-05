@@ -18,7 +18,7 @@ from merit import pilot_analysis_endpoint as pilot
 from merit import structural_v9 as sv
 from merit.manuscript_matrix_readers import _lines, _mwtab_layout
 
-DUMP_ROOT = Path(os.environ.get("MERIT_MW_DUMP_ROOT", "/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/mw-dump-latest-18thSep-2026-version"))
+DUMP_ROOT = Path(os.environ.get("MERIT_MW_DUMP_ROOT", "/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/mw-dump-latest-18thSep-2026-version"))
 
 
 def _values(path: Path, endpoint: str) -> tuple[list[str], list[list[str]]]:

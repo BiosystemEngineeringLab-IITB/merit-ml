@@ -113,7 +113,7 @@ def cutoff_sources(params: dict | None = None) -> dict:
 @lru_cache(maxsize=1)
 def reference() -> dict:
     """The frozen reference cut-offs (2.5th percentile of the reference cohort, default settings) and their sensitivity counts."""
-    root = Path(os.environ.get("MERIT_V9_CACHE_ROOT", "/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/merit-cache-workbench-full-v9"))
+    root = Path(os.environ.get("MERIT_V9_CACHE_ROOT", "/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/merit-cache-workbench-full-v9"))
     try:
         return (json.loads((root / "manifest.json").read_text())["sections"].get("readiness") or {})
     except (OSError, ValueError, KeyError):

@@ -14,8 +14,8 @@ import csv, re, math
 from pathlib import Path
 from statistics import median as pymedian
 
-DUMP = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/mw-dump-latest-confirmation-latest-version')
-SRC  = Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/outputs/diagnostics/mw_6696_source_presence.tsv')
+DUMP = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/mw-dump-latest-confirmation-latest-version')
+SRC  = Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/outputs/diagnostics/mw_6696_source_presence.tsv')
 
 BLOCK_START = re.compile(r'^(\w+)_METABOLITE_DATA_START')
 BLOCK_END   = re.compile(r'^\w+_METABOLITE_DATA_END')

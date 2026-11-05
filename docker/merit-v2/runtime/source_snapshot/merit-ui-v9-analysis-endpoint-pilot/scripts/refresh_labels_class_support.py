@@ -8,7 +8,7 @@ import collections, datetime, json, sys
 from multiprocessing import Pool
 from pathlib import Path
 HERE = Path(__file__).resolve().parent
-V9 = Path(sys.argv[1]) if len(sys.argv) > 1 else Path('/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot/merit-cache-workbench-full-v9')
+V9 = Path(sys.argv[1]) if len(sys.argv) > 1 else Path('/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/merit-cache-workbench-full-v9')
 WORKERS = int(sys.argv[2]) if len(sys.argv) > 2 else 40
 sys.path.insert(0, str(HERE.parent / 'v8_layout'))
 from merit import labels_v9 as lb

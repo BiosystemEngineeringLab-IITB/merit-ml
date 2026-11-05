@@ -39,7 +39,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-ROOT = Path("/home/shayantan/metabolomics/ML-ready/deploy/merit-v2-docker-2026-11-05/docker/merit-v2/runtime/source_snapshot")
+ROOT = Path("/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot")
 CACHE = ROOT / "mw-dump-latest-18thSep-2026-version"
 OUT = Path(__file__).resolve().parent
 K = ["study_id", "analysis_id"]

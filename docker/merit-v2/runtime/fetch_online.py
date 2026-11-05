@@ -42,10 +42,11 @@ def records(value):
 
 
 class Fetcher:
-    def __init__(self, root):
+    def __init__(self, root, *, allow_partial=False):
         self.root = Path(root).resolve()
         self.root.mkdir(parents=True, exist_ok=True)
         self.entries = []
+        self.allow_partial = allow_partial
 
     def get(self, url, relative, *, payload=None, timeout=300, attempts=5, timeout_attempts=2):
         # Workbench builds some large responses (metabolites, factors) for 90-170 s before the first byte: wait up to
@@ -150,7 +151,8 @@ class Fetcher:
             ])
         with concurrent.futures.ThreadPoolExecutor(max_workers=FETCH_WORKERS) as pool:
             list(pool.map(lambda job: self.get(*job), jobs))
-        self.require_success([job[1] for job in jobs])
+        if not self.allow_partial:
+            self.require_success([job[1] for job in jobs])
         print(json.dumps({'stage': 'fetched', 'study_id': sid, 'analyses': aids}), flush=True)
         return aids
 
@@ -191,9 +193,10 @@ def main():
     ap.add_argument('--studies', nargs='+', default=['ST000001', 'ST000096', 'ST002324', 'ST000788'])
     ap.add_argument('--append', action='store_true', help='Add newly fetched studies to this same live-input run; never read a historical deposit')
     ap.add_argument('--with-panredu', action='store_true', help='Fetch the public Pan-ReDU metadata for each requested study as external supporting evidence')
+    ap.add_argument('--allow-partial', action='store_true', help='Retain failed-request provenance and assess only matrices whose required inputs succeeded')
     ap.add_argument('--shared-reference-inputs',type=Path,help='Reuse only the freshly downloaded chemical reference snapshot of this same online-pull cohort')
     args = ap.parse_args()
-    f = Fetcher(args.run_root / 'inputs')
+    f = Fetcher(args.run_root / 'inputs', allow_partial=args.allow_partial)
     studies = {}
     if args.append:
         if (args.run_root / 'live_registry.json').exists(): studies = json.loads((args.run_root / 'live_registry.json').read_text())
@@ -204,6 +207,9 @@ def main():
     for sid in args.studies:
         if not (len(sid) == 8 and sid.startswith('ST') and sid[2:].isdigit()):
             raise ValueError(sid)
+        from versioned_context import ensure
+        context=ensure(PINNED,sid)
+        (args.run_root/f'{sid}_context_references.json').write_text(json.dumps(context,indent=1))
         studies[sid] = f.study(sid)
         if args.with_panredu and not panredu_pinned(sid):
             from live_references import fetch_panredu
