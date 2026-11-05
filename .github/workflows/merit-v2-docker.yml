@@ -5,6 +5,9 @@ on:
     paths: ['docker/merit-v2/**', '.github/workflows/merit-v2-docker.yml']
     tags: ['v2-live-*']
   workflow_dispatch:
+concurrency:
+  group: merit-v2-docker-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
   packages: write
