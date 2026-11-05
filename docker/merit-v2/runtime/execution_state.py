@@ -80,4 +80,6 @@ def dependency_reason(full,aid,source,stage):
     ep=next(a for a in full['analyses'] if a['analysis_id']==aid)['endpoints'][source]
     if stage=='redundancy' and not ep.get('sections',{}).get('analytical',{}).get('low_information'):
         return 'Low-information features could not be assessed; redundancy needs that check to exclude constant and near-constant features'
+    if stage=='qc_reproducibility' and not ep.get('sections',{}).get('analytical',{}).get('low_information'):
+        return 'QC reproducibility could not be assessed because its required numerical-scale/CV-gate evidence was not computed'
     return None
