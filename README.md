@@ -1,6 +1,6 @@
 # MERIT-ML v2 · live Docker application
 
-**Release: 5 November 2026 — `v2-live-20261105-r3`.** MERIT-ML assesses public Metabolomics Workbench studies in your browser, using your own computer for the calculations. This Docker distribution contains Python, its dependencies, the interface and the metric implementations. Install Docker once; no separate Python installation is needed.
+**Release: 5 November 2026 — `v2-live-20261105-r4`.** MERIT-ML assesses public Metabolomics Workbench studies in your browser, using your own computer for the calculations. This Docker distribution contains Python, its dependencies, the interface and the metric implementations. Install Docker once; no separate Python installation is needed.
 
 Enter a study ID such as `ST000001`. The application retrieves the study's inputs from Workbench and calculates its metrics locally. It queries **`/datatable/`**, mwTab text/JSON and `untarg_data` independently. It does not read the frozen cohort's v8/v9 study results or require the historical deposit. The fixed R1 alert reference, curated control rules and versioned global chemical reference assets are included; these are declared reference inputs, not downloaded study results. Context evidence follows the same versioned reference policy as the browser and 8791: original-cohort reviewed design labels and Pan-ReDU evidence are retrieved on demand from the public reference release and checked against its SHA-256 index. New studies outside that reference use the live programmatic design rules. These contextual reference inputs are identified explicitly; no quantitative study matrix or metric result is bundled.
 
@@ -11,7 +11,7 @@ Enter a study ID such as `ST000001`. The application retrieves the study's input
 With Docker running, use:
 
 ```sh
-docker run -d --name merit-v2 --init -p 127.0.0.1:8791:8791 -v merit-v2-studies:/app/runs ghcr.io/biosystemengineeringlab-iitb/merit-ml:v2-live-20261105-r3
+docker run -d --name merit-v2 --init -p 127.0.0.1:8791:8791 -v merit-v2-studies:/app/runs ghcr.io/biosystemengineeringlab-iitb/merit-ml:v2-live-20261105-r4
 ```
 
 Open **http://localhost:8791**. The [Docker publication workflow](https://github.com/BiosystemEngineeringLab-IITB/merit-ml/actions/workflows/merit-v2-docker.yml) passed; see [release validation](docs/merit-v2-validation.md) for the test evidence. Docker selects the matching Linux image for Intel/AMD or ARM systems. Windows and macOS use Docker's Linux container environment.
@@ -26,7 +26,7 @@ If you have the supplied prebuilt AMD64 image archive, no dependency build is ne
 
 ```sh
 docker load -i merit-v2-docker-2026-11-05-r2-amd64-image.tar.gz
-docker run -d --name merit-v2 --init -p 127.0.0.1:8791:8791 -v merit-v2-studies:/app/runs merit-ml:v2-live-20261105-r3
+docker run -d --name merit-v2 --init -p 127.0.0.1:8791:8791 -v merit-v2-studies:/app/runs merit-ml:v2-live-20261105-r4
 ```
 
 That archive is for Intel/AMD Linux containers, including Docker on Intel/AMD Windows or macOS. The source build selects your platform automatically; the registry workflow builds both AMD64 and ARM64.

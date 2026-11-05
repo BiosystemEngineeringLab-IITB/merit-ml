@@ -19,10 +19,16 @@ def compute(run,study_id,raw_study):
     resolver=oa.load('live_design_resolver',base/'resolve_v11_2026-06-01.py',out)
     extractor=oa.load('live_design_extractor',base/'extract_mwtab_features_2026-06-01.py',out)
     # Preserve the original harvester's expected layout using links to this
-    # job's freshly materialized responses; no historical path is read.
+    # job's freshly materialized responses; no historical path is read. The
+    # browser's Emscripten filesystem does not support directory symlinks, so
+    # expose only the small mwTab JSON file the harvester reads via a copy.
     for a in raw_study['analyses']:
         p=live/study_id/a['analysis_id'];alias=p/'json'
-        if not alias.exists():alias.symlink_to('mwtab',target_is_directory=True)
+        if not alias.is_symlink():
+            alias.mkdir(parents=True,exist_ok=True)
+            source=p/'mwtab'/f"{a['analysis_id']}_mwtab.json"
+            target=alias/source.name
+            if source.is_file() and not target.exists():target.write_bytes(source.read_bytes())
     mw=extractor.harvest_one(live/study_id)
     summary_rows=records(json.loads((live/study_id/'summary.json').read_text()))
     summary=summary_rows[0] if summary_rows else {}

@@ -1,6 +1,6 @@
 {
   "release": "MERIT v2 Docker",
-  "release_version": "v2-live-20261105-r3",
+  "release_version": "v2-live-20261105-r4",
   "release_date": "2026-11-05",
   "source": "8791 live runtime; calculation sources shared with 8782 and browser",
   "study_inputs_included": false,
@@ -177,7 +177,7 @@
     "live_validity.py": "d78a48d64b3855fbe629e9f77b21e73342fe05cef90d57ab266dcfff8e436031",
     "live_catalog.py": "394343383763783429804bdd3970e0e9d2bedd934a42fc28e932b39308e964b3",
     "live_inventory.py": "72b61de1757d4513be9c71d9e78e13c5918c3eb73908eeb0c6862895b5327db2",
-    "live_design_context.py": "81079aba758a3c98b55ccec49e5ff7093a0e783bdd1950dd67bf87bfb20899e2",
+    "live_design_context.py": "854d7b4f1762871882b140377bbaab224e54ebbeee92d3a78def3f6b34a50c69",
     "mwtab_input.py": "09e0b2244010a9da12ba84784b121c735f23ee75ff73523554079dc8830bfa89",
     "live_bulk.py": "9e466cf8466a2a864cc5e2cd15734783398f97c54ee92b753b1fc8b05d9a47dc",
     "live_references.py": "90780622a363e8141c0f42c2f6048d03aff9768114fe11d090340e8991de445d",
@@ -196,8 +196,8 @@
     "native_guard.py": "108e6b9a7a4c96c15f836a1de2b1297d286b90779abb77e02f84466011dff942",
     "metric_worker.py": "93b1ff743c58606ba521ade1c36eb94b99325362975c76c7da7e2bf9a3528b44",
     "matrix_worker.py": "0485f451d60620dbfebbfb1a9b96060368bc68e8dcd35e8bf07e2470b1040073",
-    "matrix_driver.py": "4ecde6b27b50a7db2d717136b113d7fe77b722031c87ec82502ca27259b88866",
-    "v2_server.py": "81be85b50dcf4baeca95c0d4913767a7c9a75dcb52b3423bcacef51fb6d52350",
+    "matrix_driver.py": "3331ee246094595ad2a004a5cc1af96a3196703d45e398f7351319c68b251e3e",
+    "v2_server.py": "3b926bcb9ee71de0503bd63362493842449f43b8fbb6551c56550af565cc72d7",
     "release_safety.py": "5e3ee8b5c579960ed886f30ab60844840d67565a29af124de77b2f1ef961f31b",
     "versioned_context.py": "5145ba72a7c78eb7385f4fcb77db0995d6799ef641a3e8779c3c619f9e485f56",
     "assets/reference/refmet_db.csv": "811a8fa9ed4508970b3dfc236bfdd7ddf1196f1b2fd05f5b87e8475066e37169",
@@ -209,7 +209,7 @@
     "assets/home.html": "5796f70adee1c2453b36b05e24105ce3c5c055c2f79b969abb12ccb04a6b3031"
   },
   "credential_scan": {
-    "files_scanned": 633,
+    "files_scanned": 202,
     "credential_findings": 0,
     "secret_values_logged": false
   }

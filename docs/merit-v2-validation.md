@@ -54,3 +54,22 @@ The native validation passed 20/20 checks, including exact complete endpoint sec
 Browser resource skips receive a conditional notice explaining that unassessed data are not absent and linking to this repository. The browser additionally uses bounded streaming downloads, local checkpoint files, worker recovery, and bounded output writers. These browser constraints are not native scientific gates. All 161 captured canonical UI/metric files remain identical to the 8782 sources after the documented path relocation.
 
 Source/image/deployment candidates are scanned for credential filenames, private-key material, token patterns and known server-secret values; values are never logged. GitHub Actions repeats a credential scan before building. The capture allowlist excludes study runs and credentials. Older deployment artifacts containing authentication material must be treated separately from this clean release; this revision does not claim to revoke an existing SSH key or erase provider-retained historical files.
+# v2-live-20261105-r4 — browser filesystem compatibility
+
+The ST005375 live-browser run exposed a shared `live_context_and_indexes` failure
+because the Emscripten filesystem does not support the directory symlink used
+to expose the freshly fetched mwTab JSON to the design-context harvester. The
+runtime now copies only that analysis's small mwTab JSON file into the expected
+`json/` directory. This changes file staging only; metric calculations and
+reference inputs are unchanged.
+
+Validation evidence:
+
+- Public browser r5: ST005375 completed all 15 assessment steps; four matrices,
+  no matrix memory skips, and `matrix_execution.json` reports no failed checks.
+- Native 8791: health endpoint responds and the served version is
+  `v2-live-20261105-r4`.
+- The release capture was regenerated with 200 allowlisted code/rule/reference
+  files; its credential scan reports no credentials or run data.
+
+The historical r2 validation record above is retained as release history.

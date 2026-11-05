@@ -1,4 +1,4 @@
-# Browser resource handling — v2-live-20261105-r3
+# Browser resource handling — v2-live-20261105-r4
 
 The guard and execution notes apply only to the browser application. They do not impose the browser's memory or file limits on 8782, 8791 or the native Docker application. No metric formula, scientific default, R1 cut-off or canonical 8782 source file was changed.
 
