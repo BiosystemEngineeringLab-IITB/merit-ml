@@ -1,3 +1,11 @@
+## 6 November 2026 — automatic localhost port allocation
+
+The standard Docker run command and Compose configuration now publish `127.0.0.1::8791`. Docker allocates an available local host port atomically; the container continues to listen on 8791. This is a deployment/documentation change only: runtime capture, image `v2-live-20261106-r8`, formulas, UI and existing server installations are unchanged.
+
+With the native service already occupying 8791, the isolated smoke test started both Docker run and Compose containers simultaneously on distinct available localhost ports (32772 and 32773). Both health/version checks passed. Restarting the first container selected port 32774 and passed health again; accordingly the README instructs users to check `docker port` after restart/recreation. The original 8791 service remained available. Only the temporary test containers and their test volumes were removed. Compose configuration parsing passed.
+
+Evidence: `ML-ready/outputs/docker_autoport_20261106/check_autoport.py` and `checks.json`. The source bundle has the distinct `r8-autoport` name so the preceding source archive is preserved. No new registry image is needed for a host-side port mapping.
+
 ## 6 November 2026 — r8 disease metadata and bulk study reports
 
 The maintainer authorized publication of both the disease repair and the previously previewed bulk-report links. The public browser release is `20261106-r14`; the native/Docker release is `v2-live-20261106-r8`.

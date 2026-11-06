@@ -13,27 +13,34 @@ Enter a study ID such as `ST000001`. The application retrieves the study's input
 With Docker running, use:
 
 ```sh
-docker run -d --name merit-v2 --init -p 127.0.0.1:8791:8791 -v merit-v2-studies:/app/runs ghcr.io/biosystemengineeringlab-iitb/merit-ml:v2-live-20261106-r8
+docker run -d --name merit-v2 --init -p 127.0.0.1::8791 -v merit-v2-studies:/app/runs ghcr.io/biosystemengineeringlab-iitb/merit-ml:v2-live-20261106-r8
+docker port merit-v2 8791/tcp
 ```
 
-Open **http://localhost:8791**. The [Docker publication workflow](https://github.com/BiosystemEngineeringLab-IITB/merit-ml/actions/workflows/merit-v2-docker.yml) passed; see [release validation](docs/merit-v2-validation.md) for the test evidence. Docker selects the matching Linux image for Intel/AMD or ARM systems. Windows and macOS use Docker's Linux container environment.
+Docker selects an available **localhost port**, so an application already using 8791 will not block startup. The second command prints the assigned address, for example `127.0.0.1:49153`; open **http://127.0.0.1:49153** using the port actually printed. Port 8791 remains internal to the container. Check the address again after restarting or recreating the container, because Docker may assign a different port. The [Docker publication workflow](https://github.com/BiosystemEngineeringLab-IITB/merit-ml/actions/workflows/merit-v2-docker.yml) passed; see [release validation](docs/merit-v2-validation.md) for the test evidence. Docker selects the matching Linux image for Intel/AMD or ARM systems. Windows and macOS use Docker's Linux container environment.
 
 To build from source instead, download this repository or the source bundle, open a terminal in its top-level folder and run:
 
 ```sh
 docker compose -f compose.merit-v2.yml up -d --build
+docker compose -f compose.merit-v2.yml port merit 8791
 ```
 
-If you have the supplied prebuilt AMD64 image archive, no dependency build is needed:
+The Compose command also chooses an available localhost port; open the address printed by its second command with `http://` in front.
+
+If you need a fixed port instead, replace `-p 127.0.0.1::8791` with, for example, `-p 127.0.0.1:8800:8791`.
+
+If you have an AMD64 image archive exported from this release, no dependency build is needed:
 
 ```sh
-docker load -i merit-v2-docker-2026-11-05-r2-amd64-image.tar.gz
-docker run -d --name merit-v2 --init -p 127.0.0.1:8791:8791 -v merit-v2-studies:/app/runs merit-ml:v2-live-20261106-r8
+docker load -i merit-v2-image.tar.gz
+docker run -d --name merit-v2 --init -p 127.0.0.1::8791 -v merit-v2-studies:/app/runs merit-ml:v2-live-20261106-r8
+docker port merit-v2 8791/tcp
 ```
 
 That archive is for Intel/AMD Linux containers, including Docker on Intel/AMD Windows or macOS. The source build selects your platform automatically; the registry workflow builds both AMD64 and ARM64.
 
-Stop with `docker compose -f compose.merit-v2.yml down`. The named volume retains your downloaded inputs and calculations. `docker compose ... down -v` also deletes that volume. Completed web jobs normally expire after 24 hours; add `--retain` to the container command if you need them kept. Export reports you want to preserve.
+For the `docker run` installation, stop with `docker stop merit-v2` and restart with `docker start merit-v2`. For Compose, stop with `docker compose -f compose.merit-v2.yml down`. The named volume retains your downloaded inputs and calculations. `docker compose ... down -v` also deletes that volume. Completed web jobs normally expire after 24 hours; add `--retain` to the container command if you need them kept. Export reports you want to preserve.
 
 ## What the profile means
 

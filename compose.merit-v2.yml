@@ -6,7 +6,8 @@ services:
       context: .
       dockerfile: docker/merit-v2/Dockerfile
     ports:
-      - "127.0.0.1:8791:8791"
+      # Docker atomically allocates an available localhost port.
+      - "127.0.0.1::8791"
     volumes:
       - merit-v2-studies:/app/runs
     environment:
