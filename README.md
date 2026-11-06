@@ -17,6 +17,15 @@ docker run -d --name merit-v2 --init -p 127.0.0.1::8791 -v merit-v2-studies:/app
 docker port merit-v2 8791/tcp
 ```
 
+**Linux permissions:** If Docker reports “permission denied”, add `sudo` before each Docker command:
+
+```sh
+sudo docker run -d --name merit-v2 --init -p 127.0.0.1::8791 -v merit-v2-studies:/app/runs ghcr.io/biosystemengineeringlab-iitb/merit-ml:v2-live-20261106-r8
+sudo docker port merit-v2 8791/tcp
+```
+
+Use the same prefix for `sudo docker compose`, `sudo docker stop` and `sudo docker start`. Windows and macOS Docker Desktop users can use the commands without `sudo`.
+
 Docker selects an available **localhost port**, so an application already using 8791 will not block startup. The second command prints the assigned address, for example `127.0.0.1:49153`; open **http://127.0.0.1:49153** using the port actually printed. Port 8791 remains internal to the container. Check the address again after restarting or recreating the container, because Docker may assign a different port. The [Docker publication workflow](https://github.com/BiosystemEngineeringLab-IITB/merit-ml/actions/workflows/merit-v2-docker.yml) passed; see [release validation](docs/merit-v2-validation.md) for the test evidence. Docker selects the matching Linux image for Intel/AMD or ARM systems. Windows and macOS use Docker's Linux container environment.
 
 To build from source instead, download this repository or the source bundle, open a terminal in its top-level folder and run:
@@ -46,7 +55,7 @@ For the `docker run` installation, stop with `docker stop merit-v2` and restart 
 
 The application reports matrix properties, analytical alerts against fixed R1 and sample-count support under your selected classes and folds. It does not combine them into a universal readiness score or certify predictive performance. Each analysis × data endpoint is assessed separately. You can change classes, folds, allowed check settings, sample eligibility, labels and subject information in the interface.
 
-This native v2 build retains the arrays needed for exact recalculation when resources permit, rather than imposing the browser version's matrix-size ceiling. Storage and processing time therefore grow with the study. A fresh fetch can differ from the manuscript's frozen deposit if Workbench has changed its inputs. Context evidence records whether it comes from the versioned reference or fresh programmatic rules; those two provenance types are not interchangeable.
+This native v2 build retains the arrays needed for exact recalculation when resources permit, rather than imposing the browser version's matrix-size ceiling. Storage and processing time therefore grow with the study.
 
 ## A large matrix must not discard the other results
 
