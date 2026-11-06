@@ -706,6 +706,11 @@ def _logo_asset_url(dark: bool = False) -> str:
     return ("/assets/merit-logo-dark.svg" if dark else "/assets/merit-logo.svg") if _logo_asset_path(dark) else ""
 
 
+def _report_dark_style() -> str:
+    from .report_dark_theme import style
+    return style()
+
+
 def _logo_theme_css() -> str:
     return """<style id="merit-logo-theme-css">
 .merit-logo-light{display:block}.merit-logo-dark{display:none}
@@ -11223,6 +11228,7 @@ def _page(state: dict[str, Any] | None = None, error: str | None = None, default
 <meta name='viewport' content='width=device-width,initial-scale=1'>
 <title>MERIT-ML</title>
 {_logo_theme_css()}
+{_report_dark_style()}
 {_merit_analytics_head_script()}
 <script>
 (function(){{

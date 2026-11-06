@@ -1,6 +1,6 @@
 {
   "release": "MERIT v2 Docker",
-  "release_version": "v2-live-20261106-r9",
+  "release_version": "v2-live-20261106-r10",
   "release_date": "2026-11-06",
   "source": "8791 live runtime; calculation sources shared with 8782 and browser",
   "study_inputs_included": false,
@@ -133,13 +133,14 @@
     "source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/recommendation_v9.py": "fc82310ba5f92dfc3b1e47077cd9f853bb967ff95b248dd383388d96caa808aa",
     "source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/remediation.py": "0b461f32e65682b210fe081536d09002a2e09ab7c11b68c57de3677c34464a6e",
     "source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/remote.py": "6b83a3f191e96a0ea922fcb4a361f61618289ae5ca63de81c6f8c431672542db",
+    "source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/report_dark_theme.py": "c1ec440b6dfd71a429e83dba74bbd0cfaf6840144372513e9bc2f9ee2121de29",
     "source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/reporting.py": "0d7853dd491e191b07068ebf62b369ba9044e9771837e28a4b81f2172fecfb19",
     "source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/sample_annotations_v9.py": "99039aa0db1bc2dac818f2bd6901750919e1a9416a2da4913388ec59dac5d75d",
     "source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/scale_v9.py": "cbebaee68e6cfd20f72e2f025eb7610ec06bd94f648ae66885c013971c522fe9",
     "source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/separability_v9.py": "cf3e3e2f041f519d85b1436facc9de1d5e86c5d193024a4758aa1fd6beb9bca6",
     "source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/serialization.py": "f315a28511c5019bf89fcd33dadb26bbceb354f51826ffdb4b2a2e61ff365086",
     "source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/structural_v9.py": "5639dafda865a17a462efea7e2b0ef1cdcc413834a7a73e974456922d751eefd",
-    "source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/ui.py": "87e2957617bae2959f4740b5d311af62ca399fb251760ec372681ed325938377",
+    "source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/ui.py": "a10f9a49e64ef603161f551955c48e05ba76c8ffaec052582b320d720d6017e5",
     "source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/utils.py": "6aadb6ac6d713213f1774ca12ffa9386295d21b979cb69a62db5520b2be1f4e6",
     "source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/v9_matrix_export.py": "d0aa011d09575983b560c6158f1ebcb743cda88165057faa6eee80f9aaf7e0d1",
     "source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/version.py": "91447944015cec709e8aa7655f7e9d64e1e4508e7023a57fe3746911c0fc6fed",
@@ -201,7 +202,7 @@
     "metric_worker.py": "93b1ff743c58606ba521ade1c36eb94b99325362975c76c7da7e2bf9a3528b44",
     "matrix_worker.py": "0485f451d60620dbfebbfb1a9b96060368bc68e8dcd35e8bf07e2470b1040073",
     "matrix_driver.py": "e709c2f076328c3ecfd85df97b2b7469e91aa9b6e8b613b76526cec744d75502",
-    "v2_server.py": "ce305ec842f3c8a201597213331f20957db89ed5fa49c654c4f34ae9ba1d19c2",
+    "v2_server.py": "9d32719c5bfe4d42382862a6cefc705f7cd2fcb1c6a5727955228a5682d9a6ae",
     "release_safety.py": "a6b17deb119f031705c5a4874e58aa90374fb992eac4b1d6a5cb71f0404de0c5",
     "versioned_context.py": "5145ba72a7c78eb7385f4fcb77db0995d6799ef641a3e8779c3c619f9e485f56",
     "assets/reference/refmet_db.csv": "811a8fa9ed4508970b3dfc236bfdd7ddf1196f1b2fd05f5b87e8475066e37169",
@@ -214,7 +215,7 @@
     "assets/landing.html": "ef2f689533df16844140a2bfd1cf281347970365f6c0c631c8c270d830193147"
   },
   "credential_scan": {
-    "files_scanned": 208,
+    "files_scanned": 209,
     "credential_findings": 0,
     "secret_values_logged": false
   }

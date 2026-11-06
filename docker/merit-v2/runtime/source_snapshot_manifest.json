@@ -885,6 +885,13 @@
       "absolute_path_relocations": 0
     },
     {
+      "source": "/home/shayantan/metabolomics/ML-ready/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/report_dark_theme.py",
+      "bundled": "source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/report_dark_theme.py",
+      "source_sha256": "c1ec440b6dfd71a429e83dba74bbd0cfaf6840144372513e9bc2f9ee2121de29",
+      "bundled_sha256": "c1ec440b6dfd71a429e83dba74bbd0cfaf6840144372513e9bc2f9ee2121de29",
+      "absolute_path_relocations": 0
+    },
+    {
       "source": "/home/shayantan/metabolomics/ML-ready/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/reporting.py",
       "bundled": "source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/reporting.py",
       "source_sha256": "0d7853dd491e191b07068ebf62b369ba9044e9771837e28a4b81f2172fecfb19",
@@ -929,8 +936,8 @@
     {
       "source": "/home/shayantan/metabolomics/ML-ready/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/ui.py",
       "bundled": "source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/ui.py",
-      "source_sha256": "d41639354090c6c239eeb9dce08f3b898ed47738bca40aca1ad02a1a35d182b9",
-      "bundled_sha256": "87e2957617bae2959f4740b5d311af62ca399fb251760ec372681ed325938377",
+      "source_sha256": "30275ae4e6043c88549ba75a411070cb61a95208797b260c202f3d5779b13170",
+      "bundled_sha256": "a10f9a49e64ef603161f551955c48e05ba76c8ffaec052582b320d720d6017e5",
       "absolute_path_relocations": 3
     },
     {

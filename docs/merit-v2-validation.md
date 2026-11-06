@@ -1,3 +1,11 @@
+## 6 November 2026 — r10 dark-report contrast repair
+
+Added one shared report stylesheet scoped entirely to `html[data-theme="dark"]` and included it in the existing renderer. No calculation, label definition, threshold, sample rule, light-mode rule or layout setting changed. Inline foreground colors and pale backgrounds are paired with dark surfaces; red/amber/green hue distinctions are retained. Readiness cards, sticky analysis labels, check markers, tabs, buttons, help popups and consent text are covered. Score heatmap fills remain unchanged; their original white/dark numeric-text choices are retained.
+
+Chrome checks covered 63 report-tab views across ST000096, ST003741 and ST000009, including datatable, mwTab and untarg_data and expanded Details. The simple composited-color audit recorded 26,703 text comparisons with no remaining failures at 4.5:1 for ordinary text or 3:1 for large text. These are targeted rendered checks, not universal accessibility certification. Enabling/disabling this stylesheet in light mode left all measured colors and geometry exactly identical. Before/after scientific JSON exports also matched exactly on 8782 and 8791.
+
+The public landing markup, scripts, worker, download/checkpoint code and SVG logos are byte-identical to r17; only the report-code archive/configuration changes. Docker landing/logo/report smoke passes with the new stylesheet present. Browser release `20261106-r18`; native/Docker `v2-live-20261106-r10`. Evidence and final public checks: `ML-ready/outputs/report_dark_mode_20261106/`. Existing automatic ports, sudo instructions and resource safeguards are unchanged.
+
 ## 6 November 2026 — r9 supplied SVG branding and theme synchronization
 
 The supplied `merit-logo.svg` replaces the old PNG branding on the landing page, report corner and tools sidebar. The original remains unchanged on the source server; derivative provenance is recorded in `docker/merit-v2/logo_provenance.json`. The full-page pale raster background and export-signature metadata were removed from the derivatives. A crop with padding preserves the artwork. The dark variant lightens lettering and raster brightness for contrast; both variants have transparent backgrounds. Landing text remains “Evaluating ML readiness in tabular metabolomics datasets from Metabolomics Workbench”.
