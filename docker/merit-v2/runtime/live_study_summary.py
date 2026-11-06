@@ -26,6 +26,8 @@ def compute(run,study_id,raw_study):
         kind='untarg' if src=='untarg_data' else src
         if not any(r['selected_kind']==kind for r in resolution):continue
         canonical=connector.normalize_bundle({**bundle,'_source_filter':{kind}})
+        from live_disease import read as disease_of
+        canonical.study.disease=disease_of(live,study_id)
         canonical.feature_matrices=[m for m in canonical.feature_matrices if _has_numeric_value(m)]
         if src=='datatable':
             alignment=_tier1_alignment_for_bundle(bundle,canonical)

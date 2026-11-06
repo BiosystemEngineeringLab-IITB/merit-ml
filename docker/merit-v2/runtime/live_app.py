@@ -41,7 +41,7 @@ def atomic(path,value):
 def code_version():
     """Digest of everything that defines a calculation besides the study inputs: code snapshot, service code, references, R1."""
     h=hashlib.sha256()
-    calculation=('fetch_online.py','online_assess.py','fast_correlation.py','online_evidence.py','mwtab_input.py','live_references.py','live_validity.py',
+    calculation=('live_disease.py','fetch_online.py','online_assess.py','fast_correlation.py','online_evidence.py','mwtab_input.py','live_references.py','live_validity.py',
                  'live_indexes.py','live_design_context.py','live_study_summary.py','execution_state.py','versioned_context.py')
     for p in [HOME/'source_snapshot_manifest.json',HOME/'assets/reference/reference_policy.json',HOME/'assets/reference/study_reference_manifest.json',HOME/'assets/alert_reference_R1.json',
               *(HOME/n for n in calculation)]:
@@ -92,6 +92,9 @@ class Jobs:
         try:self.results={k:v for k,v in json.loads(self.result_index_path.read_text()).items() if v.get('code')==self.code}
         except (OSError,ValueError):self.results={}
         self.bulk_sessions={}
+        self.bulk_report_views_path=WEB/'bulk_report_views.json'
+        try:self.bulk_report_views=json.loads(self.bulk_report_views_path.read_text())
+        except (OSError,ValueError):self.bulk_report_views={}
         self.prepared_studies={}
         for run_id in prepared_cohorts or []:
             from online_pull_common import context
@@ -408,6 +411,33 @@ def create_app(jobs,catalog=None,inventory=None):
         for item in session['studies']:
             sid=item['study_id'];job=jobs.start(sid,job_id=mapping.get(sid));mapping[sid]=job['id'];result.append((sid,job))
         return result
+    def bulk_report_link(job,sid,form):
+        # Store only view settings and the completed job reference; reports stay interactive.
+        key=hashlib.sha256(json.dumps({'study_id':sid,'job_id':job['id'],'form':form},sort_keys=True).encode()).hexdigest()
+        with jobs.lock:
+            token=next((t for t,v in jobs.bulk_report_views.items() if v.get('key')==key),None)
+            if token is None:
+                token=uuid.uuid4().hex
+                jobs.bulk_report_views[token]={'key':key,'study_id':sid,'job':dict(job),'form':dict(form),'created':time.time()}
+                atomic(jobs.bulk_report_views_path,jobs.bulk_report_views)
+        return {'study_id':sid,'url':'/bulk/report/'+token,'job_id':job['id']}
+    @app.get('/bulk/report/<token>')
+    def bulk_report(token):
+        from flask import abort
+        if not re.fullmatch(r'[a-f0-9]{32}',token):abort(404)
+        with jobs.lock:view=jobs.bulk_report_views.get(token)
+        if not view:abort(404)
+        sid=gate(view['study_id']);saved=dict(view['job'])
+        run=Path(saved['run']).resolve()
+        if (not run.is_relative_to(HOME/'runs') or saved.get('state')!='complete'
+                or sid not in saved.get('studies',[])):
+            abort(404)
+        if not (run/'assessment/json'/f'{sid.lower()}_v9.json').is_file():
+            return Response('This retained assessment has expired. Return to MERIT-ML and assess the study again.',status=410,mimetype='text/plain')
+        with jobs.lock:jobs.jobs.setdefault(saved['id'],saved)
+        job=jobs.explicit(sid,saved['id'])
+        form={**view.get('form',{}),'study_id':sid,'live_job_id':job['id'],'live_origin_study_id':sid}
+        return rendered(job,sid,form=form)
     def bulk_wait(session,pending):
         if request.accept_mimetypes.best=='application/json':return jsonify(ok=False,pending=pending,live_session_id=session['live_session_id']),202
         urls=json.dumps(['/api/jobs/'+j['id'] for j in pending])
@@ -526,7 +556,7 @@ document.getElementById('status').textContent=all.filter(j=>j.state==='complete'
             if job['state']=='failed':raise RuntimeError(job.get('error') or 'Assessment failed')
             if job['state']!='complete':pending.append(jobs.status(job))
         if pending:return jsonify(ok=False,pending=pending,live_session_id=session['live_session_id']),202
-        summaries=[];metrics=[];settings={}
+        summaries=[];metrics=[];settings={};reports=[]
         for item in session['studies']:
             sid=item['study_id'];form=dict(item.get('scoring_params') or {})
             form['matrix_overrides']=json.dumps(item.get('matrix_overrides') or {})
@@ -535,7 +565,8 @@ document.getElementById('status').textContent=all.filter(j=>j.state==='complete'
             result=jobs.render(jobs.explicit(sid,jobs.bulk_sessions[session['live_session_id']][sid]),sid,'bulk-records',form)
             value=json.loads(base64.b64decode(result['data_b64']))
             summaries.extend(value['summary_rows']);metrics.extend(value['metric_rows']);settings[sid]=value['settings']
-        return jsonify(ok=True,summary_rows=summaries,metric_rows=metrics,settings=settings,n_used=len(session['studies']),errors=[],live_session_id=session['live_session_id'])
+            reports.append(bulk_report_link(jobs.explicit(sid,jobs.bulk_sessions[session['live_session_id']][sid]),sid,form))
+        return jsonify(ok=True,summary_rows=summaries,metric_rows=metrics,settings=settings,reports=reports,n_used=len(session['studies']),errors=[],live_session_id=session['live_session_id'])
     @app.post('/bulk/download-data')
     def bulk_data():
         session=session_data();pending=[]

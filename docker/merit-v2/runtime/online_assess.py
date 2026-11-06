@@ -567,7 +567,8 @@ def metadata(sid, live, out, stage):
     aidpaths = {k: p for k, p in aidpaths.items() if p.is_file()}
     factors = json.loads((live / sid / 'factors.json').read_text())
     metabolites = json.loads((live / sid / 'metabolites.json').read_text())
-    payload = conn._build_payload_from_latest_dump(sid, aidpaths, {}, analysis_ids=[a['analysis_id'] for a in v['analyses']], factors_payload=factors,
+    from live_disease import read as disease_of
+    payload = conn._build_payload_from_latest_dump(sid, aidpaths, {}, disease_payload={'Disease':disease_of(live,sid)}, analysis_ids=[a['analysis_id'] for a in v['analyses']], factors_payload=factors,
                                                  metabolites_payload=conn._as_rows(metabolites))
     cp = live / sid / '__merit_combined_online.json'; dump(cp, payload)
     canonical = conn.normalize_bundle({'json_path': str(cp), 'file_manifest': [str(cp)], 'source_root': str(live),

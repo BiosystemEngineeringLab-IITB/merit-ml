@@ -1,7 +1,7 @@
 # MERIT v2 native live Docker distribution, 2026-11-05.
 FROM python:3.10.12-slim-bullseye@sha256:9e114b417be57d1c2b5ebb9770e415a9356f923c54d24827000378f625148363
 LABEL org.opencontainers.image.title="MERIT-ML v2 live" \
-      org.opencontainers.image.version="v2-live-20261105-r7" \
+      org.opencontainers.image.version="v2-live-20261106-r8" \
       org.opencontainers.image.source="https://github.com/BiosystemEngineeringLab-IITB/merit-ml" \
       org.opencontainers.image.description="Native live Workbench assessment; per-matrix resource isolation; no cohort result cache"
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 \

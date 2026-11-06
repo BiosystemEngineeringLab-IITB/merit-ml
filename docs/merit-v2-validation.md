@@ -1,3 +1,14 @@
+## 6 November 2026 — r8 disease metadata and bulk study reports
+
+The maintainer authorized publication of both the disease repair and the previously previewed bulk-report links. The public browser release is `20261106-r14`; the native/Docker release is `v2-live-20261106-r8`.
+
+- The official ST000010 disease endpoint declares `Cancer`. A blank retained per-source summary had overwritten the correctly parsed top-level declaration; the study index also ignored the flat response's capitalized `Disease` key. A shared parser now feeds the combined input, source summaries, index and render path. Retained summaries use the deposited input at render time. Disease is never inferred from class labels or the study title.
+- Eleven parser cases and a before/after comparison on ST000010 passed: scientific UI exports are identical, and all three available source headers now show Cancer. A full raw-response replay also reproduced every endpoint's metric sections and roster. Its study-level evidence differs only in rebuilt timestamps and provenance paths. All source summaries and the study index retain Cancer. Frozen 8782 already showed the correct declaration; its scientific cache was not modified.
+- Bulk completion lists one underlined new-tab interactive report link per study. Original fold/class/sample settings and the completed job are retained. The link metadata survives process restart while underlying run files remain; an expired run is reported explicitly. No new fetch is made just to open the retained report. Native two-study browser checks verified the actual new-tab click, k=3 restoration and k=10 recalculation, and link reopening after restart. Browser bulk remains disabled in favor of the full application.
+- The Docker capture contains 205 code/rule/global-reference files. Source packaging uses an explicit allowlist and credential scanning; no study inputs, computed study results or server credentials are included. Fixed R1 and reference URLs are unchanged. The release does not change a scientific score, threshold or sample-eligibility rule.
+
+Development evidence: `ML-ready/outputs/disease_metadata_fix_20261106/` and `ML-ready/outputs/bulk_interactive_reports_20261106/`. The first folder distinguishes raw-response fixture replay from the additional real public-browser fetch.
+
 # MERIT v2 live Docker validation — 5 November 2026
 
 This is the native Docker release at `deploy/merit-v2-docker-2026-11-05`, separate from both running development services. No 8782/8791 code, historical cache or frozen study dump was changed.

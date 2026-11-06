@@ -117,10 +117,8 @@ def state_for(sid,live,out):
     if combined.exists():
         c=json.loads(combined.read_text())
         summary['description']=c.get('project_summary') or c.get('collection_summary') or ''
-    from merit.connectors.workbench import MetabolomicsWorkbenchConnector
-    try:disease=json.loads((live/sid/'disease.json').read_text())
-    except (OSError,ValueError):disease={}
-    summary['disease']=MetabolomicsWorkbenchConnector._extract_disease_name(disease)
+    from live_disease import read as disease_of
+    summary['disease']=disease_of(live,sid)
     summary['has_disease_endpoint']=bool(summary['disease'])
     summary['submission_date']=meta.get('submission_date','');summary['release_date']=meta.get('release_date','')
     summary['analysis_type_label']=meta.get('analysis_type','')
@@ -159,7 +157,9 @@ def state_for(sid,live,out):
         sm.update(n_samples=len(measured),n_biological_samples=len(seen),n_labeled_samples=sum(counts.values()),
                   n_classes=len(counts),class_counts=dict(counts),n_feature_matrices=len(per),
                   n_features=sum(a['n_features'] for a in per),per_analysis=per)
-        if src in source_summaries:sm=source_summaries[src]
+        if src in source_summaries:sm=copy.deepcopy(source_summaries[src])
+        # A retained summary may predate the disease-field repair. Deposited input wins.
+        sm['disease']=summary['disease'];sm['has_disease_endpoint']=summary['has_disease_endpoint']
         sr=copy.deepcopy(report);sr.ingestion_summary=sm
         source_assessments[src]={'_report':sr,'readiness_score':shell,'source':src,
                                 'source_tier':'tier2' if src=='untarg_data' else 'tier1','ingestion_summary':sm}

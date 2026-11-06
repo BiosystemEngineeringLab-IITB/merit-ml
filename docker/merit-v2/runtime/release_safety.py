@@ -12,7 +12,7 @@ TOKEN_VALUE=re.compile(rb'\b(?:gh[pousr]_[A-Za-z0-9]{25,}|github_pat_[A-Za-z0-9_
 SENSITIVE_NAME=re.compile(r'(?:^|[_-])(?:credentials?|secrets?|tokens?|passwords?)(?:[._-]|$)',re.I)
 ASSIGNMENT=re.compile(rb'(?im)^\s*(?:export\s+)?(?:AWS_SECRET_ACCESS_KEY|AWS_ACCESS_KEY_ID|CLOUDFLARE_API_TOKEN|VERCEL_TOKEN|GITHUB_PAT|DOCKERHUB_TOKEN)\s*=\s*[\"\']?([A-Za-z0-9_./+=-]{20,})[\"\']?\s*$')
 BAD_NAMES={'yes','yes.pub','id_rsa','id_ed25519','id_ecdsa','authorized_keys','known_hosts','auth.json','credentials.env','config.env','cloudfare','cloudflare'}
-RUNTIME_FILES=('bulk_entry.py','online_assess.py','fetch_online.py','fast_correlation.py','live_app.py','live_render.py',
+RUNTIME_FILES=('live_disease.py','bulk_entry.py','online_assess.py','fetch_online.py','fast_correlation.py','live_app.py','live_render.py',
     'live_indexes.py','live_validity.py','live_catalog.py','live_inventory.py','live_design_context.py','mwtab_input.py',
     'live_bulk.py','live_references.py','online_evidence.py','live_study_summary.py','live_progress.py',
     'online_pull_common.py','online_pull_dashboard.py','online_pull_capture.py','online_pull_cohort.py','online_pull_compare.py',

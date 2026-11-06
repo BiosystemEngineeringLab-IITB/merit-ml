@@ -51,10 +51,8 @@ def build(run):
              'disease':'','score':None,'band':'','analysis_ids':aids,
              'mass_rt_like_metadata_present':any(x and x>0 for x in flags),
              'mass_rt_like_metadata_score':max((x for x in flags if x is not None),default=None)}
-        try:
-            disease=records(json.loads((live/sid/'disease.json').read_text()))
-            row['disease']='; '.join(sorted({str(x.get('disease') or '') for x in disease}-{''}))
-        except (OSError,ValueError):pass
+        from live_disease import read as disease_of
+        row['disease']=disease_of(live,sid)
         rows.append(row)
         doi=next(iter(values('PROJECT','DOI')),'')
         doi=re.sub(r'^https?://(?:dx\.)?doi\.org/','',doi,flags=re.I)
