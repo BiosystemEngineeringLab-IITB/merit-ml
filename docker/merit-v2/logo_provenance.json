@@ -1,0 +1,19 @@
+{
+  "source": "/home/shayantan/metabolomics/ML-ready/merit-logo.svg",
+  "sha256": "a3e258924048b3c04326fb95f1cea7a8eb34cc03713fd5f5ca4796edfa068a1c",
+  "source_unchanged": true,
+  "background_removed": "first root graphics group containing the full-page pale raster background",
+  "metadata_removed": "export signatures are not retained on modified derivatives",
+  "viewBox": "117 342 1326 709",
+  "theme_rule": "Existing data-theme selector switches transparent light/dark SVG variants",
+  "dark_vector_colors": {
+    "#043f54": "#d4edf6",
+    "#108d73": "#5fd2b5"
+  },
+  "dark_raster_brightness": 1.45,
+  "ui_assets": {
+    "merit-logo.svg": "7552dbb9dffcbbc8cde11cefd06127e2cb098d017f64eb52a57d909084847cdf",
+    "merit-logo-dark.svg": "2d4bd865dfd5c93bcb954dd8a181f579d53e2c51d8a47ebf1a7e7e21aa4439a7"
+  },
+  "original_preserved": true
+}

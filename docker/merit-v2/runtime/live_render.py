@@ -242,7 +242,7 @@ if(window.__MERIT_STATE_JSON)window.__MERIT_STATE_JSON.online_assessment={job_id
             result=result.replace('</body>',script+'</body>')
         if '</head>' in result and 'merit-theme-css' not in result:
             result=result.replace('</head>',_THEME_CSS+'</head>',1)
-        if '</body>' in result and 'merit-theme-toggle' not in result:
+        if '</body>' in result and 'id="merit-theme-toggle"' not in result and "id='merit-theme-toggle'" not in result:
             result=result.replace('</body>',_THEME_HTML+'</body>',1)
         from live_progress import enhance_page
         result=enhance_page(result,sid)

@@ -677,10 +677,12 @@ document.getElementById('status').textContent=all.filter(j=>j.state==='complete'
         if not job:return jsonify(error='Assess this study first'),404
         return rendered(job,sid,'acquisition')
     @app.get('/assets/logo.png')
+    @app.get('/assets/merit-logo.svg')
+    @app.get('/assets/merit-logo-dark.svg')
     def logo():
-        candidates=[HOME/'source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/static/merit-logo-sidebar.png',HOME/'source_snapshot/Logo.png']
-        p=next((p for p in candidates if p.exists()),None)
-        return Response(p.read_bytes(),mimetype='image/png') if p else ('',404)
+        name='merit-logo-dark.svg' if request.path.endswith('merit-logo-dark.svg') else 'merit-logo.svg'
+        p=HOME/'source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/static'/name
+        return Response(p.read_bytes(),mimetype='image/svg+xml') if p.is_file() else ('',404)
     @app.get('/study-browser-data')
     def browser():
         from live_catalog import Catalog,payload

@@ -161,8 +161,10 @@ def study_browser_data() -> Response:
 
 
 @app.get("/assets/logo.png")
+@app.get("/assets/merit-logo.svg")
+@app.get("/assets/merit-logo-dark.svg")
 def logo_asset() -> Response:
-    asset = _logo_asset_bytes()
+    asset = _logo_asset_bytes(request.path.endswith("merit-logo-dark.svg"))
     if asset is None:
         return Response("Logo not found.", status=404, mimetype="text/plain")
     payload, mime = asset

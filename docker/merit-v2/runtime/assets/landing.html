@@ -32,16 +32,24 @@ body{min-height:100vh;display:flex;flex-direction:column}a{color:var(--link);tex
 
 .bulk-entry{max-width:650px;margin:28px auto;text-align:left;padding:18px;border:1px solid var(--line);border-radius:12px}.bulk-entry h2{font-size:15px;margin:0 0 8px}.bulk-entry p,.bulk-entry label{font-size:12px;color:var(--muted)}.bulk-entry fieldset{border:0;padding:0;margin:0;min-width:0}.bulk-entry textarea{display:block;width:100%;resize:vertical;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;margin:6px 0 10px}.bulk-actions{display:flex;gap:12px;align-items:center;font-size:12px}.bulk-result{padding:6px 8px;margin:5px 0;border-radius:5px;font-size:12px}.bulk-available{color:#147252;background:#e9f7ef}.bulk-invalid,.bulk-unavailable{color:#b42318;background:#fff0ee}.bulk-embargoed{color:#8a5700;background:#fff3d1}.bulk-unknown{color:#51656a;background:#edf0f2}.bulk-browser-message{display:none}.browser-mode #bulk-fields{filter:blur(2px);opacity:.5;pointer-events:none;user-select:none}.browser-mode .bulk-browser-message{display:block}.assessment-active .latest,.assessment-active .bulk-entry,.assessment-active .notice,.assessment-active .hero-mark,.assessment-active .hero-title,.assessment-active .tagline{display:none}.assessment-active .page{margin-top:24px}.report-ready .bulk-entry{display:none}.report-status{position:fixed;top:62px;left:50%;transform:translateX(-50%);z-index:1000;padding:8px 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface);box-shadow:var(--shadow);font-size:12px;color:var(--accent);max-width:240px}.report-status[hidden]{display:none!important}
 .est{width:100%;table-layout:fixed;border-collapse:collapse;font-size:12px}.est td,.est th{text-align:left;padding:6px 4px;overflow-wrap:anywhere;border-bottom:1px solid var(--line)}
+
+.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.brand-mark{width:100px;height:48px}.hero-mark{width:min(420px,85vw);height:auto;margin:0 auto 9px}
+.merit-logo-light{display:block}.merit-logo-dark{display:none}
+html[data-theme="dark"] .merit-logo-light{display:none}
+html[data-theme="dark"] .merit-logo-dark{display:block}
+.assessment-active .hero-mark.merit-logo{display:none}
+@media(max-width:600px){.brand-mark{width:72px;height:38px}}
 </style>
 </head>
 <body class="__MERIT_MODE__-mode" data-mode="__MERIT_MODE__">
 <header class="topbar">
-  <a class="brand" href="./" aria-label="MERIT-ML home"><img class="brand-mark" src="/assets/logo.png" alt="MERIT logo">MERIT-ML</a>
+  <a class="brand" href="./" aria-label="MERIT-ML home"><img class="brand-mark merit-logo merit-logo-light" src="/assets/merit-logo.svg" alt="MERIT-ML logo"><img class="brand-mark merit-logo merit-logo-dark" src="/assets/merit-logo-dark.svg" alt="MERIT-ML logo"></a>
   <nav class="nav" aria-label="Main navigation"><span id="report-status" class="report-status" role="status" aria-live="polite" hidden>Generating report…</span><button id="about-open" type="button">About</button><a href="https://doi.org/10.26434/chemrxiv.15004429/v2" target="_blank" rel="noopener noreferrer">Publication</a><a href="https://github.com/BiosystemEngineeringLab-IITB/merit-ml" target="_blank" rel="noopener noreferrer" aria-label="MERIT-ML on GitHub" title="GitHub"><svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.55.1.76-.24.76-.53v-2.08c-3.1.67-3.76-1.32-3.76-1.32-.5-1.29-1.24-1.63-1.24-1.63-1.02-.7.08-.69.08-.69 1.12.08 1.71 1.16 1.71 1.16 1 .1.74 2.54 3.02 1.94.1-.72.39-1.21.7-1.49-2.48-.28-5.09-1.24-5.09-5.52 0-1.22.44-2.22 1.16-3-.12-.28-.5-1.42.11-2.96 0 0 .95-.3 3.05 1.15a10.6 10.6 0 0 1 5.55 0c2.12-1.45 3.06-1.15 3.06-1.15.61 1.54.23 2.68.11 2.96.72.78 1.15 1.78 1.15 3.01 0 4.29-2.61 5.23-5.1 5.51.4.35.75 1.03.75 2.08V22c0 .29.2.63.77.52A11.1 11.1 0 0 0 12 .9Z"/></svg></a><button class="new-study" type="button" onclick="document.body.classList.remove('report-ready','assessment-active');document.getElementById('report').hidden=true;document.getElementById('status').hidden=true;document.getElementById('sid').focus()">New study</button><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark theme" title="Switch theme"><span id="theme-symbol" aria-hidden="true">◐</span></button></nav>
 </header>
 <main class="page">
-  <img class="hero-mark" src="/assets/logo.png" alt="MERIT logo">
-  <h1 class="hero-title">MERIT-ML</h1>
+  <img class="hero-mark merit-logo merit-logo-light" src="/assets/merit-logo.svg" alt="MERIT-ML logo"><img class="hero-mark merit-logo merit-logo-dark" src="/assets/merit-logo-dark.svg" alt="MERIT-ML logo">
+  <h1 class="hero-title visually-hidden">MERIT-ML</h1>
   <p class="tagline">Evaluating ML readiness in tabular metabolomics datasets from Metabolomics Workbench</p>
   <div class="search-wrap">
     <form class="search-form" id="start" method="get" action="/">
@@ -65,9 +73,10 @@ body{min-height:100vh;display:flex;flex-direction:column}a{color:var(--link);tex
 <script>
 (function(){
   var root=document.documentElement,key='merit-ml-theme';
-  function setTheme(value){root.dataset.theme=value;try{localStorage.setItem(key,value)}catch(e){}var b=document.getElementById('theme-toggle');if(b)b.setAttribute('aria-label',value==='dark'?'Switch to light theme':'Switch to dark theme');var s=document.getElementById('theme-symbol');if(s)s.textContent=value==='dark'?'☼':'◐'}
+  function setTheme(value){root.dataset.theme=value;try{localStorage.setItem(key,value)}catch(e){}var b=document.getElementById('theme-toggle');if(b)b.setAttribute('aria-label',value==='dark'?'Switch to light theme':'Switch to dark theme');var s=document.getElementById('theme-symbol');if(s)s.textContent=value==='dark'?'☼':'◐';var f=document.getElementById('report');try{if(f&&f.contentDocument)f.contentDocument.documentElement.dataset.theme=value}catch(e){}}
   var saved='light';try{saved=localStorage.getItem(key)||'light'}catch(e){}setTheme(saved);
   document.getElementById('theme-toggle').addEventListener('click',function(){setTheme(root.dataset.theme==='dark'?'light':'dark')});
+  var frame=document.getElementById('report');if(frame)frame.addEventListener('load',function(){setTheme(root.dataset.theme||'light')});
   var about=document.getElementById('about');document.getElementById('about-open').addEventListener('click',function(){about.hidden=false;document.getElementById('about-close').focus()});document.getElementById('about-close').addEventListener('click',function(){about.hidden=true});about.addEventListener('click',function(e){if(e.target===about)about.hidden=true});document.addEventListener('keydown',function(e){if(e.key==='Escape')about.hidden=true});
   var mode=document.body.dataset.mode;if(mode==='browser')document.body.classList.add('browser-mode');else if(mode==='native')document.body.classList.add('native-mode');else document.body.classList.add('cache-mode');
   if(mode==='cache')document.getElementById('cache-latest-note').hidden=false;

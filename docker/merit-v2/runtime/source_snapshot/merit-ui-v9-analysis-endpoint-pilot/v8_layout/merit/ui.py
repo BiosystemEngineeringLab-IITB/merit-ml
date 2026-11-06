@@ -691,36 +691,27 @@ def _v2_param_display_text(key: str, value: float) -> str:
     return _v2_fmt_param(value, pct=key.endswith("_pct"))
 
 
-def _logo_asset_path() -> Path | None:
-    """Locate the lightweight sidebar logo without inlining it into HTML."""
-    candidates = [
-        Path(__file__).resolve().parents[1] / "static" / "merit-logo-sidebar.png",
-        Path(__file__).resolve().parents[1] / "Logo.png",
-        Path.cwd() / "Logo.png",
-        Path("/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/Logo.png"),
-    ]
-    for path in candidates:
-        try:
-            if path.exists() and path.is_file() and path.stat().st_size > 0:
-                return path
-        except Exception:
-            continue
-    return None
+def _logo_asset_path(dark: bool = False) -> Path | None:
+    """Locate the cropped, transparent SVG logo for the selected theme."""
+    path = Path(__file__).resolve().parents[1] / "static" / ("merit-logo-dark.svg" if dark else "merit-logo.svg")
+    return path if path.is_file() and path.stat().st_size else None
 
 
-def _logo_asset_bytes() -> tuple[bytes, str] | None:
-    path = _logo_asset_path()
-    if not path:
-        return None
-    try:
-        mime = mimetypes.guess_type(str(path))[0] or "image/png"
-        return path.read_bytes(), mime
-    except Exception:
-        return None
+def _logo_asset_bytes(dark: bool = False) -> tuple[bytes, str] | None:
+    path = _logo_asset_path(dark)
+    return (path.read_bytes(), "image/svg+xml") if path else None
 
 
-def _logo_asset_url() -> str:
-    return "/assets/logo.png" if _logo_asset_path() else ""
+def _logo_asset_url(dark: bool = False) -> str:
+    return ("/assets/merit-logo-dark.svg" if dark else "/assets/merit-logo.svg") if _logo_asset_path(dark) else ""
+
+
+def _logo_theme_css() -> str:
+    return """<style id="merit-logo-theme-css">
+.merit-logo-light{display:block}.merit-logo-dark{display:none}
+html[data-theme="dark"] .merit-logo-light{display:none}
+html[data-theme="dark"] .merit-logo-dark{display:block}
+</style>"""
 
 
 def _json_safe_state_payload(state: dict[str, Any] | None) -> dict[str, Any] | None:
@@ -8859,13 +8850,15 @@ def _result_panel(
     study_label = str(summary.get("study_id", "") or state.get("study_id", "study")).strip() or "study"
     state_filename = f"{study_label.lower()}_merit_assessment.json"
     pdf_header = (
-        f"<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:16px'>"
+        f"<div class='report-heading' style='display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;margin-bottom:16px'>"
         f"<div>"
         f"<h2 style='margin:0;font-family:\"Iowan Old Style\",Georgia,serif;font-size:1.5rem'>"
         f"MERIT-ML Assessment Report — {_e(summary.get('study_id',''))}</h2>"
         "<a href='/' style='display:inline-block;margin:6px 0 12px;font-size:.8rem'>Search another study</a>"
         f"</div>"
-        f"<div style='display:flex;gap:8px;align-items:center'>"
+        f"<div class='report-header-actions' style='display:flex;flex-direction:column;gap:8px;align-items:flex-end'>"
+        f"<img class='report-logo merit-logo merit-logo-light' src='{_e(_logo_asset_url())}' alt='MERIT-ML logo' style='width:160px;max-width:42vw;height:auto'/>"
+        f"<img class='report-logo merit-logo merit-logo-dark' src='{_e(_logo_asset_url(True))}' alt='MERIT-ML logo' style='width:160px;max-width:42vw;height:auto'/>"
         f"<button onclick='downloadRenderedState()' style='border:1px solid rgba(13,110,110,.35);border-radius:12px;"
         f"padding:9px 14px;background:rgba(13,110,110,.08);color:#0d6e6e;font:inherit;font-size:.82rem;"
         f"font-weight:700;cursor:pointer;white-space:nowrap' title='Download the compact public MERIT-ML assessment JSON'>"
@@ -11173,6 +11166,7 @@ def _page(state: dict[str, Any] | None = None, error: str | None = None, default
         for key, value in _V2_DEFAULT_PARAMS.items()
     })
     logo_uri = _logo_asset_url()
+    logo_dark_uri = _logo_asset_url(True)
     has_report = state is not None
     body_class = "report-tools-collapsed" if has_report else "home-mode"
     tool_toggle_html = (
@@ -11213,9 +11207,10 @@ def _page(state: dict[str, Any] | None = None, error: str | None = None, default
     if logo_uri:
         sidebar_brand_html = (
             "<div style='display:flex;align-items:flex-start;justify-content:flex-start;margin:0 0 10px'>"
-            f"<img src='{_e(logo_uri)}' alt='MERIT-ML logo' "
-            "loading='lazy' decoding='async' "
-            "style='width:100%;max-width:285px;height:auto;display:block;object-fit:contain;object-position:left center'/>"
+            f"<img class='merit-logo merit-logo-light' src='{_e(logo_uri)}' alt='MERIT-ML logo' "
+            "decoding='async' style='width:100%;max-width:285px;height:auto;object-fit:contain;object-position:left center'/>"
+            f"<img class='merit-logo merit-logo-dark' src='{_e(logo_dark_uri)}' alt='MERIT-ML logo' "
+            "decoding='async' style='width:100%;max-width:285px;height:auto;object-fit:contain;object-position:left center'/>"
             "</div>"
         )
     else:
@@ -11227,6 +11222,7 @@ def _page(state: dict[str, Any] | None = None, error: str | None = None, default
 <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width,initial-scale=1'>
 <title>MERIT-ML</title>
+{_logo_theme_css()}
 {_merit_analytics_head_script()}
 <script>
 (function(){{
@@ -13229,8 +13225,8 @@ class MetaboUIHandler(BaseHTTPRequestHandler):
 
     def do_GET(self) -> None:  # noqa: N802
         parsed = urlparse(self.path)
-        if parsed.path == "/assets/logo.png":
-            asset = _logo_asset_bytes()
+        if parsed.path in ("/assets/logo.png", "/assets/merit-logo.svg", "/assets/merit-logo-dark.svg"):
+            asset = _logo_asset_bytes(parsed.path.endswith("merit-logo-dark.svg"))
             if asset is None:
                 self._send_html("Logo not found.", HTTPStatus.NOT_FOUND)
                 return

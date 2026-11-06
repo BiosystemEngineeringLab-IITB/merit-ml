@@ -1,3 +1,13 @@
+## 6 November 2026 — r9 supplied SVG branding and theme synchronization
+
+The supplied `merit-logo.svg` replaces the old PNG branding on the landing page, report corner and tools sidebar. The original remains unchanged on the source server; derivative provenance is recorded in `docker/merit-v2/logo_provenance.json`. The full-page pale raster background and export-signature metadata were removed from the derivatives. A crop with padding preserves the artwork. The dark variant lightens lettering and raster brightness for contrast; both variants have transparent backgrounds. Landing text remains “Evaluating ML readiness in tabular metabolomics datasets from Metabolomics Workbench”.
+
+The native report's theme-button presence check previously matched its CSS selector and skipped the button itself; it now checks for an actual element ID. The browser's main theme button now updates the report document as well as the landing page, with the duplicate in-frame control hidden. Scientific formulas, thresholds, R1 and frozen data are unchanged.
+
+Local Chrome checks covered both themes and actual theme buttons for landing/report pages on 8782 and 8791, plus mobile landing overflow. Scientific report exports from ST000001 were exactly identical before/after on both services, and SVG endpoints matched the intended bytes. The new logo is visible in the report heading even with the tools sidebar closed. The native service remains under its existing persistent systemd unit; the cache pilot retained its original launch settings.
+
+Browser release `20261106-r17` and native/Docker `v2-live-20261106-r9` share the same captured scientific UI and SVG assets. The previous automatic localhost-port selection and sudo instructions remain in place. Evidence: `ML-ready/outputs/logo_replacement_20261106/`. Final deployment/image checks and screenshots are retained there; bounded smoke checks do not constitute all-study validation.
+
 ## 6 November 2026 — automatic localhost port allocation
 
 The standard Docker run command and Compose configuration now publish `127.0.0.1::8791`. Docker allocates an available local host port atomically; the container continues to listen on 8791. This is a deployment/documentation change only: runtime capture, image `v2-live-20261106-r8`, formulas, UI and existing server installations are unchanged.
