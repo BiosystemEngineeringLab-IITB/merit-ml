@@ -31,6 +31,7 @@ from merit.manuscript_matrix_readers import sample_rows_of_mwtab, sample_rows_of
 from merit.utils import is_usable_class_label, normalize_label, sample_is_qc_like
 from merit.version import __version__ as MERIT_VERSION
 from merit.visit_stats import get_cloudflare_beacon_token
+from merit.guided_tour import tour_html as _guided_tour_html
 from merit.acquisition_context_ui import context_html as _acquisition_context_html, overview_html as _acquisition_context_overview_html, derived_context_html as _derived_context_html
 
 
@@ -13179,6 +13180,7 @@ window.addEventListener('afterprint', function() {{
 	}})();
 	</script>
 {_merit_analytics_consent_banner()}
+{_guided_tour_html()}
 </body>
 </html>"""
 

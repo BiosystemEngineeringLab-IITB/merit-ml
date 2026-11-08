@@ -1,3 +1,9 @@
+# Walkthrough release — 8 November 2026
+
+`v2-live-20261108-r11` adds presentation-only search and report tours. The default one-time lifecycle, Back/Next/Skip, Escape, opt-out, replay, reload/new-study suppression, mobile/dark rendering, report iframe readiness and storage fallback passed 31 targeted browser checks. A complete ST000096 exported scientific state is identical to the prior 8782 baseline; completing the tour leaves scientific state and form inputs byte-identical. Only the shared page wrapper and new tour assets changed among the captured calculation/UI sources. No scientific formula, default, threshold or R1 changed.
+
+Docker smoke verifies its landing/report embed exactly the same tour source and a completed matrix report renders from an existing validation fixture. This is not a new all-cohort metric recalculation or a fresh-input numerical validation. The prior calculation validations remain below. Tour state is browser/site-local; a different Docker host port is a different browser origin.
+
 ## 6 November 2026 — r10 dark-report contrast repair
 
 Added one shared report stylesheet scoped entirely to `html[data-theme="dark"]` and included it in the existing renderer. No calculation, label definition, threshold, sample rule, light-mode rule or layout setting changed. Inline foreground colors and pale backgrounds are paired with dark surfaces; red/amber/green hue distinctions are retained. Readiness cards, sticky analysis labels, check markers, tabs, buttons, help popups and consent text are covered. Score heatmap fills remain unchanged; their original white/dark numeric-text choices are retained.

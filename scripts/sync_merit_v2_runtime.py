@@ -18,7 +18,7 @@ def sync(source):
   if rel.is_absolute() or '..' in rel.parts:raise ValueError(rel)
   dst=DEST/rel;dst.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(src,dst)
  (DEST/'source_snapshot_manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
- proof={'release':'MERIT v2 Docker','release_version':'v2-live-20261106-r10','release_date':'2026-11-06',
+ proof={'release':'MERIT v2 Docker','release_version':'v2-live-20261108-r11','release_date':'2026-11-08',
   'source':'8791 live runtime; calculation sources shared with 8782 and browser',
   'study_inputs_included':False,'study_results_included':False,
   'reference_policy':'Same chemical, R1, curated-rule and contextual-reference policy as 8791/browser. Per-study context references are downloaded on demand and checked against the bundled SHA-256 index; quantitative matrices and metric results are always calculated from fresh MW inputs.',

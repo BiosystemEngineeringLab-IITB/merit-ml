@@ -423,6 +423,13 @@
       "absolute_path_relocations": 0
     },
     {
+      "source": "/home/shayantan/metabolomics/ML-ready/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/guided_tour.py",
+      "bundled": "source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/guided_tour.py",
+      "source_sha256": "b72ac4b402f4e260f395f82df7104b32d6d2e59339900fa2c3580db3eb1cf5ab",
+      "bundled_sha256": "b72ac4b402f4e260f395f82df7104b32d6d2e59339900fa2c3580db3eb1cf5ab",
+      "absolute_path_relocations": 0
+    },
+    {
       "source": "/home/shayantan/metabolomics/ML-ready/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/labels_v9.py",
       "bundled": "source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/labels_v9.py",
       "source_sha256": "1c4060d891e9dba7026ead13669c4b1bac9ec2b5f7b5a3afd17f2d7310f1312e",
@@ -936,8 +943,8 @@
     {
       "source": "/home/shayantan/metabolomics/ML-ready/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/ui.py",
       "bundled": "source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/ui.py",
-      "source_sha256": "30275ae4e6043c88549ba75a411070cb61a95208797b260c202f3d5779b13170",
-      "bundled_sha256": "a10f9a49e64ef603161f551955c48e05ba76c8ffaec052582b320d720d6017e5",
+      "source_sha256": "5301c575fe2257ed045702697a506cc20ce0e8d6c7d02aa43b526cfe3d456d3c",
+      "bundled_sha256": "f02549e5b0f1bdf1782ff3d8b9a0af15728d9c14486eccd59aa8f4f07a16008a",
       "absolute_path_relocations": 3
     },
     {
@@ -987,6 +994,13 @@
       "bundled": "source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/static/merit-logo.svg",
       "source_sha256": "7552dbb9dffcbbc8cde11cefd06127e2cb098d017f64eb52a57d909084847cdf",
       "bundled_sha256": "7552dbb9dffcbbc8cde11cefd06127e2cb098d017f64eb52a57d909084847cdf",
+      "absolute_path_relocations": 0
+    },
+    {
+      "source": "/home/shayantan/metabolomics/ML-ready/merit-ui-v9-analysis-endpoint-pilot/v8_layout/static/merit-tour.js",
+      "bundled": "source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/static/merit-tour.js",
+      "source_sha256": "6bb66eef3f7a5842ad75a21e8ebb71f6da1f0bb509c13e85ad690c29b2d3e8a8",
+      "bundled_sha256": "6bb66eef3f7a5842ad75a21e8ebb71f6da1f0bb509c13e85ad690c29b2d3e8a8",
       "absolute_path_relocations": 0
     },
     {
