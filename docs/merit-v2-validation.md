@@ -1,3 +1,9 @@
+# Reader-focused manual — 12 November 2026
+
+This documentation-only revision removes internal development versions, historical-cache discussion, local server addresses, release/build instructions and source-file paths from the user guide and its downloadable index. The guide starts from entering a public study ID. Actual interface labels, all metric definitions, 13 numerical controls, eight custom cut-offs and computing-limit guidance remain. Public metadata contains only reader-facing metric names, settings and chapter links; the full source audit is kept separately.
+
+All scientific table numbers are unchanged. HTML/PDF/Markdown, mobile/dark layout, document routes, outgoing credentials and published bytes are checked. No scientific formula, default, threshold, reference value or source data changes. Earlier release verification follows.
+
 # User manual release — 12 November 2026
 
 `v2-live-20261112-r13` bundles the new 32-page searchable PDF and responsive HTML manual, Markdown source and a metric/control coverage manifest. Top navigation and the report heading link to `/manual/`. The guide covers 19 scored items, separate Structural/FAIR summaries, all 37 previous reference-table items, newer informational/interface features, 13 registered numerical settings, eight custom score cut-offs and native resource settings.

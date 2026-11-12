@@ -2,11 +2,11 @@
 
 **Evaluating ML readiness in tabular metabolomics datasets from Metabolomics Workbench**
 
-Manual version: **12 November 2026**. This guide describes the current browser and native Docker applications. It supersedes the v7 manual and its composite scores, readiness bands and feasibility gates.
+**Updated 12 November 2026.** Use this guide to assess a public Metabolomics Workbench study, understand its results and adjust the settings for your classification task.
 
 MERIT-ML means *Metabolomics Evaluation of Readiness and Interoperability of Tabular Data for Machine Learning*. Open [MERIT-ML](https://merit-ml.in/) to assess a public Metabolomics Workbench study, or use the [Docker application and source code](https://github.com/BiosystemEngineeringLab-IITB/merit-ml) on your own computer. MERIT-ML is independent of Metabolomics Workbench.
 
-This guide includes every current scored item, the separate Structural and FAIR summaries, informational blocks, all 13 numerical settings, the eight custom alert cut-offs, class selection, sample and subject edits, guidance, downloads, bulk use and resource-limit messages. The software controls, rather than historical manuscript figures, define the current interface.
+The guide covers every metric, the separate Structural and FAIR summaries, supporting information, all 13 numerical settings and eight custom alert cut-offs. It also explains class selection, sample and subject edits, guidance, downloads, bulk assessment and messages about computer or browser limits.
 
 ## 1. Start here
 
@@ -17,7 +17,7 @@ This guide includes every current scored item, the separate Structural and FAIR 
 5. Review sample eligibility, repeated sample IDs, subject IDs, controls, analytical alerts and checks that could not be assessed. Change inputs only when you can justify the change from the deposit or your scientific question.
 6. Inspect the metric tabs and save the assessment JSON, relevant feature lists and matrices. Preprocessing, feature selection and model fitting remain your responsibility.
 
-The browser assesses one study at a time using your computer. Workbench response time, network speed, matrix size and available memory affect duration. The Docker application also retrieves inputs on demand and supports bulk assessment. Neither needs the frozen manuscript study-result cache to calculate a new assessment. Both use versioned reference assets, including R1 and chemical lookup data; those are distinct from precomputed study assessments.
+MERIT-ML retrieves study data from Metabolomics Workbench when you request an assessment. The browser assesses one study at a time using your computer. Repository response time, network speed, matrix size and available memory affect how long it takes. For bulk assessment or matrices that exceed browser limits, use the local Docker application. You do not need to download a collection of studies before starting.
 
 ### 1.1 Search, availability and appearance
 
@@ -43,9 +43,9 @@ A study can contain several analyses. Each analysis can contain independently re
 |---|---|
 | datatable | Quantitative table obtained from the official `/datatable/` endpoint, not `/datatable/file/`. |
 | mwTab | A readable quantitative metabolite-data block in the analysis's mwTab record. The record can contain metadata without a valid numeric matrix. |
-| untarg_data | A readable untargeted feature table from the official untarg_data endpoint. Registry membership alone does not establish matrix validity. |
-| Tier 1 | The manuscript's grouping of datatable and mwTab. They remain separate sources and can differ in samples, features and values. |
-| Tier 2 | The manuscript's grouping of untarg_data. The tier is a source convention, not an analytical-quality ranking. |
+| untarg_data | A readable untargeted feature table from the official untarg_data endpoint. An entry in the repository’s untargeted-study list does not by itself establish matrix validity. |
+| Tier 1 | The grouping of datatable and mwTab used in source descriptions. They remain separate sources and can differ in samples, features and values. |
+| Tier 2 | The grouping used for untarg_data in source descriptions. The tier is a source convention, not an analytical-quality ranking. |
 | Position | One sample row of datatable or untarg_data, or one sample column of an mwTab quantitative block. |
 | Distinct sample ID | A sample identifier counted once even when it occurs at several positions. It does not necessarily identify an independent subject. |
 | ML-eligible position | A measured position remaining after the current eligibility rules and edits, excluding Tier 1 alignment rows and controls not selected for modelling. |
@@ -102,7 +102,7 @@ The narrative follows **applied** settings, classes and edits. A control you hav
 |---|---|
 | Analysis | The AN accession; keep different analyses separate. |
 | Data file | datatable, mwTab or untarg_data. Grouped endpoints have the same summary signature; their numeric values can still differ. |
-| Summary | Count-requirement status, strongest analytical alert and assessed coverage, with relevant subject/structural notes. It is not a readiness band. |
+| Summary | Count-requirement status, strongest analytical alert and assessed coverage, with relevant subject/structural notes. It summarises count support and analytical alerts without combining them into one score. |
 | Cross-validation sample-count support | Smallest class, required folds, class/sample counts, p/n, class support, separability/chance and subject warnings. |
 | Analytical alerts · fixed reference | The named checks raising low/extreme alerts, their values/cut-offs, checks unavailable and units documentation. |
 | Selected annotation and metadata indicators | Named-feature coverage, named features mapped to RefMet, external IDs, mass/RT-field presence and LC-method context. These do not set the alert/count summary. |
@@ -225,7 +225,7 @@ Score = the percentage of valid RefMet-mapped records whose RefMet term has at l
 
 ### 7.4 Mass/RT-like metadata presence
 
-This binary component is 100 when the mwTab annotation evidence contains a filled mass/m/z-like or retention-time/index-like field under the implemented rules, otherwise zero. An mwTab record without an annotation table scores zero; a record that cannot be read is distinguished from absent coordinate content.
+This binary component is 100 when the mwTab annotation evidence contains a filled mass/m/z-like or retention-time/index-like field under the field-recognition rules described here, otherwise zero. An mwTab record without an annotation table scores zero; a record that cannot be read is distinguished from absent coordinate content.
 
 The scored evidence concerns annotation metadata for named metabolites. The m/z–RT text of an unnamed feature or an untargeted results-file header is displayed as contextual evidence and is not silently counted as this annotation field. Presence of exact/neutral mass is not the same as a measured m/z, and retention index is not retention time.
 
@@ -233,7 +233,7 @@ Coordinate details show field provenance and coverage, mass-like versus strict m
 
 ### 7.5 Basic LC-method context
 
-Only analyses recognised as explicitly LC by the implemented chromatography-type rule are assessed. Score = one third each for a column declaration, **both** mobile phases and a gradient/composition declaration. The gradient rule requires percentage/composition wording with time information or an isocratic declaration. Dedicated chromatography fields are read; an external method file or unstructured narrative is not assumed to supply missing components.
+Only analyses recognised as explicitly LC from the declared chromatography type are assessed. Score = one third each for a column declaration, **both** mobile phases and a gradient/composition declaration. The gradient rule requires percentage/composition wording with time information or an isocratic declaration. Dedicated chromatography fields are read; an external method file or unstructured narrative is not assumed to supply missing components.
 
 Flow rate, temperature, dimensions, particle size and basic/extended/full-context details are informational. GC or another explicit non-LC type is not applicable. An unknown/unrecognised type is shown with the actual declaration or “LC not explicitly identified”, rather than proof of no LC. LC context does not demonstrate comparable retention times across studies.
 
@@ -275,7 +275,7 @@ The denominator is **all feature positions × ML-eligible sample positions**, in
 
 | Category | Meaning |
 |---|---|
-| I1: Missing entries | Empty or non-numeric cells, with the six entry classes reported separately. The current implementation calculates this category for assessed matrices, including datatable. |
+| I1: Missing entries | Empty or non-numeric cells, with the six entry classes reported separately. Assessed for all three data sources, including datatable. |
 | I2: Zeros, meaning unknown | Every mwTab/untarg_data zero. For datatable: zeros also zero in mwTab, not traceable to a paired cell, or in an unpaired datatable. |
 | I3: Zeros hiding a missing value | A paired datatable zero whose matching mwTab cell has no number: empty, missing token or text. |
 | I4: Zeros replacing a value | A paired datatable zero whose matching mwTab cell has a non-zero number, including negative/positive values and values that round to zero at datatable precision. |
@@ -309,9 +309,9 @@ The caution counts features with CV **below** C, default 1%, adjustable 0.1–5%
 
 Features must have at least three values and not be flagged by the current low-information rule. Each pair requires at least **10 shared numeric positions**. Missing entries are omitted; zeros remain values. The metric needs at least **10 eligible positions** and at least two evaluated features, otherwise it is not assessed.
 
-The implementation ranks each feature once over its observed values, using average ranks for ties. It correlates those ranks on the pair's shared observations. With complete data this is usual Spearman correlation; with missing data it need not equal separately re-ranking every pair's shared subset. Absolute correlation is used, so strong negative and positive relationships can both count.
+Each feature is ranked once over its observed values, using average ranks for ties. It correlates those ranks on the pair's shared observations. With complete data this is usual Spearman correlation; with missing data it need not equal separately re-ranking every pair's shared subset. Absolute correlation is used, so strong negative and positive relationships can both count.
 
-The threshold c defaults to **0.90**, adjustable **0.80–0.99** in steps of 0.01. A pair must exceed c; the implementation treats values within `1e−5` of c as equal, to avoid numerical rounding artefacts.
+The threshold c defaults to **0.90**, adjustable **0.80–0.99** in steps of 0.01. A pair must exceed c; values within `1e−5` of c are treated as equal, to avoid numerical rounding artefacts.
 
 The **fast caret-style selection** flags, for each exceeding pair, the member with the larger mean absolute correlation across the evaluated features; its documented tie rule resolves equal means. A feature selected by multiple pairs is counted once. Mean correlations are not iteratively recalculated after each removal. Score = `100 × (1 − flagged features / evaluated features)`. Removing the flagged set leaves no evaluated pair above the threshold, but the set is not guaranteed to be the smallest possible removal set.
 
@@ -365,7 +365,7 @@ Fields already represented as raw-file evidence, factors, identical factor value
 
 ## 11. Annotation / Interoperability
 
-There are **two scored items**, with name/mapping/class/repetition evidence. They are separate interpretation/reuse indicators; unnamed features can still support modelling and naming alone does not establish correct metabolite identification.
+There are **two scored items**, with name/mapping/class/repetition evidence. They describe interpretation and reuse; unnamed features can still support modelling and naming alone does not establish correct metabolite identification.
 
 ### 11.1 Named-feature coverage
 
@@ -395,7 +395,7 @@ Let m be the smallest selected class, M the largest, and k the selected number o
 
 `Class support = 100 × H(p) × min(1, m / k)`.
 
-The entropy term describes balance of the **smallest against largest** class, not entropy across all classes. The second term describes how far the smallest class reaches the fold count. At default k = 5, 10 versus 10 gives 100, 3 versus 3 gives 60, and 100 versus 200 gives about 91.8. One class gives zero. No labelled eligible samples or a selected class missing from this matrix makes it unavailable.
+The entropy term describes balance of the **smallest against largest** class, rather than entropy across all classes. The second term describes how far the smallest class reaches the fold count. At default k = 5, 10 versus 10 gives 100, 3 versus 3 gives 60, and 100 versus 200 gives about 91.8. One class gives zero. No labelled eligible samples or a selected class missing from this matrix makes it unavailable.
 
 Higher means stronger support under this explicit heuristic; it is not a validated prediction of accuracy, power or estimate stability. It does not enter the analytical alerts. Class details show the balance and fold terms separately, samples left out and the factor/joint-class tables.
 
@@ -417,7 +417,7 @@ Features are internally converted to average ranks across measured positions, wi
 
 Let K be the **number of nearest neighbours** (default 7) and θ the overlap threshold (default 3). For each class c, R(c) is the share of its samples with **more than θ** of the K neighbours belonging to other classes. Score = `100 × mean over classes of (1 − R(c))`. Every class gets equal weight. Higher means stronger local separation under the current labels; it is not cross-validated model accuracy.
 
-K can be **3–15** in steps of 1. θ is a whole number, at least zero and at most **floor(K/2)**. The displayed input range extends to 7; its effective upper bound follows K and larger entries are capped. Distance ties at the K-th neighbour are handled by the implemented exact tied-neighbour calculation; a relative tolerance of `1e−5` accounts for stored precision.
+K can be **3–15** in steps of 1. θ is a whole number, at least zero and at most **floor(K/2)**. The displayed input range extends to 7; its effective upper bound follows K and larger entries are capped. Distance ties at the K-th neighbour are handled by an exact tied-neighbour calculation; a relative tolerance of `1e−5` accounts for stored precision.
 
 The score is not assessed with fewer than two classes, an absent selected class, no varying usable feature, at most K samples in total or a class with fewer than **K − θ + 1** samples. The default K=7, θ=3 therefore needs at least five samples in each class, but this is a separability requirement distinct from the CV-fold control. For matrices above 4,000 sample IDs the retained neighbourhood has 200 neighbours per sample; selecting a narrow task can leave too few retained neighbours for an exact result, which is reported.
 
@@ -425,7 +425,7 @@ The rank representation is constructed for the matrix; class selection and eligi
 
 ### 13.2 Chance level and overlap details
 
-Chance is the expected score if class labels were randomly assigned while preserving class sizes. For a class with n_c of N samples, the other-class-neighbour count follows the implemented hypergeometric distribution with population N−1, other-class population N−n_c and K draws. Chance = `100 × mean over classes P(other-class neighbours ≤ θ)`.
+Chance is the expected score if class labels were randomly assigned while preserving class sizes. For a class with n_c of N samples, the other-class-neighbour count follows a hypergeometric distribution with population N−1, other-class population N−n_c and K draws. Chance = `100 × mean over classes P(other-class neighbours ≤ θ)`.
 
 Always read separability beside chance. Strong imbalance and different class counts can change the chance value. The report can show class-specific overlap and chance, the most overlapping class pair, samples surrounded by other-class neighbours and tie evidence. These are exploratory label/data diagnostics, not evidence that samples are mislabeled or that a causal biological difference exists.
 
@@ -433,7 +433,7 @@ Always read separability beside chance. Strong imbalance and different class cou
 
 This informational block tests whether measured feature values differ between the selected classes. It reports the number/share tested and significant, test name, adjusted and raw p-values, direction where meaningful, class medians/counts, examples and reasons features/tests are unavailable. It is not automatic feature selection, model feature importance, a readiness score or proof of a disease biomarker.
 
-Without confirmed subject information, the default is **Kruskal–Wallis**, using one value/profile per sample ID and testing a feature only when every selected class has at least **five measured values**. Missing values are excluded for that feature. These statistical tests use the implementation's rank-based representation; class medians/directions are presented from deposited values for the observations included by that feature's test.
+Without confirmed subject information, the default is **Kruskal–Wallis**, using one value/profile per sample ID and testing a feature only when every selected class has at least **five measured values**. Missing values are excluded for that feature. These statistical tests use the rank-based representation described above; class medians/directions are presented from deposited values for the observations included by that feature's test.
 
 With real subject IDs confirmed:
 
@@ -455,9 +455,7 @@ Subject information reports coverage, distinct subjects, subjects with several s
 
 Open **Show tools** to see the current settings and Help. Apply a change to recompute the relevant outputs. The CV-fold control is prominent because it directly changes count support; it is a different k from separability neighbours. Settings shared between report sections are one active choice for the study.
 
-The following table is generated from the current calculation registry and checked against the rendered inputs. **Default / minimum / maximum / step** describe the actual numerical controls; read these inputs and exported settings rather than rounding in small display badges.
-
-<!-- GENERATED_PARAMETERS -->
+The table lists every numerical setting under **Show tools**. **Default**, **minimum**, **maximum** and **step** describe the values you can enter. The assessment download records the settings applied to your results.
 
 | Setting | Default | Minimum–maximum | Step | Effect / constraint |
 |---|---:|---|---:|---|
@@ -475,9 +473,7 @@ The following table is generated from the current calculation registry and check
 | Separability: overlap threshold θ | 3 | 0–7 | 1 | Integer; effective maximum floor(K/2), although input maximum is 7. |
 | Feature associations: FDR q | 0.05 | 0.01–0.2 | 0.01 | Significance and paired-test minimum support. |
 
-<!-- END_GENERATED_PARAMETERS -->
-
-The θ cap and permitted alert percentiles in the notes are additional constraints. There are **13 registered numerical settings plus eight optional custom cut-off fields**, not 21 independent scored metrics. All other fixed requirements, such as detection >70%, at least three values, minimum shared-pair samples and MetaBatch-style coverage, are described with their metrics rather than exposed as sliders.
+The θ cap and permitted alert percentiles in the notes are additional constraints. There are **13 numerical settings plus eight optional custom cut-off fields**. These are controls, not additional scored metrics. All other fixed requirements, such as detection >70%, at least three values, minimum shared-pair samples and MetaBatch-style coverage, are described with their metrics rather than exposed as sliders.
 
 ### 14.1 Custom alert score cut-offs
 
@@ -511,11 +507,9 @@ An unavailable/resource-limited recomputation remains unavailable with a reason.
 
 ## 15. R1 and alert interpretation
 
-R1 is a **versioned reference of default analytical scores**, originally calculated from 11,749 valid matrices in the 4,121-study manuscript benchmark. It is not an overall score, experimental-quality ranking or threshold learned from downstream accuracy. The reference counts matrices, so a study with several analyses/endpoints can contribute several observations.
+The analytical checks compare your matrix with a **reference collection of scores**, labelled **R1** in the interface. This reference contains scores from 11,749 matrices. It gives a consistent comparison for any public study ID you assess; your study does not need to belong to that collection. It is not an overall readiness score or a threshold trained to predict model accuracy. The reference counts matrices, so a study with several analyses or data sources can contribute several observations.
 
 At defaults, an assessable score strictly below its **2.5th-percentile** cut-off is extreme. A score below its **10th-percentile** cut-off but not extreme is low. Exact equality is not alerted at that boundary. Missing/unassessed scores do not enter the percentile calculation or become passes. Ties mean the share flagged need not equal the nominal percentile.
-
-<!-- GENERATED_REFERENCE -->
 
 | Percentile | Missing entries and zeros | Low-information features | Redundant features | Outlier samples |
 |---|---:|---:|---:|---:|
@@ -526,13 +520,11 @@ At defaults, an assessable score strictly below its **2.5th-percentile** cut-off
 
 Reference populations with an assessable value: Missing entries and zeros: **11,717**; Low-information features: **11,518**; Redundant features: **10,367**; Outlier samples: **11,591**.
 
-<!-- END_GENERATED_REFERENCE -->
-
 The table shows rounded cut-offs; full precision is used in calculation. Each percentile uses only matrices where that particular metric could be assessed. The chosen default low and extreme percentiles can each be **2.5, 5, 7.5 or 10**, with low never below extreme. Selecting another percentile changes which reference cut-off is used; it does not recalculate the reference from the current study.
 
 The low boundary controls the total set reviewed; moving only the extreme boundary redistributes flagged matrices between extreme and low tiers. Several checks can flag one matrix, so their alert counts cannot be added to obtain unique matrices. The summary uses the strongest tier and shows how many checks were assessed.
 
-R1 remains the same when a new study is queried. Entering custom values overrides the decision boundaries, not the reference's underlying cohort. Future recalibration needs a documented new reference version, with its cohort and calculation rules preserved. The assessment record identifies the reference and active custom settings. A planned maintenance audit is not a current per-request automatic recalibration feature.
+Assessing a new study does not change the default comparison. You can choose another reference percentile or enter your own score cut-offs. These choices change which results raise alerts, without changing the comparison collection itself. The assessment download records the reference and any custom settings used.
 
 The reference describes all assessed Workbench matrices, not experimentally matched peers. Endpoint, platform, sample size, preprocessing and feature composition can affect these distributions. An extreme alert is a prompt for specific review, not a declaration that the matrix is unusable. No alert means no assessed value crossed these relative boundaries; it is not certification.
 
@@ -540,7 +532,7 @@ The reference describes all assessed Workbench matrices, not experimentally matc
 
 ### 16.1 Assessment JSON
 
-Use **Download MERIT-ML Assessment JSON** at the report top. It records current per-analysis/endpoint results, supporting counts, applied parameters, class/sample edits, subject confirmation and reference/custom cut-off information. No universal readiness score or old band should be inferred from this profile. Save records when comparing tasks or settings; the on-screen page is not a publication archive.
+Use **Download MERIT-ML Assessment JSON** at the report top. It records current per-analysis/endpoint results, supporting counts, applied parameters, class/sample edits, subject confirmation and reference/custom cut-off information. The profile does not assign one universal readiness score. Save records when comparing tasks or settings; the on-screen page is not a publication archive.
 
 ### 16.2 Matrix with classes in force
 
@@ -564,58 +556,47 @@ Lists are built when requested, avoiding the need to embed every large list in t
 
 ### 16.5 Reproducibility and data handling
 
-Record the study/analysis/endpoint, retrieval date and source hashes, software/reference version, effective settings, class choice, edits, omitted checks and exported data's scope. Workbench can change deposited records; a later fresh fetch can yield a different matrix. Report whether compared results came from the same fetched inputs. Downloaded source data remain attributable to the repository and study authors; a local export does not grant permission to redistribute those inputs.
+Record the study/analysis/endpoint, retrieval date and source hashes, software and reference details, applied settings, class choice, edits, omitted checks and exported data's scope. Workbench can change deposited records; a later fresh fetch can yield a different matrix. Report whether compared results came from the same fetched inputs. Downloaded source data remain attributable to the repository and study authors; a local export does not grant permission to redistribute those inputs.
 
 ## 17. Bulk assessment and local Docker use
 
-### 17.1 Native bulk assessment
+### 17.1 Assess several studies locally
 
 The landing-page bulk field accepts typed/pasted study IDs, normalises them and removes duplicates, with a maximum of **500 IDs** per submitted set. Review the validation results before running. Available IDs are green, invalid/unavailable IDs red, explicitly confirmed embargoes amber and unverified entries grey. A failed public-availability request is not proof of an embargo. Only available accepted IDs are submitted.
 
 The completed bulk view gives summary tables/downloads and underlined **individual study-report links**. Open each in a new tab to inspect and interact with the ordinary report. The link retains the bulk job's settings/edits where applicable; later interaction in a study report does not silently rewrite the already completed bulk summary. Reports require retained job files; expired/deleted jobs have an explicit message.
 
-The browser landing displays bulk assessment disabled/blurred with a link to Docker. It assesses one study per running session. The retired Find Similar Studies and old report-level bulk panels are not part of the current workflow.
+Bulk assessment is disabled in the browser application, with a link to the local Docker application. Use the browser to assess one study at a time, or Docker to assess several studies in one run.
 
-### 17.2 Install the native application
+### 17.2 Use the local application
 
-Docker must be installed and running; Python/scientific dependencies are contained in the image. Follow the [current repository instructions](https://github.com/BiosystemEngineeringLab-IITB/merit-ml) for the published release and platform. The supplied launcher requests an available **localhost** port; inspect the printed address rather than assuming port 8791 on your computer.
+You can use MERIT-ML in your browser without installing anything. The local Docker application is an alternative for bulk work or matrices that do not fit in the browser.
 
-On Linux, prefix Docker commands with `sudo` if your account needs it. On Windows/macOS use the corresponding Docker terminal and omit `sudo` where it is unavailable. Docker provides the Linux container environment; this is not a claim that Docker itself requires no installation. The source build is an alternative to a published image; the repository gives exact image tags and Compose commands.
+1. Install Docker for your operating system and make sure it is running.
+2. Open the [MERIT-ML installation instructions](https://github.com/BiosystemEngineeringLab-IITB/merit-ml) and follow the launch command for your system. Python and its scientific dependencies are included in the application.
+3. Open the local web address printed by the launcher. It selects an available port; you do not need to choose one in advance.
+4. Enter a public study ID and assess it in the same way as on the website.
 
-For this documented release, the published image can be started on an available localhost port:
+On Linux, use `sudo` before a Docker command if your account requires it. On Windows or macOS, use the appropriate Docker terminal and omit `sudo` where it is unavailable. The installation page also explains how to stop, restart or update the application.
 
-```sh
-sudo docker run -d --name merit-ml --init -p 127.0.0.1::8791 -v merit-ml-studies:/app/runs ghcr.io/biosystemengineeringlab-iitb/merit-ml:v2-live-20261112-r13
-sudo docker port merit-ml 8791/tcp
-```
+Only studies you request are downloaded. Docker keeps their inputs and results in a storage volume on your computer, which can grow as you assess more studies. Export results you want to keep. Stopping the application does not remove that volume; deleting the volume removes the data in it. Completed reports normally expire after 24 hours unless you configure the application to retain them. Internet access is needed to retrieve study inputs and external evidence.
 
-Open the printed address with `http://` in front. On Windows/macOS, or an account already permitted to use Docker, omit `sudo` as appropriate. If a container with that name already exists, start the existing one or choose a new name rather than deleting data accidentally. `sudo docker stop merit-ml` stops it; `sudo docker start merit-ml` starts it again.
-
-To build the source checkout instead:
-
-```sh
-sudo docker compose -f compose.merit-v2.yml up -d --build
-sudo docker compose -f compose.merit-v2.yml port merit 8791
-```
-
-Only studies you request are downloaded. A Docker volume retains local runs and can grow; there is no automatic whole-cohort download at startup or guaranteed 5 GB cache eviction policy. Export reports you need. Stopping a container differs from deleting a volume; removing the volume deletes retained local data. The native server normally expires completed web jobs after 24 hours unless configured to retain them. Internet access is required to retrieve repository inputs and external evidence.
-
-### 17.3 Native resource settings
+### 17.3 Advanced settings for the local application
 
 | Environment setting | Default | Meaning |
 |---|---|---|
-| `MERIT_WORKER_MEMORY_MB` | Automatic, 65% of currently available host/container memory | Per-worker MiB budget; 0 chooses automatic. Leave memory for the server and other processes. |
+| `MERIT_WORKER_MEMORY_MB` | Automatic, 65% of available computer/container memory | Per-worker MiB budget; 0 chooses automatic. Leave memory for the rest of the application and other processes. |
 | `MERIT_CHECK_TIMEOUT_SECONDS` | 1800 seconds | Time limit for an individual calculation/check; 0 disables this timeout. |
 | `MERIT_RENDER_TIMEOUT_SECONDS` | 3600 seconds | Maximum wait for report/export rendering. |
 | Docker memory allocation | Your container/host setting | Overall memory still bounds the application; increasing a per-worker setting does not create RAM. |
 
-These are deployment/resource controls, not scientific sliders. Execution records give budgets, elapsed time, measured peak RSS and error/timeout reasons. No fixed browser matrix-size ceiling is applied to the native application. However, finite memory/time, output construction, process failures or an OS-level termination can still prevent a calculation. The application is not a promise that any matrix size will finish on any computer. The default installation binds localhost; public exposure requires a separately secured service deployment.
+These advanced settings control computing resources, not the scientific thresholds under Show tools. Execution records report the memory budget, elapsed time, peak memory use and reasons for failures or timeouts. The local application can process matrices beyond the browser limits when your computer has enough resources. It still cannot guarantee completion of every matrix on every computer. The standard installation is intended for use on your own computer.
 
 ## 18. Browser limits and partial results
 
-The browser uses **Pyodide/WebAssembly** and JavaScript workers to run the assessment with your compute. Versioned application/reference assets are downloaded as needed. A study is not refused merely because one matrix is large: the guard considers each analysis × endpoint and, where applicable, each check. Successful results are retained and independent work continues.
+The browser uses **Pyodide/WebAssembly** and JavaScript workers to run the assessment with your compute. The application and reference files needed for assessment are downloaded as needed. A study is not refused merely because one matrix is large: the guard considers each analysis × endpoint and, where applicable, each check. Successful results are retained and independent work continues.
 
-The current admission estimate starts with **330 MiB** runtime and adds estimated costs for cells, input-file bytes, stored feature pairs and squared sample-position count. A bounded feature-pair probe can refine dense-pair estimates. The admission budget is **1 GiB**, or **0.5 GiB** when a device reports less than 4 GB memory. These are estimates, not measured universal peak-memory guarantees. Device memory can be unavailable or approximate.
+The browser estimates the memory needed for each matrix. The estimate starts with **330 MiB** for the application and adds the expected costs of cells, input files, feature pairs and sample comparisons. A small feature-pair check helps estimate the cost when many features are correlated. The memory budget is **1 GiB**, or **0.5 GiB** when a device reports less than 4 GB memory. These are estimates, not measured universal peak-memory guarantees. Device memory can be unavailable or approximate.
 
 Input responses are streamed with a **50 MB** limit; a declared oversize response can be refused before collection, and collection stops if the streamed body crosses the limit. ZIP, CSV/text and JSON output construction also has a **50 MB** browser limit, with additional pair-list preflight checks. A small report can therefore coexist with an unavailable large download.
 
@@ -639,7 +620,7 @@ Eligibility/low-information changes can require expensive pair recomputation; a 
 | Strong separability | Compare chance; review labels, subject dependence, other factors, batch and external validation. This is not measured test-set performance. |
 | Shared/unverified subjects | Verify the identifier; if real, keep subjects disjoint in downstream validation. Do not assume “Human” or a group name identifies a person. |
 | A chosen class has no samples after edits | Change the task or restore relevant eligibility only if justified; do not silently ignore the absent class. |
-| Browser refusal or stopped worker | Keep completed results, read the named matrix/check and reason, and use the native application for omitted work. |
+| Browser refusal or stopped worker | Keep completed results, read the named matrix/check and reason, and use the local application for omitted work. |
 | Export fails but report remains | Check output/pair-list resource limits; calculation and export availability are separate. |
 | Slow assessment | Allow for repository/network delays and feature-pair calculations; read current step and Generating report. Do not assume a quiet interval proves completion. |
 
@@ -649,9 +630,7 @@ MERIT-ML does not verify the complete acquisition/preprocessing pipeline, fit a 
 
 ## 20. Complete metric and evidence checklist
 
-The checklist below maps every registered reference-table item to this guide. Some items are summaries or informational evidence rather than additional numeric metrics. It also lists the newer interactive and informational features that were added after the earlier metric reference.
-
-<!-- GENERATED_METRIC_CHECKLIST -->
+Use this checklist to find each metric and its supporting information. Some rows describe summaries, controls or informational results rather than additional scored metrics.
 
 | Item | Role | Guide section |
 |---|---|---|
@@ -703,21 +682,19 @@ The checklist below maps every registered reference-table item to this guide. So
 | Use as, labels, batch-like edits, subject shortcuts and confirmation | Interface / informational | 5 |
 | Thirteen numerical settings, bounds, steps and dependencies | Interface / informational | 14 |
 | Eight custom score cut-offs, fallbacks and precedence | Interface / informational | 14.1 |
-| Fixed R1, strict comparisons, ties and reference versioning | Interface / informational | 15 |
+| Reference-based alerts, strict comparisons, ties and custom cut-offs | Interface / informational | 15 |
 | Assessment JSON, matrices, full-position exports and feature/evidence lists | Interface / informational | 16 |
 | Bulk validation/statuses, individual interactive reports and expiry | Interface / informational | 17 |
-| Native memory/check/render settings and available-port launch | Interface / informational | 17.2–17.3 |
+| Local memory/time settings and automatic choice of address | Interface / informational | 17.2–17.3 |
 | Browser per-matrix guards, downloads, checkpoints and omissions | Interface / informational | 18 |
 | Unavailable / partial / metadata-only states and troubleshooting | Interface / informational | 2, 3, 18–19 |
 
-<!-- END_GENERATED_METRIC_CHECKLIST -->
+## 21. Getting help and keeping your results
 
-## 21. Versions, provenance and further help
+Save the assessment JSON and, where available, the run record when you want to compare results or ask for help. Include the study ID, analysis and data source, applied settings, chosen classes, sample edits and the exact error message. State whether you used the browser or Docker and which checks completed.
 
-This manual was checked against the running report, its form controls, current calculation source and browser/native resource handling on **12 November 2026**. The accompanying coverage manifest records source-file hashes, the 13 numerical setting specifications, eight custom fields and metric/feature coverage. A documentation check does not establish that every future repository deposit will parse or that every matrix fits available hardware.
+Workbench records can change. Keep the retrieval date and the input details in your download when you need to reproduce an assessment. The record also identifies the alert reference and the settings used, so another user can understand how you obtained the result.
 
-The current browser and native applications calculate matrix metrics from retrieved inputs. The manuscript's frozen benchmark is a separate reproducibility resource; the development reference viewer may display that benchmark rather than fetch a new study. All editions must identify their input and reference provenance. R1, chemical lookups, curated control rules and labelled contextual reference evidence are versioned inputs, not a claim that every contextual datum was freshly collected in the current assessment.
+Never send passwords, tokens, private keys or unrelated private sample information when requesting support.
 
-Save the assessment JSON and run record, where available, when asking for help. Include study/analysis/endpoint, active settings/classes, exact error, whether you used browser or Docker, and which independent results completed. Never send passwords, tokens, private keys or unrelated private sample information.
-
-Visit [MERIT-ML](https://merit-ml.in/), [the publication](https://doi.org/10.26434/chemrxiv.15004429/v2) and [the source, installation and issue tracker](https://github.com/BiosystemEngineeringLab-IITB/merit-ml). This guide is available as searchable HTML, downloadable PDF and Markdown; its metric definitions and controls use the same manual version.
+Open [MERIT-ML](https://merit-ml.in/) to assess a study, [read the publication](https://doi.org/10.26434/chemrxiv.15004429/v2) for the scientific methods, or use the [installation instructions and issue tracker](https://github.com/BiosystemEngineeringLab-IITB/merit-ml) for help with the local application. This guide is available as searchable HTML, downloadable PDF and editable Markdown.

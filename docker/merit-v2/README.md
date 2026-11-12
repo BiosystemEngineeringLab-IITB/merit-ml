@@ -3,7 +3,7 @@
 Build from the repository root:
 
 ```sh
-docker build -f docker/merit-v2/Dockerfile -t merit-ml:v2-live-20261112-r13 .
+docker build -f docker/merit-v2/Dockerfile -t merit-ml:v2-live-20261112-r14 .
 ```
 
 The Dockerfile copies only this runtime and its pinned dependencies. `Dockerfile.dockerignore` excludes downloads, generated outputs and the old application. `relocate_bundle.py` verifies and rewrites captured absolute source paths inside the image.
@@ -21,6 +21,6 @@ This explicitly whitelists source files, control rules, the fixed R1 and version
 python3 scripts/package_merit_v2.py
 ```
 
-The source archive goes to `release-artifacts/`, excluded from Git. It includes only the v2 Docker runtime, requirements, Dockerfile, Compose file, README, workflow, scripts, license and release documentation. It is small relative to a Docker image, but requires an internet-connected Docker build. For offline installation of the software, distribute `docker save merit-ml:v2-live-20261112-r13 | gzip > merit-v2-image.tar.gz`; Workbench retrieval still needs the internet. Do not distribute local downloaded study data as part of this source bundle.
+The source archive goes to `release-artifacts/`, excluded from Git. It includes only the v2 Docker runtime, requirements, Dockerfile, Compose file, README, workflow, scripts, license and release documentation. It is small relative to a Docker image, but requires an internet-connected Docker build. For offline installation of the software, distribute `docker save merit-ml:v2-live-20261112-r14 | gzip > merit-v2-image.tar.gz`; Workbench retrieval still needs the internet. Do not distribute local downloaded study data as part of this source bundle.
 
-The GitHub workflow builds AMD64 and ARM64 images and publishes the distinct `v2-live-20261112-r13` tag to GHCR. It never commits generated files. Package visibility may initially be private: an organisation maintainer may need to set the GHCR package to Public. See the root README for launch commands and resource controls.
+The GitHub workflow builds AMD64 and ARM64 images and publishes the distinct `v2-live-20261112-r14` tag to GHCR. It never commits generated files. Package visibility may initially be private: an organisation maintainer may need to set the GHCR package to Public. See the root README for launch commands and resource controls.

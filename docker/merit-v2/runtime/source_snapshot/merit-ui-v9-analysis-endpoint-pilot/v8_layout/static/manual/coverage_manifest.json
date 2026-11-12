@@ -1,1259 +1,384 @@
 {
-  "manual_version": "2026-11-12",
-  "scope": "Current browser and native MERIT-ML; documentation only; scientific rules unchanged.",
-  "registered_numerical_settings": {
-    "structural_sample_support_n": {
-      "default": 20.0,
-      "minimum": 5.0,
-      "maximum": 100.0,
-      "step": 1.0,
-      "source": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/structural_v9.py",
-      "line": 26
-    },
-    "low_information_freq_ratio": {
-      "default": 19.0,
-      "minimum": 5.0,
-      "maximum": 99.0,
-      "step": 1.0,
-      "source": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/low_information_v9.py",
-      "line": 42
-    },
-    "low_information_unique_pct": {
-      "default": 10.0,
-      "minimum": 1.0,
-      "maximum": 25.0,
-      "step": 1.0,
-      "source": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/low_information_v9.py",
-      "line": 42
-    },
-    "low_information_cv_pct": {
-      "default": 1.0,
-      "minimum": 0.1,
-      "maximum": 5.0,
-      "step": 0.1,
-      "source": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/low_information_v9.py",
-      "line": 42
-    },
-    "redundancy_cutoff": {
-      "default": 0.9,
-      "minimum": 0.8,
-      "maximum": 0.99,
-      "step": 0.01,
-      "source": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/correlation_v9.py",
-      "line": 28
-    },
-    "outlier_iqr_k": {
-      "default": 1.5,
-      "minimum": 1.0,
-      "maximum": 3.0,
-      "step": 0.1,
-      "source": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/outliers_v9.py",
-      "line": 20
-    },
-    "qc_rsd_cutoff": {
-      "default": 20.0,
-      "minimum": 10.0,
-      "maximum": 40.0,
-      "step": 1.0,
-      "source": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/qc_reproducibility_v9.py",
-      "line": 31
-    },
-    "cv_folds": {
-      "default": 5.0,
-      "minimum": 2.0,
-      "maximum": 10.0,
-      "step": 1.0,
-      "source": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/labels_v9.py",
-      "line": 71
-    },
-    "sep_k": {
-      "default": 7.0,
-      "minimum": 3.0,
-      "maximum": 15.0,
-      "step": 1.0,
-      "source": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/separability_v9.py",
-      "line": 38
-    },
-    "sep_theta": {
-      "default": 3.0,
-      "minimum": 0.0,
-      "maximum": 7.0,
-      "step": 1.0,
-      "source": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/separability_v9.py",
-      "line": 38
-    },
-    "sep_fdr": {
-      "default": 0.05,
-      "minimum": 0.01,
-      "maximum": 0.2,
-      "step": 0.01,
-      "source": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/separability_v9.py",
-      "line": 38
-    },
-    "readiness_extreme_pct": {
-      "default": 2.5,
-      "minimum": 2.5,
-      "maximum": 10.0,
-      "step": 2.5,
-      "source": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/readiness_v9.py",
-      "line": 39
-    },
-    "readiness_low_pct": {
-      "default": 10.0,
-      "minimum": 2.5,
-      "maximum": 10.0,
-      "step": 2.5,
-      "source": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/readiness_v9.py",
-      "line": 39
-    }
-  },
-  "custom_cutoff_fields": [
-    "readiness_cut_missingness_extreme",
-    "readiness_cut_missingness_low",
-    "readiness_cut_low_information_extreme",
-    "readiness_cut_low_information_low",
-    "readiness_cut_redundancy_extreme",
-    "readiness_cut_redundancy_low",
-    "readiness_cut_outliers_extreme",
-    "readiness_cut_outliers_low"
-  ],
-  "reference_version": "R1",
-  "reference_sha256": "aded807c583c063eaf2173f7c6ed36d8baeac211bd23a678316e957c96beef61",
-  "source_files": [
+  "title": "MERIT-ML metrics and settings",
+  "updated": "12 November 2026",
+  "metrics": [
     {
-      "file": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/structural_v9.py",
-      "sha256": "5639dafda865a17a462efea7e2b0ef1cdcc413834a7a73e974456922d751eefd",
-      "functions": [
-        "label_values",
-        "nonempty_label",
-        "all_values_filled",
-        "subject_of",
-        "effective_positions",
-        "compute"
-      ],
-      "classes": []
-    },
-    {
-      "file": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/missingness_v9.py",
-      "sha256": "2c2583c667924d7cfbf78ae5155319e32835a8ad199aa6974dc56aa0066e840a",
-      "functions": [
-        "_q",
-        "compute"
-      ],
-      "classes": []
-    },
-    {
-      "file": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/qc_blank_v9.py",
-      "sha256": "63a76992379f0fe8c0a64c6dab3b6227c918755c7d1a15f73f71642edb0cc8b9",
-      "functions": [
-        "is_blank",
-        "rule_factors",
-        "_decision",
-        "sample_kind",
-        "found_where",
-        "where_found",
-        "position_kinds",
-        "_keyword",
-        "listed",
-        "keywords_found",
-        "compute",
-        "sample_table_controls"
-      ],
-      "classes": []
-    },
-    {
-      "file": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/low_information_v9.py",
-      "sha256": "b68b8483397de90677270853033b6ff6eda192802deb31d57c4f168d814b1dc4",
-      "functions": [
-        "_params",
-        "cv_pct",
-        "cv",
-        "flags",
-        "encode",
-        "_value_text",
-        "_code_counts",
-        "compute"
-      ],
-      "classes": []
-    },
-    {
-      "file": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/correlation_v9.py",
-      "sha256": "16c1551a8d91825d8c40bdf41e05fd7c5feae93ed58ac4a4e42bbb174c2c4cca",
-      "functions": [
-        "cutoff",
-        "prepare",
-        "block_size",
-        "compute_block",
-        "spearman_blocks",
-        "merge_blocks",
-        "find_correlation_fast",
-        "largest_group",
-        "summarise",
-        "compute_from_values"
-      ],
-      "classes": []
-    },
-    {
-      "file": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/outliers_v9.py",
-      "sha256": "142069edf7f14691970503d4c79a43c8ea167f96d527b35a3285add8229f2f82",
-      "functions": [
-        "k_of",
-        "compute"
-      ],
-      "classes": []
-    },
-    {
-      "file": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/qc_reproducibility_v9.py",
-      "sha256": "58107af91b6d7fd132bd944b597ba89f1595277f9e9403d39546edde75baebe2",
-      "functions": [
-        "gate",
-        "cutoff",
-        "material",
-        "qc_group",
-        "compute"
-      ],
-      "classes": []
-    },
-    {
-      "file": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/scale_v9.py",
-      "sha256": "cbebaee68e6cfd20f72e2f025eb7610ec06bd94f648ae66885c013971c522fe9",
-      "functions": [
-        "_q",
-        "samples",
-        "score"
-      ],
-      "classes": []
-    },
-    {
-      "file": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/annotation_v9.py",
-      "sha256": "db4e66631e25aadfb7934adb335982a212c91a4e2efb0e6cb36fa70a958baed9",
-      "functions": [
-        "norm",
-        "file_of",
-        "refmet_lookup",
-        "refmet_classes",
-        "_class_of",
-        "repeat_key",
-        "analyse"
-      ],
-      "classes": []
-    },
-    {
-      "file": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/labels_v9.py",
-      "sha256": "1c4060d891e9dba7026ead13669c4b1bac9ec2b5f7b5a3afd17f2d7310f1312e",
-      "functions": [
-        "folds",
-        "sample_label",
-        "split",
-        "sample_table_conflicts",
-        "_unsettled",
-        "eligible_labels",
-        "factor_items",
-        "combinations",
-        "class_name",
-        "parse_choice",
-        "choice_text",
-        "_balance",
-        "other_factors",
-        "pair_entropy",
-        "_scores",
-        "sample_classes",
-        "compute"
-      ],
-      "classes": []
-    },
-    {
-      "file": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/separability_v9.py",
-      "sha256": "cf3e3e2f041f519d85b1436facc9de1d5e86c5d193024a4758aa1fd6beb9bca6",
-      "functions": [
-        "settings",
-        "standardised_ranks",
-        "distances",
-        "dense_ranks",
-        "_store",
-        "_square",
-        "condensed",
-        "unit_profiles",
-        "_neighbour_sets",
-        "overlap",
-        "chance",
-        "chance_per_class",
-        "discriminative",
-        "unit_values",
-        "subjects",
-        "subjects_confirmed",
-        "signed_rank_p",
-        "min_pairs",
-        "bh_adjusted",
-        "_top",
-        "deposited_values",
-        "feature_names",
-        "_bh",
-        "by_subject",
-        "_usable",
-        "compute",
-        "_medians"
-      ],
-      "classes": []
-    },
-    {
-      "file": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/sample_annotations_v9.py",
-      "sha256": "686e3d11912e9cf71e33c2348b73c4785661ef8108a82649f045705bb588eab0",
-      "functions": [
-        "_norm",
-        "technical_kind",
-        "_pairs",
-        "_factors",
-        "value_family",
-        "_additional",
-        "_filters",
-        "confounded",
-        "compute",
-        "precalculated_labels",
-        "technical_additional_names"
-      ],
-      "classes": []
-    },
-    {
-      "file": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/additional_sample_data.py",
-      "sha256": "dc9f0077bfabd8e5efa2cb016ff466547f95af3f4554edaa9fd322b5cfb89e6d",
-      "functions": [
-        "fields_of",
-        "records_from_text",
-        "records_from_json",
-        "read",
-        "_why_not",
-        "summarise"
-      ],
-      "classes": []
-    },
-    {
-      "file": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/readiness_v9.py",
-      "sha256": "52586d01839483c56597f36d102397ca885189f3ac88bd387ef5ed9718574a51",
-      "functions": [
-        "_snap",
-        "custom",
-        "custom_ignored",
-        "tiers",
-        "_reference_cutoffs",
-        "cutoffs",
-        "cutoff_sources",
-        "reference",
-        "data_result",
-        "task_result",
-        "summary_parts",
-        "summary",
-        "settings",
-        "signature"
-      ],
-      "classes": []
-    },
-    {
-      "file": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/coordinate_metrics.py",
-      "sha256": "0dcb3eb540499753bce858913a479eee881bdff6a4ec2f587eae3003ae56902a",
-      "functions": [
-        "evidence_of",
-        "coordinate_metric",
-        "lc_context_recommendations",
-        "lc_metric"
-      ],
-      "classes": []
-    },
-    {
-      "file": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/recommendation_v9.py",
-      "sha256": "fc82310ba5f92dfc3b1e47077cd9f853bb967ff95b248dd383388d96caa808aa",
-      "functions": [
-        "_rec",
-        "_n",
-        "_facts",
-        "_goto",
-        "_labels_text",
-        "_section",
-        "recommendation_html"
-      ],
-      "classes": []
-    },
-    {
-      "file": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/overview_v9.py",
-      "sha256": "05ee17ab072c021ab0e9191332f01c8e9644586b97dc8ba582878861131d0441",
-      "functions": [],
-      "classes": []
-    },
-    {
-      "file": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/pilot_analysis_endpoint.py",
-      "sha256": "75cf675fcdaf8a5cb523aebf9d83d0d7ca7f9247b5060e1b4103c498c6ef9ca4",
-      "functions": [
-        "_raw_study",
-        "_memo",
-        "study_ids",
-        "_item_defs",
-        "endpoint_agreement",
-        "_agreement_html",
-        "_study",
-        "_unnamed_coordinates",
-        "_unnamed_coordinates_text",
-        "_red_note",
-        "_note",
-        "_descriptions",
-        "_pct",
-        "_bar",
-        "_summary",
-        "_mark",
-        "_dup_pct",
-        "_item_detail",
-        "_subject_note",
-        "_endpoint_cell",
-        "_per_endpoint_rows",
-        "_intro",
-        "structural_panel",
-        "_agree",
-        "overview_strip",
-        "_edit_note",
-        "placeholder_panel",
-        "overview_section_cards",
-        "_ov_colour",
-        "_ov_availability",
-        "_ov_definitions",
-        "_ov_structural_detail",
-        "_ov_structural_reason",
-        "_ov_analytical_detail",
-        "_ov_units",
-        "_overview_data",
-        "_ov_tip",
-        "_ov_tile",
-        "_ov_flag",
-        "_ov_goto",
-        "_ov_absent",
-        "_overview_description",
-        "_rd_cut_panel",
-        "_rd_custom_text",
-        "_readiness_description",
-        "_lc_declared",
-        "_rd_by_ep",
-        "_rd_info",
-        "_rd_alert_head",
-        "_rd_subjects",
-        "_rd_summary_cell",
-        "_rd_count_values",
-        "_rd_count_cell",
-        "_rd_cut_settings",
-        "_rd_check_sentences",
-        "_rd_units",
-        "_rd_alerts",
-        "_rd_more",
-        "_rd_alert_flag",
-        "_rd_bar",
-        "_rd_reuse",
-        "readiness_block",
-        "overview_scores",
-        "export_overview_block",
-        "_cell_kind",
-        "_strip",
-        "_strip_head",
-        "_where_text",
-        "_merged",
-        "_kind_text",
-        "editor_panel",
-        "_additional_by_sample",
-        "_sample_evidence",
-        "qc_describe",
-        "_evidence_cell",
-        "_filter_row",
-        "derived_inputs_panel",
-        "_fair_check_value",
-        "_fair_value",
-        "_fair_evidence",
-        "_deposited",
-        "_fair_values_html",
-        "_fair_items_table",
-        "_lookup_note",
-        "_fair_endpoint_note",
-        "metadata_panel",
-        "export_metadata_block",
-        "_analytical",
-        "design_context",
-        "acquisition_context",
-        "data_summary_rows",
-        "_type_note",
-        "_units_title",
-        "_results_lines",
-        "_format_note",
-        "_qc_repro_description",
-        "_processing_description",
-        "_qc_blank_description",
-        "analytical_descriptions",
-        "analytical_cutoff_note",
-        "analytical_pending",
-        "_plural",
-        "_curated_note",
-        "_qc_repro",
-        "_qc_blank_study",
-        "_sample_table_line",
-        "_not_measured_line",
-        "_control_example",
-        "_controls_box",
-        "_qc_repro_line",
-        "_qc_blank_cell",
-        "_value",
-        "_extra_field",
-        "_additional_cell",
-        "_processing_cell",
-        "qc_blank_panel",
-        "export_qc_blank_block",
-        "export_analytical_block",
-        "export_block",
-        "_missingness_description",
-        "_missingness_study",
-        "_p1",
-        "_floor1",
-        "_share_pct",
-        "_missingness_cell",
-        "missingness_panel",
-        "export_missingness_block",
-        "_scale_description",
-        "_num",
-        "_scale_study",
-        "_scale_cell",
-        "scale_panel",
-        "export_scale_block",
-        "_annotations_description",
-        "_ann_signature",
-        "_annotations_study",
-        "_q",
-        "_state",
-        "_technical_line",
-        "_none",
-        "_batch_cell",
-        "_order_cell",
-        "_label_cell",
-        "_factor_cell",
-        "_confounded_note",
-        "_annotations_row",
-        "annotations_panel",
-        "export_annotations_block",
-        "_low_information_description",
-        "_low_information_study",
-        "_details_and_examples",
-        "_low_info_example",
-        "_feature_list_form",
-        "_low_information_cell",
-        "low_information_panel",
-        "export_low_information_block",
-        "_redundancy_description",
-        "_redundancy_study",
-        "_redundancy_cell",
-        "redundancy_panel",
-        "export_redundancy_block",
-        "_light",
-        "feature_list_payload",
-        "_outliers_description",
-        "_outlier_study",
-        "_outlier_cell",
-        "outlier_panel",
-        "export_outlier_block",
-        "annotation_description",
-        "_annotation_study",
-        "study_card_annotations",
-        "study_card_classes",
-        "_ann_absent",
-        "_ann_na",
-        "_coverage_cell",
-        "_refmet_cell",
-        "_class_colours",
-        "_class_bar",
-        "_classes_cell",
-        "_repeats_cell",
-        "_class_legend",
-        "_annotation_block",
-        "annotation_panel",
-        "export_annotation_block",
-        "annotation_lists",
-        "_labels_study",
-        "_lb_choice_text",
-        "_lb_example",
-        "labels_description",
-        "_lb_selector",
-        "_lb_value",
-        "_lb_metric_html",
-        "_lb_used",
-        "_lb_classes_html",
-        "_lb_other_html",
-        "_lb_num",
-        "_lb_factors_html",
-        "labels_panel",
-        "export_labels_block",
-        "_ml_study",
-        "ml_description",
-        "_ml_num",
-        "_ml_cell_sep",
-        "_ml_cell_overlap",
-        "_ml_cell_disc",
-        "_num_short",
-        "_trim",
-        "_short_classes",
-        "_n_html",
-        "_sci",
-        "_ml_cell_subjects",
-        "ml_panel",
-        "export_ml_block",
-        "drop_superseded",
-        "public"
-      ],
-      "classes": []
-    },
-    {
-      "file": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/ui.py",
-      "sha256": "dcbf15d4a1ba950f31ddbe734eb483ab4038fc65362c7c36a0c08ad23426fd2c",
-      "functions": [
-        "_e",
-        "_repository_display_label",
-        "_cloudflare_beacon_token",
-        "_merit_analytics_head_script",
-        "_merit_analytics_consent_css",
-        "_merit_analytics_consent_banner",
-        "_merit_about_usage_stats_html",
-        "_merit_about_usage_stats_css",
-        "_merit_about_usage_stats_js",
-        "_study_id_key",
-        "_workbench_study_url",
-        "_workbench_rest_url",
-        "_workbench_study_rest_url",
-        "_workbench_analysis_rest_url",
-        "_source_matrix_rest_endpoint",
-        "_source_matrix_rest_label",
-        "_verify_rest_chip",
-        "_overview_rest_source",
-        "_overview_verify_chip",
-        "_verify_workbench_button",
-        "_report_merit_parsing_issue_card",
-        "_embargoed_study_message",
-        "_is_embargoed_study",
-        "_v2_band_label",
-        "_v2_is_default_params",
-        "_coerce_v2_scoring_params",
-        "_coerce_v2_matrix_overrides",
-        "_v2_fmt_param",
-        "_v2_fmt_score",
-        "_v2_param_display_value",
-        "_v2_param_display_bounds",
-        "_v2_param_display_text",
-        "_logo_asset_path",
-        "_logo_asset_bytes",
-        "_logo_asset_url",
-        "_report_dark_style",
-        "_logo_theme_css",
-        "_json_safe_state_payload",
-        "_default_precomputed_root",
-        "_study_metadata_index_path",
-        "_citation_index_path",
-        "_load_citation_index",
-        "_related_publications_html",
-        "_citation_card_html",
-        "_normalize_platform_label",
-        "_normalize_analysis_type_label",
-        "_load_study_browser_data",
-        "_study_browser_sorted_rows",
-        "_study_browser_facet_values",
-        "_study_browser_facets",
-        "_study_browser_norm",
-        "_study_browser_split_quoted",
-        "_study_browser_expand_term",
-        "_study_browser_infer_field",
-        "_study_browser_parse_search",
-        "_study_browser_row_fields",
-        "_study_browser_contains",
-        "_study_browser_match_search",
-        "_study_browser_value_matches",
-        "_study_browser_compact_row",
-        "_study_browser_data_payload",
-        "_study_browser_html",
-        "_bulk_workspace_html",
-        "_sidebar_top_worst_html",
-        "_score_color",
-        "_score_100_text",
-        "_status_display_label",
-        "_status_badge",
-        "_score_bar",
-        "_pill",
-        "_safe_missing_rate",
-        "_source_aware_missingness_rate",
-        "_analysis_id_label",
-        "_normalize_analysis_tokens",
-        "_mini_info_icon",
-        "_overview_datatable_ml_eligible",
-        "_datatable_editor_alignment",
-        "_analysis_type_text",
-        "_design_summary_sentence",
-        "_study_design_context_notice",
-        "_sample_row_breakdown_html",
-        "_fsr_has_repeated_ids",
-        "_fsr_row_detail",
-        "_fsr_positions_row_html",
-        "_source_summary",
-        "_source_sample_count_notice",
-        "_repeated_subject_level_notice",
-        "_study_header",
-        "_nmr_analysis_table",
-        "_per_analysis_table",
-        "_refmet_class_charts",
-        "_class_separability_panel",
-        "_metric_display_name",
-        "_metric_descriptor",
-        "_drop_legacy_batch_info_metric",
-        "_v2_metric_by_name",
-        "_v2_display_text",
-        "_v2_state_study_id",
-        "_v2_dump_root",
-        "_v2_default_sample_eligible",
-        "_v2_read_row_oriented_sample_table",
-        "_v2_read_mwtab_samples",
-        "_v2_read_study_factor_labels",
-        "_v2_build_sample_matrix_model",
-        "_v2_effective_sample_rows",
-        "_v2_label_stats",
-        "_v2_update_metric",
-        "_v2_apply_matrix_overrides_to_report",
-        "_v2_apply_display_terminology_to_report",
-        "_v2_mean_score",
-        "_v2_status_badge_for_score",
-        "_v2_ratio_score",
-        "_v2_band_from_score",
-        "_v2_cap_band",
-        "_v2_adjust_report_metrics",
-        "_v2_compute_readiness_score",
-        "_v2_apply_scoring_profile",
-        "_checks_list_html",
-        "_pct_text",
-        "_per_analysis_share_rows",
-        "_named_feature_coverage_popup",
-        "_refmet_named_features_popup",
-        "_refmet_record_mapping_popup",
-        "_external_cross_references_popup",
-        "_metric_info_tooltip",
-        "_metric_rows",
-        "_fmt_num",
-        "_fmt_sci",
-        "_fmt_pct",
-        "_analysis_table",
-        "_analytical_breakdown_html",
-        "_analytical_metric_rows",
-        "_ml_difficulty",
-        "_readiness_confidence",
-        "_risks_panel",
-        "_source_availability_panel",
-        "_matrix_adjust_tab_html",
-        "_download_tabular_data_tab_html",
-        "_tabbed_report",
-        "_result_panel",
-        "_bulk_clean_matrix_overrides",
-        "_ml_export_clean_analysis_ids",
-        "_bulk_clean_session",
-        "_bulk_session_embargoed_ids",
-        "_raise_if_embargoed_bulk_session",
-        "_ml_export_source_hash",
-        "_ml_export_citation_metadata",
-        "_ml_export_derivation_metadata",
-        "_ml_export_slug",
-        "_ml_export_fetch_text",
-        "_ml_export_fetch_json",
-        "_ml_export_rows_from_payload",
-        "_ml_export_analysis_id",
-        "_ml_export_study_id",
-        "_ml_export_untarg_registry_analyses",
-        "_ml_export_cached_analysis_ids",
-        "_ml_export_study_analyses",
-        "_ml_export_factor_labels",
-        "_ml_export_parse_table",
-        "_ml_export_mwtab_table",
-        "_ml_export_mwtab_matrix_rows",
-        "_ml_export_unique_features",
-        "_ml_export_matrix_from_table",
-        "_ml_export_fetch_matrix",
-        "_ml_export_effective_row",
-        "_ml_export_write_tsv",
-        "_ml_export_build_zip",
-        "_ml_ready_data_zip_payload",
-        "_bulk_ml_ready_data_zip_payload",
-        "_bulk_report_sections",
-        "_bulk_pick_source",
-        "_bulk_get_metric",
-        "_bulk_metric_value",
-        "_bulk_score100",
-        "_bulk_fmt_value",
-        "_bulk_text_cell",
-        "_bulk_rows_to_tsv",
-        "_bulk_export_columns",
-        "_bulk_export_readme_text",
-        "_bulk_publication_identifiers",
-        "_bulk_citation_text",
-        "_bulk_provenance_fields",
-        "_bulk_export_session_payload",
-        "_bulk_first_recommendation",
-        "_bulk_lowest_section",
-        "_bulk_lowest_metric",
-        "_bulk_gate_summary",
-        "_bulk_metric_long_rows",
-        "_bulk_refmet_fields",
-        "_bulk_run_from_session",
-        "_bulk_chunk_payload",
-        "_bulk_runner_page",
-        "_bulk_results_page",
-        "_v2_scoring_control",
-        "_v2_custom_cutoffs_html",
-        "_v2_scoring_controls_html",
-        "_page",
-        "serve_ui",
-        "_requested_fetch_mode",
-        "_is_http_location",
-        "_read_json_from_location",
-        "_load_precomputed_state",
-        "_load_cached_workflow_state",
-        "_load_cached_workflow_state_payload"
-      ],
-      "classes": [
-        "MetaboUIHandler"
-      ]
-    },
-    {
-      "file": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/report_dark_theme.py",
-      "sha256": "c1ec440b6dfd71a429e83dba74bbd0cfaf6840144372513e9bc2f9ee2121de29",
-      "functions": [
-        "style"
-      ],
-      "classes": []
-    },
-    {
-      "file": "merit-ui-v9-analysis-endpoint-pilot/v8_layout/merit/guided_tour.py",
-      "sha256": "b72ac4b402f4e260f395f82df7104b32d6d2e59339900fa2c3580db3eb1cf5ab",
-      "functions": [
-        "tour_html"
-      ],
-      "classes": []
-    },
-    {
-      "file": "online-tool/live_app.py",
-      "sha256": "e6f0b46ad9001708861fa05c1b47f1724a7b04b4aca2cb614292c37f35a50dee"
-    },
-    {
-      "file": "online-tool/live_bulk.py",
-      "sha256": "dfe5e09bd26a603a5a465c7411f1fb38132bad3bc6c7b318365625d977dfcaa7"
-    },
-    {
-      "file": "online-tool/bulk_entry.py",
-      "sha256": "c7ec37f0603b22df39227f737a234b0dc9941c21bd364a25bc5beffdf04a47a0"
-    },
-    {
-      "file": "online-tool/live_disease.py",
-      "sha256": "baf0bdc37dd7026836457d09054aa14f681040a50f353b7c262090f6eef4302b"
-    },
-    {
-      "file": "online-tool/live_design_context.py",
-      "sha256": "854d7b4f1762871882b140377bbaab224e54ebbeee92d3a78def3f6b34a50c69"
-    },
-    {
-      "file": "online-tool/native_resources.py",
-      "sha256": "b2499f045f930f09cf4d90a29c13e302fd56728010a89c34126a0edca847387c"
-    },
-    {
-      "file": "online-tool/native_guard.py",
-      "sha256": "108e6b9a7a4c96c15f836a1de2b1297d286b90779abb77e02f84466011dff942"
-    },
-    {
-      "file": "online-tool/matrix_driver.py",
-      "sha256": "e709c2f076328c3ecfd85df97b2b7469e91aa9b6e8b613b76526cec744d75502"
-    },
-    {
-      "file": "online-tool/matrix_worker.py",
-      "sha256": "0485f451d60620dbfebbfb1a9b96060368bc68e8dcd35e8bf07e2470b1040073"
-    },
-    {
-      "file": "online-tool/v2_server.py",
-      "sha256": "4a3cc0af2773fdd6bb4ade965a97cfb459339dc9d2be525f05279345e93c88b0"
-    },
-    {
-      "file": "online-tool/versioned_context.py",
-      "sha256": "5145ba72a7c78eb7385f4fcb77db0995d6799ef641a3e8779c3c619f9e485f56"
-    },
-    {
-      "file": "online-tool/browser_app/browser_runtime.py",
-      "sha256": "c521fe327db0e6713c98034f638bc50b22a1325c4825b881fcc49926065bccc3"
-    },
-    {
-      "file": "online-tool/browser_app/app.js",
-      "sha256": "633043d6bc67ac034b888fab90dc60cbb1557058a1f06d4c418c649827705af5"
-    },
-    {
-      "file": "online-tool/browser_app/index.html",
-      "sha256": "01033a193012f19c235492e6e36fd6d3b8a247e1ff8d5ffe587635f78897f933"
-    },
-    {
-      "file": "online-tool/browser_app/downloads.js",
-      "sha256": "177d209f2fc8080927e5232bf0dd4369e70103bec1613b14b35a9b6e2ae4f2a8"
-    }
-  ],
-  "reference_items": [
-    {
-      "number": 1,
-      "section": "Structural",
       "item": "Sample support",
-      "role": "Scored",
-      "guide": "6"
+      "type": "Scored",
+      "guide_section": "6"
     },
     {
-      "number": 2,
-      "section": "Structural",
       "item": "Samples with a factor label",
-      "role": "Scored",
-      "guide": "6"
+      "type": "Scored",
+      "guide_section": "6"
     },
     {
-      "number": 3,
-      "section": "Structural",
       "item": "Numeric value cells",
-      "role": "Scored",
-      "guide": "6"
+      "type": "Scored",
+      "guide_section": "6"
     },
     {
-      "number": 4,
-      "section": "Structural",
       "item": "Distinct sample IDs per position (tab: Duplicate sample IDs)",
-      "role": "Scored",
-      "guide": "6"
+      "type": "Scored",
+      "guide_section": "6"
     },
     {
-      "number": 5,
-      "section": "Structural",
       "item": "Structural mean",
-      "role": "Separate summary",
-      "guide": "6"
+      "type": "Separate summary",
+      "guide_section": "6"
     },
     {
-      "number": 6,
-      "section": "Structural",
       "item": "Linkage, completeness and agreement",
-      "role": "Informational",
-      "guide": "6"
+      "type": "Informational",
+      "guide_section": "6"
     },
     {
-      "number": 7,
-      "section": "Metadata and FAIR Reusability",
       "item": "Study metadata",
-      "role": "Scored",
-      "guide": "7"
+      "type": "Scored",
+      "guide_section": "7"
     },
     {
-      "number": 8,
-      "section": "Metadata and FAIR Reusability",
       "item": "RefMet mapping of deposited metabolite records",
-      "role": "Scored",
-      "guide": "7"
+      "type": "Scored",
+      "guide_section": "7"
     },
     {
-      "number": 9,
-      "section": "Metadata and FAIR Reusability",
       "item": "External IDs via RefMet",
-      "role": "Scored",
-      "guide": "7"
+      "type": "Scored",
+      "guide_section": "7"
     },
     {
-      "number": 10,
-      "section": "Metadata and FAIR Reusability",
       "item": "Mass/RT metadata",
-      "role": "Scored (0/100)",
-      "guide": "7"
+      "type": "Scored (0/100)",
+      "guide_section": "7"
     },
     {
-      "number": 11,
-      "section": "Metadata and FAIR Reusability",
       "item": "LC-method context",
-      "role": "Scored",
-      "guide": "7"
+      "type": "Scored",
+      "guide_section": "7"
     },
     {
-      "number": 12,
-      "section": "Metadata and FAIR Reusability",
       "item": "FAIR index",
-      "role": "Separate summary",
-      "guide": "7"
+      "type": "Separate summary",
+      "guide_section": "7"
     },
     {
-      "number": 13,
-      "section": "Metadata and FAIR Reusability",
       "item": "Deposited evidence",
-      "role": "Informational",
-      "guide": "7"
+      "type": "Informational",
+      "guide_section": "7"
     },
     {
-      "number": 14,
-      "section": "Analytical QC",
-      "item": "Missing entries and zeros \u2020",
-      "role": "Scored; alert",
-      "guide": "8\u201310"
+      "item": "Missing entries and zeros †",
+      "type": "Scored; alert",
+      "guide_section": "8–10"
     },
     {
-      "number": 15,
-      "section": "Analytical QC",
-      "item": "Low-information features \u2020",
-      "role": "Scored; alert",
-      "guide": "8\u201310"
+      "item": "Low-information features †",
+      "type": "Scored; alert",
+      "guide_section": "8–10"
     },
     {
-      "number": 16,
-      "section": "Analytical QC",
-      "item": "Redundant features \u2020",
-      "role": "Scored; alert",
-      "guide": "8\u201310"
+      "item": "Redundant features †",
+      "type": "Scored; alert",
+      "guide_section": "8–10"
     },
     {
-      "number": 17,
-      "section": "Analytical QC",
-      "item": "Outlier samples \u2020",
-      "role": "Scored; alert",
-      "guide": "8\u201310"
+      "item": "Outlier samples †",
+      "type": "Scored; alert",
+      "guide_section": "8–10"
     },
     {
-      "number": 18,
-      "section": "Analytical QC",
       "item": "Units declared",
-      "role": "Scored (0/100)",
-      "guide": "8\u201310"
+      "type": "Scored (0/100)",
+      "guide_section": "8–10"
     },
     {
-      "number": 19,
-      "section": "Analytical QC",
       "item": "Analytical review alerts",
-      "role": "Readiness profile",
-      "guide": "8\u201310"
+      "type": "Readiness profile",
+      "guide_section": "8–10"
     },
     {
-      "number": 20,
-      "section": "Analytical QC",
       "item": "Sample eligibility and controls",
-      "role": "Informational",
-      "guide": "8\u201310"
+      "type": "Informational",
+      "guide_section": "8–10"
     },
     {
-      "number": 21,
-      "section": "Analytical QC",
       "item": "QC reproducibility",
-      "role": "Informational",
-      "guide": "8.2"
+      "type": "Informational",
+      "guide_section": "8.2"
     },
     {
-      "number": 22,
-      "section": "Analytical QC",
       "item": "Low-variation caution",
-      "role": "Informational",
-      "guide": "8\u201310"
+      "type": "Informational",
+      "guide_section": "8–10"
     },
     {
-      "number": 23,
-      "section": "Analytical QC",
       "item": "Measurement scale",
-      "role": "Informational",
-      "guide": "8\u201310"
+      "type": "Informational",
+      "guide_section": "8–10"
     },
     {
-      "number": 24,
-      "section": "Analytical QC",
       "item": "Acquisition, data summary and processing",
-      "role": "Informational",
-      "guide": "8\u201310"
+      "type": "Informational",
+      "guide_section": "8–10"
     },
     {
-      "number": 25,
-      "section": "Analytical QC",
       "item": "Sample annotations (MetaBatch-style)",
-      "role": "Informational",
-      "guide": "8\u201310"
+      "type": "Informational",
+      "guide_section": "8–10"
     },
     {
-      "number": 26,
-      "section": "Analytical QC",
       "item": "Additional sample data",
-      "role": "Informational",
-      "guide": "8\u201310"
+      "type": "Informational",
+      "guide_section": "8–10"
     },
     {
-      "number": 27,
-      "section": "Analytical QC",
       "item": "Evidence behind the scored items",
-      "role": "Informational",
-      "guide": "8\u201310"
+      "type": "Informational",
+      "guide_section": "8–10"
     },
     {
-      "number": 28,
-      "section": "Annotation / Interoperability",
       "item": "Named-feature coverage",
-      "role": "Scored",
-      "guide": "11"
+      "type": "Scored",
+      "guide_section": "11"
     },
     {
-      "number": 29,
-      "section": "Annotation / Interoperability",
       "item": "RefMet mapping of named features",
-      "role": "Scored",
-      "guide": "11"
+      "type": "Scored",
+      "guide_section": "11"
     },
     {
-      "number": 30,
-      "section": "Annotation / Interoperability",
       "item": "Labels, mapping, classes and repeats",
-      "role": "Informational",
-      "guide": "11"
+      "type": "Informational",
+      "guide_section": "11"
     },
     {
-      "number": 31,
-      "section": "Label Structure and Class Support",
       "item": "Class support",
-      "role": "Scored",
-      "guide": "4, 12"
+      "type": "Scored",
+      "guide_section": "4, 12"
     },
     {
-      "number": 32,
-      "section": "Label Structure and Class Support",
       "item": "Cross-validation sample-count support (tab: Cross-validation feasible)",
-      "role": "Scored (0/100); readiness profile",
-      "guide": "4, 12"
+      "type": "Scored (0/100); readiness profile",
+      "guide_section": "4, 12"
     },
     {
-      "number": 33,
-      "section": "Label Structure and Class Support",
       "item": "Classes, factors and exclusions",
-      "role": "Informational",
-      "guide": "4, 12"
+      "type": "Informational",
+      "guide_section": "4, 12"
     },
     {
-      "number": 34,
-      "section": "ML Task Readiness",
       "item": "Class separability",
-      "role": "Scored",
-      "guide": "13"
+      "type": "Scored",
+      "guide_section": "13"
     },
     {
-      "number": 35,
-      "section": "ML Task Readiness",
       "item": "Chance level",
-      "role": "Shown with the score",
-      "guide": "13"
+      "type": "Shown with the score",
+      "guide_section": "13"
     },
     {
-      "number": 36,
-      "section": "ML Task Readiness",
       "item": "Features associated with the selected classes",
-      "role": "Informational",
-      "guide": "13"
+      "type": "Informational",
+      "guide_section": "13"
     },
     {
-      "number": 37,
-      "section": "ML Task Readiness",
       "item": "Overlap details, p/n and subjects",
-      "role": "Informational",
-      "guide": "13"
+      "type": "Informational",
+      "guide_section": "13"
     },
     {
-      "section": "Current interface",
       "item": "Search, availability, progress and Generating report",
-      "role": "Interface / informational",
-      "guide": "1, 3"
+      "type": "Interface / informational",
+      "guide_section": "1, 3"
     },
     {
-      "section": "Current interface",
       "item": "Light/dark mode, About, publication, GitHub and manual",
-      "role": "Interface / informational",
-      "guide": "1"
+      "type": "Interface / informational",
+      "guide_section": "1"
     },
     {
-      "section": "Current interface",
       "item": "Search/report tours, replay and opt-out/storage limits",
-      "role": "Interface / informational",
-      "guide": "1.2"
+      "type": "Interface / informational",
+      "guide_section": "1.2"
     },
     {
-      "section": "Current interface",
       "item": "Per-matrix profile, coverage, tiles, colour/help and grouped endpoints",
-      "role": "Interface / informational",
-      "guide": "3"
+      "type": "Interface / informational",
+      "guide_section": "3"
     },
     {
-      "section": "Current interface",
       "item": "Data at a glance and applied-input recommendations",
-      "role": "Interface / informational",
-      "guide": "3.2, 19"
+      "type": "Interface / informational",
+      "guide_section": "3.2, 19"
     },
     {
-      "section": "Current interface",
       "item": "Derived design/analyzer/acquisition context and provenance",
-      "role": "Interface / informational",
-      "guide": "3.3, 10.3"
+      "type": "Interface / informational",
+      "guide_section": "3.3, 10.3"
     },
     {
-      "section": "Current interface",
       "item": "Whole-string / selected-factor classes and observed combinations",
-      "role": "Interface / informational",
-      "guide": "4"
+      "type": "Interface / informational",
+      "guide_section": "4"
     },
     {
-      "section": "Current interface",
       "item": "Other-factor states, proportions and joint distributions",
-      "role": "Interface / informational",
-      "guide": "4.3"
+      "type": "Interface / informational",
+      "guide_section": "4.3"
     },
     {
-      "section": "Current interface",
       "item": "Use as, labels, batch-like edits, subject shortcuts and confirmation",
-      "role": "Interface / informational",
-      "guide": "5"
+      "type": "Interface / informational",
+      "guide_section": "5"
     },
     {
-      "section": "Current interface",
       "item": "Thirteen numerical settings, bounds, steps and dependencies",
-      "role": "Interface / informational",
-      "guide": "14"
+      "type": "Interface / informational",
+      "guide_section": "14"
     },
     {
-      "section": "Current interface",
       "item": "Eight custom score cut-offs, fallbacks and precedence",
-      "role": "Interface / informational",
-      "guide": "14.1"
+      "type": "Interface / informational",
+      "guide_section": "14.1"
     },
     {
-      "section": "Current interface",
-      "item": "Fixed R1, strict comparisons, ties and reference versioning",
-      "role": "Interface / informational",
-      "guide": "15"
+      "item": "Reference-based alerts, strict comparisons, ties and custom cut-offs",
+      "type": "Interface / informational",
+      "guide_section": "15"
     },
     {
-      "section": "Current interface",
       "item": "Assessment JSON, matrices, full-position exports and feature/evidence lists",
-      "role": "Interface / informational",
-      "guide": "16"
+      "type": "Interface / informational",
+      "guide_section": "16"
     },
     {
-      "section": "Current interface",
       "item": "Bulk validation/statuses, individual interactive reports and expiry",
-      "role": "Interface / informational",
-      "guide": "17"
+      "type": "Interface / informational",
+      "guide_section": "17"
     },
     {
-      "section": "Current interface",
-      "item": "Native memory/check/render settings and available-port launch",
-      "role": "Interface / informational",
-      "guide": "17.2\u201317.3"
+      "item": "Local memory/time settings and automatic choice of address",
+      "type": "Interface / informational",
+      "guide_section": "17.2–17.3"
     },
     {
-      "section": "Current interface",
       "item": "Browser per-matrix guards, downloads, checkpoints and omissions",
-      "role": "Interface / informational",
-      "guide": "18"
+      "type": "Interface / informational",
+      "guide_section": "18"
     },
     {
-      "section": "Current interface",
       "item": "Unavailable / partial / metadata-only states and troubleshooting",
-      "role": "Interface / informational",
-      "guide": "2, 3, 18\u201319"
+      "type": "Interface / informational",
+      "guide_section": "2, 3, 18–19"
     }
   ],
-  "source_reference_item_count": 37,
-  "additional_feature_count": 17
+  "settings": [
+    {
+      "setting": "Cross-validation folds k",
+      "default": "5",
+      "allowed_range": "2–10",
+      "step": "1",
+      "effect": "Class-count requirement and Class support fold term."
+    },
+    {
+      "setting": "Structural: sample-support target N",
+      "default": "20",
+      "allowed_range": "5–100",
+      "step": "1",
+      "effect": "Structural item and mean; not CV count support."
+    },
+    {
+      "setting": "Low-information: frequency ratio R",
+      "default": "19",
+      "allowed_range": "5–99",
+      "step": "1",
+      "effect": "Flag when ratio > R and distinct percentage ≤ U; also changes redundancy eligibility."
+    },
+    {
+      "setting": "Low-information: distinct-value percentage U",
+      "default": "10",
+      "allowed_range": "1–25",
+      "step": "1",
+      "effect": "Flag when percentage ≤ U and ratio > R; also changes redundancy eligibility."
+    },
+    {
+      "setting": "Low-variation caution: CV (%)",
+      "default": "1",
+      "allowed_range": "0.1–5",
+      "step": "0.1",
+      "effect": "Informational only; strictly below the threshold."
+    },
+    {
+      "setting": "Redundancy: absolute correlation c",
+      "default": "0.9",
+      "allowed_range": "0.8–0.99",
+      "step": "0.01",
+      "effect": "Evaluated pairs above c, with 1e−5 equality tolerance."
+    },
+    {
+      "setting": "QC reproducibility: RSD (%)",
+      "default": "20",
+      "allowed_range": "10–40",
+      "step": "1",
+      "effect": "Informational pass counts; detection must still be >70%."
+    },
+    {
+      "setting": "Outliers: fence multiplier a",
+      "default": "1.5",
+      "allowed_range": "1–3",
+      "step": "0.1",
+      "effect": "Sample medians outside Q1−a·IQR / Q3+a·IQR."
+    },
+    {
+      "setting": "Extreme-alert percentile",
+      "default": "2.5",
+      "allowed_range": "2.5–10",
+      "step": "2.5",
+      "effect": "Choose 2.5, 5, 7.5 or 10 from R1."
+    },
+    {
+      "setting": "Low-alert percentile",
+      "default": "10",
+      "allowed_range": "2.5–10",
+      "step": "2.5",
+      "effect": "Choose 2.5, 5, 7.5 or 10; effective value never below extreme."
+    },
+    {
+      "setting": "Separability: neighbours K",
+      "default": "7",
+      "allowed_range": "3–15",
+      "step": "1",
+      "effect": "Neighbour count, not CV folds."
+    },
+    {
+      "setting": "Separability: overlap threshold θ",
+      "default": "3",
+      "allowed_range": "0–7",
+      "step": "1",
+      "effect": "Integer; effective maximum floor(K/2), although input maximum is 7."
+    },
+    {
+      "setting": "Feature associations: FDR q",
+      "default": "0.05",
+      "allowed_range": "0.01–0.2",
+      "step": "0.01",
+      "effect": "Significance and paired-test minimum support."
+    }
+  ],
+  "custom_alert_cutoffs": {
+    "checks": [
+      "Missing entries and zeros",
+      "Low-information features",
+      "Redundant features",
+      "Outlier samples"
+    ],
+    "tiers": [
+      "Extreme",
+      "Low"
+    ],
+    "fields": 8,
+    "allowed_range": "0–100",
+    "default": "Empty: use the selected reference percentile"
+  }
 }

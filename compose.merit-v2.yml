@@ -1,7 +1,7 @@
 name: merit-v2
 services:
   merit:
-    image: ghcr.io/biosystemengineeringlab-iitb/merit-ml:v2-live-20261112-r13
+    image: ghcr.io/biosystemengineeringlab-iitb/merit-ml:v2-live-20261112-r14
     build:
       context: .
       dockerfile: docker/merit-v2/Dockerfile
