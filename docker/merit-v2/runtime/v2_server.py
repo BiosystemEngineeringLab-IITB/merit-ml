@@ -65,7 +65,7 @@ def create(jobs,catalog=None,inventory=None):
     service=old_create(jobs,catalog,inventory)
     @service.after_request
     def add_version(response):
-        response.headers['X-MERIT-Version']='v2-live-20261108-r12'
+        response.headers['X-MERIT-Version']='v2-live-20261112-r13'
         return response
     @service.get('/api/v2/execution/<key>')
     def execution(key):

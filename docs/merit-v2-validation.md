@@ -1,3 +1,11 @@
+# User manual release — 12 November 2026
+
+`v2-live-20261112-r13` bundles the new 32-page searchable PDF and responsive HTML manual, Markdown source and a metric/control coverage manifest. Top navigation and the report heading link to `/manual/`. The guide covers 19 scored items, separate Structural/FAIR summaries, all 37 previous reference-table items, newer informational/interface features, 13 registered numerical settings, eight custom score cut-offs and native resource settings.
+
+The documentation matches the rendered input defaults/bounds/steps and implementation registry. All 427 table cells are found in the PDF, with no out-of-page text. Light/dark, mobile overflow and contents links pass. Cached/native routes serve identical document bytes and reject non-manual paths. The reference report's scientific JSON and form inputs are unchanged. Docker serves the same four files and renders an existing test matrix report with the manual link. These are documentation/targeted regression checks, not a new all-cohort recalculation or fresh-input numerical certification. No metric formula, default, threshold or R1 changes.
+
+The guide is bundled locally, including PDF/Markdown downloads, rather than depending on the public website to serve it in Docker. Earlier release evidence follows.
+
 # Walkthrough release — 8 November 2026
 
 `v2-live-20261108-r12` adds presentation-only search and report tours. The default one-time lifecycle, Back/Next/Skip, Escape, opt-out, replay, reload/new-study suppression, mobile/dark rendering, report iframe readiness and storage fallback passed 31 targeted browser checks. A complete ST000096 exported scientific state is identical to the prior 8782 baseline; completing the tour leaves scientific state and form inputs byte-identical. Only the shared page wrapper and new tour assets changed among the captured calculation/UI sources. No scientific formula, default, threshold or R1 changed.

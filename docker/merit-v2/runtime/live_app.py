@@ -25,7 +25,7 @@ import io
 import zipfile
 import tempfile
 from pathlib import Path
-from flask import Flask, Response, jsonify, request, send_file
+from flask import Flask, Response, jsonify, request, send_file, send_from_directory
 
 HOME=Path(__file__).resolve().parent
 WEB=HOME/'runs/web'
@@ -676,6 +676,16 @@ document.getElementById('status').textContent=all.filter(j=>j.state==='complete'
         job=jobs.explicit(sid,request.args.get('live_job_id')) if request.args.get('live_job_id') else jobs.get(sid)
         if not job:return jsonify(error='Assess this study first'),404
         return rendered(job,sid,'acquisition')
+    @app.get('/manual')
+    def manual_redirect():
+        return Response(status=308, headers={'Location':'/manual/'})
+    @app.get('/manual/')
+    @app.get('/manual/<path:name>')
+    def user_manual(name='index.html'):
+        allowed={'index.html','MERIT-ML_User_Manual.pdf','MERIT-ML_User_Manual.md','coverage_manifest.json'}
+        if name not in allowed:
+            return Response('Manual file not found',status=404,mimetype='text/plain')
+        return send_from_directory(HOME/'source_snapshot/merit-ui-v9-analysis-endpoint-pilot/v8_layout/static/manual',name,max_age=0)
     @app.get('/assets/logo.png')
     @app.get('/assets/merit-logo.svg')
     @app.get('/assets/merit-logo-dark.svg')

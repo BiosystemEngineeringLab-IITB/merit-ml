@@ -7,7 +7,7 @@ import io
 import re
 from pathlib import Path
 
-from flask import Flask, Response, request
+from flask import Flask, Response, request, send_from_directory
 
 from merit.visit_stats import get_public_visit_stats
 from merit.acquisition_context import CONTEXT_KEY
@@ -54,8 +54,24 @@ def _default_precomputed_root() -> str:
 app = Flask(__name__)
 
 
+@app.get("/manual")
+def manual_redirect():
+    return Response(status=308, headers={"Location": "/manual/"})
+
+
+@app.get("/manual/")
+@app.get("/manual/<path:name>")
+def user_manual(name="index.html"):
+    allowed = {"index.html", "MERIT-ML_User_Manual.pdf", "MERIT-ML_User_Manual.md", "coverage_manifest.json"}
+    if name not in allowed:
+        return Response("Manual file not found", status=404, mimetype="text/plain")
+    return send_from_directory(Path(__file__).resolve().parents[1] / "static/manual", name, max_age=0)
+
+
 @app.after_request
 def _persist_theme(response: Response) -> Response:
+    if request.path == "/manual" or request.path.startswith("/manual/"):
+        return response
     if response.mimetype != "text/html":
         return response
     page = response.get_data(as_text=True)

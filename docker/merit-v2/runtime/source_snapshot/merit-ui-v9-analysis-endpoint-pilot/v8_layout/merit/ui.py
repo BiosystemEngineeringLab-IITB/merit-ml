@@ -8861,6 +8861,8 @@ def _result_panel(
         f"<h2 style='margin:0;font-family:\"Iowan Old Style\",Georgia,serif;font-size:1.5rem'>"
         f"MERIT-ML Assessment Report — {_e(summary.get('study_id',''))}</h2>"
         "<a href='/' style='display:inline-block;margin:6px 0 12px;font-size:.8rem'>Search another study</a>"
+        "<a class='merit-manual-link' href='/manual/' target='_blank' rel='noopener noreferrer' "
+        "style='display:inline-block;margin:6px 0 12px 16px;font-size:.8rem;font-weight:600'>User manual</a>"
         f"</div>"
         f"<div class='report-header-actions' style='display:flex;flex-direction:column;gap:8px;align-items:flex-end'>"
         f"<img class='report-logo merit-logo merit-logo-light' src='{_e(_logo_asset_url())}' alt='MERIT-ML logo' style='width:160px;max-width:42vw;height:auto'/>"

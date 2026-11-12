@@ -1,6 +1,10 @@
 # MERIT-ML v2 · live Docker application
 
-**Release: 8 November 2026 — `v2-live-20261108-r12`.** MERIT-ML assesses public Metabolomics Workbench studies in your browser, using your own computer for the calculations. This Docker distribution contains Python, its dependencies, the interface and the metric implementations. Install Docker once; no separate Python installation is needed.
+[User manual (HTML)](https://merit-ml.in/live/manual/) · [Download the manual (PDF)](https://merit-ml.in/live/manual/MERIT-ML_User_Manual.pdf)
+
+The 12 November 2026 manual covers every metric, all 13 numerical settings, eight custom alert cut-offs, class/sample/subject edits, downloads, tours and resource messages. The same guide is bundled in this application at `/manual/`, with Markdown and coverage metadata, so it can be read locally.
+
+**Release: 8 November 2026 — `v2-live-20261112-r13`.** MERIT-ML assesses public Metabolomics Workbench studies in your browser, using your own computer for the calculations. This Docker distribution contains Python, its dependencies, the interface and the metric implementations. Install Docker once; no separate Python installation is needed.
 
 **Guided walkthroughs:** The search page and the first generated report each have a Next/Back tour. Skip or close at any time, or choose “Don’t show tours automatically”. Completion and opt-out are saved in browser storage for that site; subsequent studies and report updates do not restart the tours. “Take a tour” replays them. These preferences are separate for different browsers/origins (including a newly allocated Docker port), and clearing site data resets them. The walkthrough changes no scientific input or result.
 
@@ -15,14 +19,14 @@ Enter a study ID such as `ST000001`. The application retrieves the study's input
 With Docker running, use:
 
 ```sh
-docker run -d --name merit-v2 --init -p 127.0.0.1::8791 -v merit-v2-studies:/app/runs ghcr.io/biosystemengineeringlab-iitb/merit-ml:v2-live-20261108-r12
+docker run -d --name merit-v2 --init -p 127.0.0.1::8791 -v merit-v2-studies:/app/runs ghcr.io/biosystemengineeringlab-iitb/merit-ml:v2-live-20261112-r13
 docker port merit-v2 8791/tcp
 ```
 
 **Linux permissions:** If Docker reports “permission denied”, add `sudo` before each Docker command:
 
 ```sh
-sudo docker run -d --name merit-v2 --init -p 127.0.0.1::8791 -v merit-v2-studies:/app/runs ghcr.io/biosystemengineeringlab-iitb/merit-ml:v2-live-20261108-r12
+sudo docker run -d --name merit-v2 --init -p 127.0.0.1::8791 -v merit-v2-studies:/app/runs ghcr.io/biosystemengineeringlab-iitb/merit-ml:v2-live-20261112-r13
 sudo docker port merit-v2 8791/tcp
 ```
 
@@ -45,7 +49,7 @@ If you have an AMD64 image archive exported from this release, no dependency bui
 
 ```sh
 docker load -i merit-v2-image.tar.gz
-docker run -d --name merit-v2 --init -p 127.0.0.1::8791 -v merit-v2-studies:/app/runs merit-ml:v2-live-20261108-r12
+docker run -d --name merit-v2 --init -p 127.0.0.1::8791 -v merit-v2-studies:/app/runs merit-ml:v2-live-20261112-r13
 docker port merit-v2 8791/tcp
 ```
 
