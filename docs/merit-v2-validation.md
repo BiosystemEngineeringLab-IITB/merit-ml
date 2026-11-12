@@ -1,3 +1,7 @@
+# Browser architecture documentation — 12 November 2026
+
+Added a source-checked technical manual chapter describing direct public API retrieval, Pyodide/WebAssembly execution in a worker, local IndexedDB/virtual filesystem storage, report bridging, setting dependencies, per-matrix limits and recovery, and the exact distinction between in-page checkpoint recovery and closing/reloading the tab. Reference assets are distinguished from newly fetched study responses. All existing metric/control tables and calculations are unchanged. The manuscript-ready architecture is also supplied as docs/web-architecture.md. Documentation checks and final publication evidence are retained separately.
+
 # Reader-focused manual — 12 November 2026
 
 This documentation-only revision removes internal development versions, historical-cache discussion, local server addresses, release/build instructions and source-file paths from the user guide and its downloadable index. The guide starts from entering a public study ID. Actual interface labels, all metric definitions, 13 numerical controls, eight custom cut-offs and computing-limit guidance remain. Public metadata contains only reader-facing metric names, settings and chapter links; the full source audit is kept separately.

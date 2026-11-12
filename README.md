@@ -4,7 +4,7 @@
 
 The 12 November 2026 manual covers every metric, all 13 numerical settings, eight custom alert cut-offs, class/sample/subject edits, downloads, tours and resource messages. The same guide is bundled in this application at `/manual/`, with Markdown and a metrics/settings index, so it can be read locally.
 
-**Release: 8 November 2026 — `v2-live-20261112-r14`.** MERIT-ML assesses public Metabolomics Workbench studies in your browser, using your own computer for the calculations. This Docker distribution contains Python, its dependencies, the interface and the metric implementations. Install Docker once; no separate Python installation is needed.
+**Release: 8 November 2026 — `v2-live-20261112-r15`.** MERIT-ML assesses public Metabolomics Workbench studies in your browser, using your own computer for the calculations. This Docker distribution contains Python, its dependencies, the interface and the metric implementations. Install Docker once; no separate Python installation is needed.
 
 **Guided walkthroughs:** The search page and the first generated report each have a Next/Back tour. Skip or close at any time, or choose “Don’t show tours automatically”. Completion and opt-out are saved in browser storage for that site; subsequent studies and report updates do not restart the tours. “Take a tour” replays them. These preferences are separate for different browsers/origins (including a newly allocated Docker port), and clearing site data resets them. The walkthrough changes no scientific input or result.
 
@@ -19,14 +19,14 @@ Enter a study ID such as `ST000001`. The application retrieves the study's input
 With Docker running, use:
 
 ```sh
-docker run -d --name merit-v2 --init -p 127.0.0.1::8791 -v merit-v2-studies:/app/runs ghcr.io/biosystemengineeringlab-iitb/merit-ml:v2-live-20261112-r14
+docker run -d --name merit-v2 --init -p 127.0.0.1::8791 -v merit-v2-studies:/app/runs ghcr.io/biosystemengineeringlab-iitb/merit-ml:v2-live-20261112-r15
 docker port merit-v2 8791/tcp
 ```
 
 **Linux permissions:** If Docker reports “permission denied”, add `sudo` before each Docker command:
 
 ```sh
-sudo docker run -d --name merit-v2 --init -p 127.0.0.1::8791 -v merit-v2-studies:/app/runs ghcr.io/biosystemengineeringlab-iitb/merit-ml:v2-live-20261112-r14
+sudo docker run -d --name merit-v2 --init -p 127.0.0.1::8791 -v merit-v2-studies:/app/runs ghcr.io/biosystemengineeringlab-iitb/merit-ml:v2-live-20261112-r15
 sudo docker port merit-v2 8791/tcp
 ```
 
@@ -49,7 +49,7 @@ If you have an AMD64 image archive exported from this release, no dependency bui
 
 ```sh
 docker load -i merit-v2-image.tar.gz
-docker run -d --name merit-v2 --init -p 127.0.0.1::8791 -v merit-v2-studies:/app/runs merit-ml:v2-live-20261112-r14
+docker run -d --name merit-v2 --init -p 127.0.0.1::8791 -v merit-v2-studies:/app/runs merit-ml:v2-live-20261112-r15
 docker port merit-v2 8791/tcp
 ```
 
@@ -89,3 +89,5 @@ The source capture is [docker/merit-v2/runtime](docker/merit-v2/runtime); [runti
 No credentials, private keys, deployment configuration or cohort caches belong in the image or source bundle. Commits use the maintainer's existing Git identity, without agent co-author trailers. Existing repository history is preserved.
 
 The start page provides study-ID search, recently released Workbench studies, About, Publication and GitHub links, and a light/dark theme. Bulk assessment on the landing page accepts typed or pasted study IDs, removes duplicates, and checks availability before running. Available IDs are green, invalid/unavailable IDs red, confirmed embargoes amber and unverified IDs gray. The browser edition displays a disabled bulk area linking to Docker. `/workspace` redirects to this landing page. Reports open at the assessment heading; metric definitions and calculations are unchanged.
+
+Technical implementation: [How the web tool works](https://merit-ml.in/live/manual/#22-how-the-web-tool-works), including live retrieval, browser-side Python execution, local storage and per-matrix recovery.
