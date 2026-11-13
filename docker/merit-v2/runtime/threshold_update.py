@@ -270,8 +270,11 @@ def _restore(root=ROOT):
 def status(ident,root=ROOT):
     p=jobpath(ident,root);s=read(p/'status.json')
     if s['state'] in ('running','starting'):
-        try:os.kill(s.get('pid') or -999999,0)
-        except ProcessLookupError:s=update_status(p,state='interrupted',message='Calculation process stopped; resume from completed studies')
+        try:
+            pid=s.get('pid') or -999999;os.kill(pid,0)
+            args=(Path('/proc')/str(pid)/'cmdline').read_bytes().decode(errors='replace').split('\0')
+            if ident not in args or not any(Path(a).name=='threshold_update.py' for a in args):raise ProcessLookupError()
+        except (ProcessLookupError,FileNotFoundError):s=update_status(p,state='interrupted',message='Calculation process stopped; resume from completed studies')
         progress=p/'work'/str(s.get('current_study') or '')/'threshold_progress.json'
         if progress.exists():s['current_check']=read(progress)
     if (p/'candidate.json').exists():

@@ -4,7 +4,7 @@ import tarfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 out=ROOT/'release-artifacts';out.mkdir(exist_ok=True)
-archive=out/'merit-v2-docker-2026-11-13-r16-source.tar.gz'
+archive=out/'merit-v2-docker-2026-11-13-r17-source.tar.gz'
 allowed=['README.md','.gitignore','.gitattributes','LICENSE','SECURITY.md','CODE_OF_CONDUCT.md','.dockerignore','compose.merit-v2.yml',
          'docker/merit-v2','scripts/sync_merit_v2_runtime.py','scripts/package_merit_v2.py','scripts/test_merit_v2.py','scripts/test_merit_v2_edits.py','scripts/test_merit_v2_disease.py','scripts/test_user_manual.py',
          '.github/workflows/merit-v2-docker.yml','docs/web-architecture.md','docs/merit-v2-validation.md','docs/legacy-v7-readme.md']
@@ -20,7 +20,7 @@ with tarfile.open(archive,'w:gz') as tar:
    if not p.is_file() or any(x in ('runs','__pycache__','.git') for x in rel.parts) or p.suffix=='.pyc':continue
    if p.name in ('credentials.env','config.env','cloudfare') or p.is_symlink():raise ValueError('Forbidden asset: '+str(rel))
    assert_safe([p],root=Path('/home/shayantan/metabolomics/ML-ready'))
-   tar.add(p,arcname='merit-v2-docker-2026-11-13-r16/'+str(rel),recursive=False)
+   tar.add(p,arcname='merit-v2-docker-2026-11-13-r17/'+str(rel),recursive=False)
 digest=hashlib.sha256(archive.read_bytes()).hexdigest()
 archive.with_suffix(archive.suffix+'.sha256').write_text(digest+'  '+archive.name+'\n')
 print(archive,archive.stat().st_size,'bytes',digest)

@@ -101,5 +101,10 @@ class ReferenceTests(unittest.TestCase):
             self.assertTrue(t.work_in_use(scratch));t.stop_owned_work(scratch);self.assertLess(proc.wait(timeout=5),0)
         finally:
             if proc.poll() is None:proc.kill();proc.wait()
+    def test_reused_pid_does_not_block_resume(self):
+        import os
+        ident=t.prepare('2020-01-01','2020-01-02','selected_range',self.root)
+        t.update_status(t.jobpath(ident,self.root),state='running',pid=os.getpid())
+        self.assertEqual(t.status(ident,self.root)['state'],'interrupted')
 
 if __name__=='__main__':unittest.main(verbosity=2)
