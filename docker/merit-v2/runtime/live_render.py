@@ -183,6 +183,10 @@ def respond(payload):
     key=str(run.resolve())
     if key not in _SETUP:_SETUP[key]=setup(run)
     ui,pilot,live,out=_SETUP[key]
+    from merit import readiness_v9 as rd
+    from threshold_update import baseline,validate_reference
+    reference=validate_reference(payload.get('alert_reference') or baseline())
+    rd.reference=lambda: reference
     if payload.get('action')=='warm':
         return {'ok':True,'mime':'text/plain','filename':None,'data_b64':'','isolation':{'denied_attempts':oa.DENIED,'files_read':[]}}
     form=dict(payload.get('form') or {})
@@ -246,6 +250,8 @@ if(window.__MERIT_STATE_JSON)window.__MERIT_STATE_JSON.online_assessment={job_id
             result=result.replace('</body>',_THEME_HTML+'</body>',1)
         from live_progress import enhance_page
         result=enhance_page(result,sid)
+        from threshold_ui import report_note
+        result=report_note(result,reference)
         data=result.encode();mime='text/html';filename=None
     elif action=='feature-list':
         metric=form.get('metric','')

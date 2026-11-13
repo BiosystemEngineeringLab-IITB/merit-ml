@@ -312,7 +312,11 @@ class Jobs:
         if job['state']!='complete':raise ValueError('Assessment has not completed')
         with self.lock: lock=self.render_locks.setdefault(job['id'],threading.Lock())
         retrieved=dt.datetime.fromtimestamp(job['fetched_at'],dt.timezone.utc).isoformat(timespec='seconds') if job.get('fetched_at') else None
-        payload={'run':job['run'],'study_id':sid,'job_id':job['id'],'action':action,'form':form or {},'retrieved_utc':retrieved}
+        from threshold_update import active
+        reference=active()
+        payload={'run':job['run'],'study_id':sid,'job_id':job['id'],'action':action,'form':form or {},'retrieved_utc':retrieved,
+                 'alert_reference':reference}
+        atomic(Path(job['run'])/'reference_in_force.json',reference)
         with lock,self.render_slots:
             with self.lock:self.busy.add(job['id'])
             try:
@@ -321,6 +325,10 @@ class Jobs:
                     from online_pull_common import context
                     _,_,runtime,_=context(job['online_pull_run_id'],sid)
                     env['MERIT_ONLINE_EXECUTION_ROOT']=str(HOME);env.pop('MERIT_EXISTING_PROJECT_ROOT',None)
+                if reference['reference_version']!='R1':
+                    # Apply an approved local reference through the current renderer,
+                    # including retained assessments; their numerical records are unchanged.
+                    runtime=HOME;env=ENV.copy()
                 value=None
                 try:
                     # Warm renderers run the current code only; retained cohort runs keep their own pinned renderer.
@@ -375,7 +383,10 @@ def create_app(jobs,catalog=None,inventory=None):
         return check['study_id']
     def home_html():
         home=HOME/'assets/landing.html'
-        if home.exists():return home.read_text().replace('__MERIT_MODE__','native').replace('__MERIT_APP_SCRIPT__','')
+        if home.exists():
+            from threshold_ui import entry
+            text=home.read_text().replace('__MERIT_MODE__','native').replace('__MERIT_APP_SCRIPT__','')
+            return text.replace('<nav class="nav" aria-label="Main navigation">','<nav class="nav" aria-label="Main navigation">'+entry())
         return '<!doctype html><html><head></head><body><h1>MERIT-ML</h1></body></html>'
     @app.errorhandler(Unavailable)
     def unavailable(exc):
@@ -657,7 +668,7 @@ document.getElementById('status').textContent=all.filter(j=>j.state==='complete'
                         'fetch':json.loads(mf.read_text()) if mf.exists() else {},
                         'materialization':json.loads((p/'materialization.json').read_text()) if (p/'materialization.json').exists() else [],
                         'source_snapshot':json.loads((runtime/'source_snapshot_manifest.json').read_text()),
-                        'reference':json.loads((runtime/'assets/alert_reference_R1.json').read_text()),
+                        'reference':__import__('threshold_update').active(),
                         'chemical_reference_policy':json.loads(policy.read_text()) if policy.exists() else {'policy':'fresh chemical reference'},
                         'deposition_dates':dates})
     @app.post('/download/feature-list')
@@ -705,6 +716,8 @@ document.getElementById('status').textContent=all.filter(j=>j.state==='complete'
         return jsonify(catalog.status() if catalog else {'studies':0,'refreshing':False,'error':'catalog not initialized'})
     @app.get('/api/visit-stats')
     def stats():return jsonify(ok=False,reason='Visit analytics are not collected in the isolated live pilot')
+    from threshold_update import install_routes
+    install_routes(app)
     return app
 
 

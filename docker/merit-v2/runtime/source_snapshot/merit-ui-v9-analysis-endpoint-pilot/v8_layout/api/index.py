@@ -43,7 +43,7 @@ def _default_precomputed_root() -> str:
     candidates = [
         os.path.join(os.getcwd(), "merit-cache-workbench-full-v8"),
         os.path.join(os.path.dirname(os.getcwd()), "merit-cache-workbench-full-v8"),
-        "/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/merit-cache-workbench-full-v8",
+        "/home/shayantan/metabolomics/ML-ready/merit-cache-workbench-full-v8",
     ]
     for candidate in candidates:
         if os.path.exists(candidate):
@@ -52,6 +52,40 @@ def _default_precomputed_root() -> str:
 
 
 app = Flask(__name__)
+
+# Local reference management is optional and separate from stored study metrics.
+# Public browser deployments expose only the disabled control in their static UI.
+_local_threshold_runtime = Path(__file__).resolve().parents[3] / "online-tool"
+if os.environ.get("VERCEL") != "1" and (_local_threshold_runtime / "threshold_update.py").is_file():
+    import sys as _threshold_sys
+    _threshold_sys.path.insert(0, str(_local_threshold_runtime))
+    import threshold_update as _threshold_update
+    from merit import readiness_v9 as _threshold_readiness
+    from flask import g as _threshold_g, has_request_context as _threshold_request_context
+    def _request_reference():
+        if _threshold_request_context() and hasattr(_threshold_g, "merit_reference"):
+            return _threshold_g.merit_reference
+        return _threshold_update.active()
+    _threshold_readiness.reference = _request_reference
+    _threshold_update.install_routes(app)
+
+    @app.before_request
+    def _freeze_request_reference():
+        if not request.path.startswith(("/api/thresholds", "/thresholds", "/manual", "/assets")):
+            _threshold_g.merit_reference = _threshold_update.active()
+
+    @app.after_request
+    def _local_threshold_note(response):
+        if request.path in ("/", "/workflow/run") and response.mimetype == "text/html":
+            from threshold_ui import report_note
+            response.set_data(report_note(response.get_data(as_text=True), _request_reference()))
+        return response
+
+    @app.errorhandler(ValueError)
+    def _threshold_validation_error(exc):
+        if request.path.startswith("/api/thresholds"):
+            return Response(json.dumps({"error": str(exc)}), status=400, mimetype="application/json")
+        return Response("The request could not be completed", status=400, mimetype="text/plain")
 
 
 @app.get("/manual")

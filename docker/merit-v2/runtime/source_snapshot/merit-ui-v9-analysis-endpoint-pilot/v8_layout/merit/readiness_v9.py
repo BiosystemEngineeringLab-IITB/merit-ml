@@ -113,7 +113,7 @@ def cutoff_sources(params: dict | None = None) -> dict:
 @lru_cache(maxsize=1)
 def reference() -> dict:
     """The frozen reference cut-offs (2.5th percentile of the reference cohort, default settings) and their sensitivity counts."""
-    root = Path(os.environ.get("MERIT_V9_CACHE_ROOT", "/home/shayantan/metabolomics/ML-ready/online-tool/source_snapshot/merit-cache-workbench-full-v9"))
+    root = Path(os.environ.get("MERIT_V9_CACHE_ROOT", "/home/shayantan/metabolomics/ML-ready/merit-cache-workbench-full-v9"))
     try:
         return (json.loads((root / "manifest.json").read_text())["sections"].get("readiness") or {})
     except (OSError, ValueError, KeyError):
@@ -227,7 +227,7 @@ def settings(params: dict | None, folds: int, deposited_labels: bool, class_defi
                                     for (k, t), v in custom(params).items()],
             "cutoffs_by_percentile": {p: v.get("cutoffs") for p, v in (ref.get("sensitivity") or {}).items()},
             "reference": {k: ref.get(k) for k in ("reference_version", "reference_cohort", "reference_matrices", "n_matrices_with_a_value",
-                                                  "reference_cohort_sha256", "created_at")},
+                                                  "reference_cohort_sha256", "created_at", "update_provenance")},
             "summary_format": SUMMARY_FORMAT}
 
 

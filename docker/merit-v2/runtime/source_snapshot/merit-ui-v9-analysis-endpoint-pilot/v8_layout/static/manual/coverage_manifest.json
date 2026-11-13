@@ -1,6 +1,6 @@
 {
   "title": "MERIT-ML metrics and settings",
-  "updated": "12 November 2026",
+  "updated": "13 November 2026",
   "metrics": [
     {
       "item": "Sample support",
@@ -68,39 +68,39 @@
       "guide_section": "7"
     },
     {
-      "item": "Missing entries and zeros †",
+      "item": "Missing entries and zeros \u2020",
       "type": "Scored; alert",
-      "guide_section": "8–10"
+      "guide_section": "8\u201310"
     },
     {
-      "item": "Low-information features †",
+      "item": "Low-information features \u2020",
       "type": "Scored; alert",
-      "guide_section": "8–10"
+      "guide_section": "8\u201310"
     },
     {
-      "item": "Redundant features †",
+      "item": "Redundant features \u2020",
       "type": "Scored; alert",
-      "guide_section": "8–10"
+      "guide_section": "8\u201310"
     },
     {
-      "item": "Outlier samples †",
+      "item": "Outlier samples \u2020",
       "type": "Scored; alert",
-      "guide_section": "8–10"
+      "guide_section": "8\u201310"
     },
     {
       "item": "Units declared",
       "type": "Scored (0/100)",
-      "guide_section": "8–10"
+      "guide_section": "8\u201310"
     },
     {
       "item": "Analytical review alerts",
       "type": "Readiness profile",
-      "guide_section": "8–10"
+      "guide_section": "8\u201310"
     },
     {
       "item": "Sample eligibility and controls",
       "type": "Informational",
-      "guide_section": "8–10"
+      "guide_section": "8\u201310"
     },
     {
       "item": "QC reproducibility",
@@ -110,32 +110,32 @@
     {
       "item": "Low-variation caution",
       "type": "Informational",
-      "guide_section": "8–10"
+      "guide_section": "8\u201310"
     },
     {
       "item": "Measurement scale",
       "type": "Informational",
-      "guide_section": "8–10"
+      "guide_section": "8\u201310"
     },
     {
       "item": "Acquisition, data summary and processing",
       "type": "Informational",
-      "guide_section": "8–10"
+      "guide_section": "8\u201310"
     },
     {
       "item": "Sample annotations (MetaBatch-style)",
       "type": "Informational",
-      "guide_section": "8–10"
+      "guide_section": "8\u201310"
     },
     {
       "item": "Additional sample data",
       "type": "Informational",
-      "guide_section": "8–10"
+      "guide_section": "8\u201310"
     },
     {
       "item": "Evidence behind the scored items",
       "type": "Informational",
-      "guide_section": "8–10"
+      "guide_section": "8\u201310"
     },
     {
       "item": "Named-feature coverage",
@@ -260,7 +260,7 @@
     {
       "item": "Local memory/time settings and automatic choice of address",
       "type": "Interface / informational",
-      "guide_section": "17.2–17.3"
+      "guide_section": "17.2\u201317.3"
     },
     {
       "item": "Browser per-matrix guards, downloads, checkpoints and omissions",
@@ -270,98 +270,103 @@
     {
       "item": "Unavailable / partial / metadata-only states and troubleshooting",
       "type": "Interface / informational",
-      "guide_section": "2, 3, 18–19"
+      "guide_section": "2, 3, 18\u201319"
+    },
+    {
+      "item": "Update thresholds: local reference calculation, approval and restoration",
+      "type": "Interface / optional local operation",
+      "guide_section": "23"
     }
   ],
   "settings": [
     {
       "setting": "Cross-validation folds k",
       "default": "5",
-      "allowed_range": "2–10",
+      "allowed_range": "2\u201310",
       "step": "1",
       "effect": "Class-count requirement and Class support fold term."
     },
     {
       "setting": "Structural: sample-support target N",
       "default": "20",
-      "allowed_range": "5–100",
+      "allowed_range": "5\u2013100",
       "step": "1",
       "effect": "Structural item and mean; not CV count support."
     },
     {
       "setting": "Low-information: frequency ratio R",
       "default": "19",
-      "allowed_range": "5–99",
+      "allowed_range": "5\u201399",
       "step": "1",
-      "effect": "Flag when ratio > R and distinct percentage ≤ U; also changes redundancy eligibility."
+      "effect": "Flag when ratio > R and distinct percentage \u2264 U; also changes redundancy eligibility."
     },
     {
       "setting": "Low-information: distinct-value percentage U",
       "default": "10",
-      "allowed_range": "1–25",
+      "allowed_range": "1\u201325",
       "step": "1",
-      "effect": "Flag when percentage ≤ U and ratio > R; also changes redundancy eligibility."
+      "effect": "Flag when percentage \u2264 U and ratio > R; also changes redundancy eligibility."
     },
     {
       "setting": "Low-variation caution: CV (%)",
       "default": "1",
-      "allowed_range": "0.1–5",
+      "allowed_range": "0.1\u20135",
       "step": "0.1",
       "effect": "Informational only; strictly below the threshold."
     },
     {
       "setting": "Redundancy: absolute correlation c",
       "default": "0.9",
-      "allowed_range": "0.8–0.99",
+      "allowed_range": "0.8\u20130.99",
       "step": "0.01",
-      "effect": "Evaluated pairs above c, with 1e−5 equality tolerance."
+      "effect": "Evaluated pairs above c, with 1e\u22125 equality tolerance."
     },
     {
       "setting": "QC reproducibility: RSD (%)",
       "default": "20",
-      "allowed_range": "10–40",
+      "allowed_range": "10\u201340",
       "step": "1",
       "effect": "Informational pass counts; detection must still be >70%."
     },
     {
       "setting": "Outliers: fence multiplier a",
       "default": "1.5",
-      "allowed_range": "1–3",
+      "allowed_range": "1\u20133",
       "step": "0.1",
-      "effect": "Sample medians outside Q1−a·IQR / Q3+a·IQR."
+      "effect": "Sample medians outside Q1\u2212a\u00b7IQR / Q3+a\u00b7IQR."
     },
     {
       "setting": "Extreme-alert percentile",
       "default": "2.5",
-      "allowed_range": "2.5–10",
+      "allowed_range": "2.5\u201310",
       "step": "2.5",
       "effect": "Choose 2.5, 5, 7.5 or 10 from R1."
     },
     {
       "setting": "Low-alert percentile",
       "default": "10",
-      "allowed_range": "2.5–10",
+      "allowed_range": "2.5\u201310",
       "step": "2.5",
       "effect": "Choose 2.5, 5, 7.5 or 10; effective value never below extreme."
     },
     {
       "setting": "Separability: neighbours K",
       "default": "7",
-      "allowed_range": "3–15",
+      "allowed_range": "3\u201315",
       "step": "1",
       "effect": "Neighbour count, not CV folds."
     },
     {
-      "setting": "Separability: overlap threshold θ",
+      "setting": "Separability: overlap threshold \u03b8",
       "default": "3",
-      "allowed_range": "0–7",
+      "allowed_range": "0\u20137",
       "step": "1",
       "effect": "Integer; effective maximum floor(K/2), although input maximum is 7."
     },
     {
       "setting": "Feature associations: FDR q",
       "default": "0.05",
-      "allowed_range": "0.01–0.2",
+      "allowed_range": "0.01\u20130.2",
       "step": "0.01",
       "effect": "Significance and paired-test minimum support."
     }
@@ -378,7 +383,7 @@
       "Low"
     ],
     "fields": 8,
-    "allowed_range": "0–100",
+    "allowed_range": "0\u2013100",
     "default": "Empty: use the selected reference percentile"
   }
 }

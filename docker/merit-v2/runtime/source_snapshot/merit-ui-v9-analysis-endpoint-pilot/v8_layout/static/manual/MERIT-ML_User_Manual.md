@@ -2,7 +2,7 @@
 
 **Evaluating ML readiness in tabular metabolomics datasets from Metabolomics Workbench**
 
-**Updated 12 November 2026.** Use this guide to assess a public Metabolomics Workbench study, understand its results and adjust the settings for your classification task.
+**Updated 13 November 2026.** Use this guide to assess a public Metabolomics Workbench study, understand its results and adjust the settings for your classification task.
 
 MERIT-ML means *Metabolomics Evaluation of Readiness and Interoperability of Tabular Data for Machine Learning*. Open [MERIT-ML](https://merit-ml.in/) to assess a public Metabolomics Workbench study, or use the [Docker application and source code](https://github.com/BiosystemEngineeringLab-IITB/merit-ml) on your own computer. MERIT-ML is independent of Metabolomics Workbench.
 
@@ -690,6 +690,7 @@ Use this checklist to find each metric and its supporting information. Some rows
 | Local memory/time settings and automatic choice of address | Interface / informational | 17.2–17.3 |
 | Browser per-matrix guards, downloads, checkpoints and omissions | Interface / informational | 18 |
 | Unavailable / partial / metadata-only states and troubleshooting | Interface / informational | 2, 3, 18–19 |
+| Update thresholds: optional local reference calculation, approval and restoration | Interface / optional local operation | 23 |
 
 ## 21. Getting help and keeping your results
 
@@ -780,3 +781,41 @@ Use these links for the complete metric definitions and operating instructions.
 - [19. Troubleshooting and practical interpretation](https://merit-ml.in/live/manual/#19-troubleshooting-and-practical-interpretation)
 - [20. Complete metric and evidence checklist](https://merit-ml.in/live/manual/#20-complete-metric-and-evidence-checklist)
 - [21. Getting help and keeping your results](https://merit-ml.in/live/manual/#21-getting-help-and-keeping-your-results)
+
+## 23. Update analytical alert thresholds
+
+**Optional; local Docker application only.** The prominent **Update thresholds** control opens an independent workflow for recalculating the comparison reference used by Missing entries and zeros, Low-information features, Redundant features and Outlier samples. In the browser edition it is blurred and disabled, with a link to Docker. Ordinary assessment does not require this operation. Original R1 remains the default until you approve another reference.
+
+### 23.1 Select public release dates
+
+Choose **From** and **Through** with the calendars. Both dates are included. Selection uses Workbench's public release date, rather than submission or revision date. The application retrieves the current public registry and release metadata, excludes future releases and studies not confirmed public, and lists missing or conflicting release dates separately. A fresh per-study analysis registry and summary are checked again during retrieval. A changed or unconfirmed release date excludes that study from calculation.
+
+Choose either **Original R1 plus selected studies** or **Selected date range only**. The first retains the original 11,749 derived score rows and adds newly retrieved matrix identities once; an existing study–analysis–endpoint does not replace or duplicate its original R1 row. The second builds its reference solely from valid matrices in the selected range. The original R1 comparison cohort is the 9 March 2026 cohort represented in the 18 September deposit. Its small score-only baseline contains identifiers and four derived values per matrix, without sample identifiers or measurement tables. It is used for extending the reference, never as the assessment of a newly requested study.
+
+After **Find public studies**, review the study count, analysis count and possible endpoints. Valid matrix counts cannot be known from the registry alone and become available after the tables are retrieved. Missing date information is not silently replaced by submission dates. Discovery can take several minutes when the repository responds slowly.
+
+### 23.2 Calculate and follow progress
+
+Click **Calculate thresholds**. One study is fetched and assessed at a time, using the same official endpoints and scientific functions as ordinary local assessment. Only the stages needed for the four analytical scores are run; class separability and annotation are not calculated for this operation. Calculations use the default analytical parameters and sample-eligibility rules, without your report's custom classes, fold setting, sample edits or alternative analytical cut-offs. The new reference must compare a consistent set of default scores.
+
+The progress bar shows completed studies, the current study/check, valid matrices and failures. Each completed study has a durable compact result. **Pause after current study** stops after that result has been saved; **Resume calculation**, or the saved-run selector after reopening the application, continues without repeating completed studies. A process or machine interruption is reported separately from successful completion. A long cohort can take hours or days; keep the local application running while it calculates. Only one reference calculation runs at a time.
+
+Raw responses, parsed matrices and large correlation/intermediate files occupy a temporary working directory for the current study. They are deleted after its compact result or failure has been saved. Retained records contain the four scores, matrix dimensions, study/analysis/endpoint identifiers, release dates, source URLs and response hashes/times, failures and reference provenance. They contain no retained measurement table. Disk space must still accommodate the largest study and its intermediate calculations temporarily. Saved reference history and compact provenance remain in the local application's data volume until you remove that data.
+
+### 23.3 Review the proposed reference
+
+The completed panel shows reference studies, analyses and matrices; counts by endpoint; the newly retrieved and original-baseline matrix counts; and each metric's assessable count, median and interquartile range. Compare the candidate's extreme and low cut-offs against original R1. The calculation uses the same linear-interpolation percentile rule as R1 and retains the 2.5th, 5th, 7.5th and 10th percentiles for all four checks. Missing or unassessable scores are omitted independently for each metric, rather than assigned zero. Ties at a cut-off do not raise an alert.
+
+Download the candidate, score/provenance records and cohort manifest before approval if you want an independent check. Each records the selected dates and cohort mode, retrieval/calculation period, source/code fingerprints, counts and failures. When discovery, dates or individual calculations leave incomplete coverage, the panel explains it and requires explicit acknowledgement before approval. If any metric has no assessable score, no usable reference can be created. A reference based on very few matrices can have unstable percentiles; inspect the reported counts before deciding to use it.
+
+### 23.4 Approve, apply or restore
+
+**Approve and activate these thresholds** is a separate step. Calculation by itself never changes an assessment's alert thresholds. Approval verifies the reviewed candidate's digest and reproduces its cut-offs from its retained score rows, then atomically stores the active reference and a dated history entry in your local data volume. Original R1 is not overwritten. The report displays the active reference identifier, cohort/date description and matrix count; structured assessment settings identify the reference and its update provenance.
+
+The approved reference supplies the percentile-based defaults to new reports and later recalculations, including Data at a glance. Reports open in another tab receive an update signal and refresh through the ordinary report form; if browser storage events are unavailable, use Apply or reopen the report. Existing explicit custom score cut-offs continue to take precedence. The percentile selectors still select among the four retained percentiles. Class definitions, sample counts, analytical scores and original measurement values do not change merely because a different reference is activated.
+
+Use **Restore original R1** to return the percentile-based defaults to the original reference. Saved candidates and approval history are retained. This operation affects your local application only: it does not change the public website or anyone else's installation. To reproduce a result, save the assessment JSON and the reference/provenance downloads. The [alert interpretation](https://merit-ml.in/live/manual/#15-r1-and-alert-interpretation), [numerical controls](https://merit-ml.in/live/manual/#14-all-numerical-controls), [downloads](https://merit-ml.in/live/manual/#16-downloads-and-provenance) and [Docker instructions](https://merit-ml.in/live/manual/#17-bulk-assessment-and-local-docker-use) remain applicable.
+
+### 23.5 Command-line use
+
+The same workflow is available as `threshold_update.py` in the Docker image. From a running container named `merit-v2`, use `docker exec merit-v2 python threshold_update.py prepare --start-date YYYY-MM-DD --end-date YYYY-MM-DD --mode extend_r1`. The output includes a reference run ID. Use that ID with `docker exec merit-v2 python threshold_update.py run --id RUN_ID` to calculate, or with `status --id RUN_ID` to inspect progress. Use `--mode selected_range` when preparing a reference from only the chosen dates. The graphical review/approval page remains the recommended way to activate the result. Command-line approval requires the exact candidate SHA-256 and, when coverage is incomplete, `--accept-partial`. `docker exec merit-v2 python threshold_update.py restore` restores original R1. On Linux installations that require it, prefix Docker commands with `sudo`.

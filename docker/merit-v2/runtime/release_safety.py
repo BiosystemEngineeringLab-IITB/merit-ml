@@ -17,7 +17,8 @@ RUNTIME_FILES=('live_disease.py','bulk_entry.py','online_assess.py','fetch_onlin
     'live_bulk.py','live_references.py','online_evidence.py','live_study_summary.py','live_progress.py',
     'online_pull_common.py','online_pull_dashboard.py','online_pull_capture.py','online_pull_cohort.py','online_pull_compare.py',
     'online_pull_progress.py','relocate_bundle.py','execution_state.py','native_resources.py','native_guard.py',
-    'metric_worker.py','matrix_worker.py','matrix_driver.py','v2_server.py','release_safety.py','versioned_context.py')
+    'metric_worker.py','matrix_worker.py','matrix_driver.py','v2_server.py','release_safety.py','versioned_context.py',
+    'threshold_update.py','threshold_worker.py','threshold_ui.py','threshold_tests.py')
 
 
 def inspect_blob(name,raw,secret_values=()):

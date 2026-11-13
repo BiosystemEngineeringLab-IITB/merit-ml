@@ -52,7 +52,7 @@ def main():
             assert not re.search(pattern, text, re.I), (name, pattern)
     index = json.loads((MANUAL / 'coverage_manifest.json').read_text())
     assert set(index) == {'title', 'updated', 'metrics', 'settings', 'custom_alert_cutoffs'}
-    assert len(index['metrics']) == 54
+    assert len(index['metrics']) == 55
     assert sum(x['type'].startswith('Scored') for x in index['metrics']) == 19
     assert index['custom_alert_cutoffs']['fields'] == 8
     actual = {}
